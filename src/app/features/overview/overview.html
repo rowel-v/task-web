@@ -81,7 +81,7 @@
             @if (todaysTasks().length !== 0) {
               <button
                 class="btn btn-sm bg-app-button-purple hover:bg-app-button-hover-gray border-none"
-                (click)="openCreateTodoFormDialog()"
+                (click)="openModal.set('create-todo-dialog')"
               >
                 <svg lucidePlus />
                 <span class="hidden sm:inline">Add Todo</span>
@@ -94,7 +94,7 @@
             @for (todo of displayedTodaysTasks(); track todo.id) {
               <div
                 class="group flex items-center hover:bg-app-button-hover-gray text-app-text-white gap-4 rounded-sm p-4 transition cursor-pointer"
-                (click)="selectedTodo.set(todo); openTodoDetail()"
+                (click)="openModal.set('todo-details-dialog'); selectedTodo.set(todo)"
               >
                 <!-- Task information -->
                 <div class="min-w-0 flex-1">
@@ -142,10 +142,6 @@
                     <svg lucidePlus />
                     <span class="hidden sm:inline">Add Todo</span>
                   </button>
-
-                  @if (openModal() === 'create-todo-dialog') {
-                    <app-create-task-dialog (cancelled)="openModal.set(null)"/>
-                  }
                 </div>
               </div>
             }
@@ -241,7 +237,7 @@
               @for (upcomingTodo of upcomingTodos(); track upcomingTodo.id) {
                 <tr
                   class="group transition hover:bg-app-button-hover-gray hover:rounded-2xl cursor-pointer"
-                  (click)="selectedTodo.set(upcomingTodo); openTodoDetail()"
+                  (click)="openModal.set('todo-details-dialog'); selectedTodo.set(upcomingTodo)"
                 >
                   <td class="rounded-l-md">
                     <div class="font-medium">{{ upcomingTodo.name }}</div>
@@ -282,3 +278,11 @@
     </div>
   </div>
 </div>
+
+@if (openModal() === 'create-todo-dialog') {
+  <app-create-task-dialog [isClosing]="isClosing()" (cancelled)="closeModal()" />
+}
+
+@if (openModal() === 'todo-details-dialog' && selectedTodo(); as todo) {
+  <app-task-details-dialog [todo]="todo" [isClosing]="isClosing()" (closed)="closeModal()" />
+}

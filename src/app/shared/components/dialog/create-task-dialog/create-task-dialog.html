@@ -5,6 +5,8 @@
   <!--Modal-->
   <div
     class="flex flex-col px-6 pt-6 bg-app-background-white text-app-text-green w-full max-w-md h-100 rounded-md"
+    [class.scale-in-center]="!isClosing()"
+    [class.scale-out-center]="isClosing()"
     (click)="$event.stopPropagation()"
   >
     <!--Modal header-->
@@ -26,14 +28,18 @@
       <input type="text" placeholder="Task name" class="border-b me-2 h-7 text-lg outline-none" />
 
       <!--Task Description-->
-      <input type="text" placeholder="Description" class="border-b me-2 h-7 text-lg outline-none" />
+      <input
+        type="text"
+        placeholder="Description (optional)"
+        class="border-b me-2 h-7 text-lg outline-none"
+      />
 
       <!--Task Priority-->
       <div class="flex items-center justify-start gap-3 text-[17px]">
         <span>Priority</span>
 
         <label class="flex items-center text-sm gap-1">
-          <input type="radio" name="priority" value="low" />
+          <input type="radio" name="priority" value="low" checked />
           Low
         </label>
 
@@ -66,13 +72,12 @@
     <!--Modal Footer-->
     <div class="flex justify-end gap-3 mt-auto pb-5">
       <button
-        class="btn btn-ghost gap-1.5 hover:bg-app-background-hover"
+        class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
         (click)="cancelled.emit()"
       >
         Cancel
       </button>
-      <button class="btn btn-accent hover:bg-app-background-hover"
-      >Save</button>
+      <button class="btn btn-accent hover:bg-app-background-hover">Save</button>
     </div>
   </div>
 </div>

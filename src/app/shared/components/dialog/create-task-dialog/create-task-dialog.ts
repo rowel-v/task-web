@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Todo, TodoPriority, TodoStatus } from '../../../models/todo';
 import { LucideX } from '@lucide/angular';
@@ -13,7 +13,7 @@ export class CreateTaskDialog {
 
   submitted = output<Todo>();
   cancelled = output<void>();
-  
+  isClosing = input.required<boolean>();
   todoForm = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,

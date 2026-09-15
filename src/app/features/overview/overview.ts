@@ -1,11 +1,8 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import { TodoService } from '../../core/services/todo-service';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateTodoForm } from '../tasks/create-todo-form/create-todo-form';
 import { RouterLink } from '@angular/router';
 import { Todo } from '../../shared/models/todo';
-import { TodoDetail } from '../tasks/todo-detail/todo-detail';
 import { formatDateTime } from '../../shared/utils/date-utils';
 import { TotalTasksDetailsModal } from './total-tasks-details-modal/total-tasks-details-modal';
 import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
@@ -14,15 +11,15 @@ import { InprogressTasksDetailsModal } from './inprogress-tasks-details-modal/in
 import { CompletedTasksDetailsModal } from './completed-tasks-details-modal/completed-tasks-details-modal';
 import { LucideArrowRight, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from './tasks-status-badge/tasks-status-badge';
-import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog'
+import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 
 type TodosDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
-type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | null;
+type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-dialog' | null;
 
 @Component({
   selector: 'app-overview',
   imports: [
-    MatIconModule,
     RouterLink,
     TotalTasksDetailsModal,
     TasksStatusCard,
@@ -32,7 +29,8 @@ type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | null;
     LucidePlus,
     TasksStatusBadge,
     LucideArrowRight,
-    CreateTaskDialog
+    CreateTaskDialog,
+    TaskDetailsDialog,
   ],
   templateUrl: './overview.html',
   styles: ``,
@@ -42,7 +40,6 @@ export class Overview {
   protected readonly todos: Signal<Todo[]> = this.todoService.todos;
   protected selectedTodo = signal<Todo | null>(null);
   protected readonly formatDateTime: (d: Date) => string = formatDateTime;
-  private readonly todoFormDialog = inject(MatDialog);
   protected modalTodosDetails: TodosDetailsFlag = null;
   protected todosDetailsFlag = signal<TodosDetailsFlag>(null);
   protected isClosing = signal(false);
@@ -50,6 +47,17 @@ export class Overview {
   protected displayedTodaysTasks = computed(() => this.todoService.todaysTasks().slice(0, 5));
 
   protected openModal = signal<ModalSelection>(null);
+
+  protected closeModal() {
+    if (this.isClosing()) {
+      return;
+    }
+    this.isClosing.set(true);
+    setTimeout(() => {
+      this.openModal.set(null);
+      this.isClosing.set(false);
+    }, 300);
+  }
 
   protected openModalTodosDetailsFlag(currentTodosDetailsSelected: TodosDetailsFlag) {
     this.todosDetailsFlag.set(currentTodosDetailsSelected);
@@ -65,38 +73,7 @@ export class Overview {
       this.isClosing.set(false);
     }, 200);
   }
-  protected openCreateTodoFormDialog() {
-    const dialogRef = this.todoFormDialog.open(CreateTodoForm, {
-      width: '600px',
-      height: '90vh',
-    });
-
-    dialogRef.componentInstance.submitted.subscribe((todo) => {
-      this.todoService.addTodo(todo);
-      dialogRef.close();
-    });
-
-    dialogRef.componentInstance.cancelled.subscribe(() => {
-      dialogRef.close();
-    });
-  }
-
-  protected openTodoDetail() {
-    const dialogRef = this.todoFormDialog.open(TodoDetail, {
-      width: '500px',
-      data: this.selectedTodo,
-    });
-
-    dialogRef.componentInstance.updatedStatus.subscribe(({ todoToUpdate, updatedStatus }) => {
-      this.todoService.updateStatus(todoToUpdate, updatedStatus);
-      dialogRef.close();
-    });
-
-    dialogRef.componentInstance.closed.subscribe(() => {
-      dialogRef.close();
-    });
-  }
-
+  
   protected totalTasks(): number {
     return this.todoService.totalTasks();
   }

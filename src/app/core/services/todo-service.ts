@@ -26,7 +26,7 @@ export class TodoService {
       description: 'Call the dental clinic and schedule a cleaning appointment.',
       priority: 'low',
       status: 'pending',
-      duedate: new Date('2026-09-15T09:00:00Z'),
+      duedate: new Date('2026-09-16T09:00:00Z'),
       createdAt: new Date('2026-08-30T19:00:00Z'),
       updatedAt: new Date('2026-08-30T19:00:00Z'),
     },

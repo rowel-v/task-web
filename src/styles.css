@@ -140,6 +140,28 @@
   }
 }
 
+@keyframes scale-in-center {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out-center {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .wobble-hor-bottom {
   animation: wobble-hor-bottom 4s infinite both;
 }
@@ -172,12 +194,21 @@
   animation: scale-out-tr 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
 }
 
-/* use in circle progress */
+/* used in circle progress */
 .hover-shadow-drop-center:hover {
   animation: shadow-drop-center 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
-/* use in sidebar title */
+/* used in sidebar title */
 .wobble-hor-bottom {
   animation: wobble-hor-bottom 4s infinite both;
+}
+
+/* used in create task dialog   */
+.scale-in-center {
+	animation: scale-in-center 0.3s cubic-bezier(0.445, 0.050, 0.550, 0.950) both;
+}
+
+.scale-out-center {
+	animation: scale-out-center 0.3s cubic-bezier(0.445, 0.050, 0.550, 0.950) reverse both;
 }
