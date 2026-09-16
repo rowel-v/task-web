@@ -38,7 +38,7 @@ export class Tasks {
     const term = this.searchService.searchTerm().toLowerCase().trim();
     console.log(term);
 
-    let filtered: Todo[];
+    let filtered: Todo[] = [];
     switch (this.selectedTab()) {
       case 'all':
         filtered = this.todos();
@@ -78,26 +78,41 @@ export class Tasks {
   }
 
   protected emptyState = computed(() => {
+    const term = this.searchService.searchTerm().trim();
+    const hasResults = this.todosToDisplay().length > 0;
+
+    if (term && !hasResults) {
+      return {
+        message: `No task found for "${term}".`,
+        image: 'images/stick-man-empty-task-search.png',
+        imageWidth: 'w-96',
+      };
+    }
+
     switch (this.selectedTab()) {
       case 'all':
         return {
-          message: '"No pending tasks. You\'re all caught up!"',
+          message: "You don't have any tasks yet.",
           image: 'images/stick-man-empty-all-tasks.png',
+          imageWidth: 'w-35',
         };
       case 'pending':
         return {
-          message: '"No pending tasks. You\'re all caught up!"',
+          message: "No pending tasks. You're all caught up!",
           image: 'images/stick-man-empty-pending-tasks.png',
+          imageWidth: 'w-35',
         };
       case 'in_progress':
         return {
-          message: '"Nothing in progress right now."',
+          message: 'Nothing in progress right now.',
           image: 'images/stick-man-empty-in-progress-tasks.png',
+          imageWidth: 'w-30',
         };
       case 'completed':
         return {
-          message: '"No completed tasks yet."',
+          message: 'No completed tasks yet.',
           image: 'images/stick-man-empty-completed-tasks.png',
+          imageWidth: 'w-35',
         };
     }
   });

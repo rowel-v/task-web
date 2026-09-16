@@ -42,8 +42,15 @@
         </div>
       </div>
     } @empty {
-      <div class="flex flex-col items-center justify-center h-screen">
-        <img [src]="emptyState().image" alt="sd" class="w-35" />
+      <div class="bg flex flex-col items-center justify-center h-screen overflow-hidden">
+        <img
+          [src]="emptyState().image"
+          alt="Empty state"
+          width="400"
+          height="400"
+          class="object-contain max-w-full max-h-full"
+          [class]="emptyState().imageWidth"
+        />
         <p class="text-[18px] italic font-extralight">{{ emptyState().message }}</p>
       </div>
     }
