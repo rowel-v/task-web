@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { LucideX } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
+import { Todo } from '../../../models/todo';
 
 @Component({
   selector: 'app-task-details-dialog',
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styles: ``,
 })
 export class TaskDetailsDialog {
-  closed = output<void>();
+  todo = input.required<Todo>();
   isClosing = input.required<boolean>();
-  todo = input.required<import('../../../models/todo').Todo>(); // adjust import path
+  closed = output<void>();
 }

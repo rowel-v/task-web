@@ -115,21 +115,21 @@
                 <!-- Status -->
                 @switch (todo.status) {
                   @case ('pending') {
-                    <app-tasks-status-badge status="Pending" />
+                    <app-tasks-status-badge status="pending" />
                   }
 
                   @case ('in_progress') {
-                    <app-tasks-status-badge status="In Progress" />
+                    <app-tasks-status-badge status="in_progress" />
                   }
 
                   @case ('completed') {
-                    <app-tasks-status-badge status="Completed" />
+                    <app-tasks-status-badge status="completed" />
                   }
                 }
               </div>
             } @empty {
               <div class="flex items-center justify-center py-12">
-                <img src="images/stick-man-thumbs-up.png" alt="No Tasks" />
+                <img src="images/stick-man-empty-today-tasks.png" alt="No Tasks" />
 
                 <div class="flex flex-col">
                   <p class="text-md italic">You don't have any tasks</p>
@@ -259,13 +259,13 @@
                   <td class="rounded-r-md">
                     @switch (upcomingTodo.status) {
                       @case ('pending') {
-                        <app-tasks-status-badge status="Pending" />
+                        <app-tasks-status-badge status="pending" />
                       }
                       @case ('in_progress') {
-                        <app-tasks-status-badge status="In Progress" />
+                        <app-tasks-status-badge status="in_progress" />
                       }
                       @case ('completed') {
-                        <app-tasks-status-badge status="Completed" />
+                        <app-tasks-status-badge status="completed" />
                       }
                     }
                   </td>

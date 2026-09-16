@@ -1,117 +1,55 @@
-<div class="mx-auto w-full h-full flex flex-col">
-  <div class="flex flex-col shrink-0">
-    <div>
-      <div class="flex flex-row items-center justify-between">
-        <!-- Filters -->
-        <mat-card class="mb-5">
-          <mat-card-content>
-            <mat-button-toggle-group value="all">
-              <mat-button-toggle value="all" (click)="changeCurrentFilterSelected('all')">
-                All
-              </mat-button-toggle>
-
-              <mat-button-toggle value="pending" (click)="changeCurrentFilterSelected('pending')">
-                Pending
-              </mat-button-toggle>
-
-              <mat-button-toggle
-                value="in_progress"
-                (click)="changeCurrentFilterSelected('in_progress')"
-              >
-                In Progress
-              </mat-button-toggle>
-
-              <mat-button-toggle
-                value="completed"
-                (click)="changeCurrentFilterSelected('completed')"
-              >
-                Completed
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-          </mat-card-content>
-        </mat-card>
-        <button
-          (click)="openCreateTodoFormDialog()"
-          mat-raised-button
-          color="primary"
-          class="mb-6 me-8"
-        >
-          <mat-icon>add</mat-icon>
-          Add Todo
-        </button>
-      </div>
-    </div>
+<div class="mx-auto w-full h-full flex flex-col text-app-text-white">
+  <!--All-->
+  <div class="tabs tabs-border gap-1 mb-3">
+    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('all')">
+      <input type="radio" name="my_tabs_4" checked="checked" />
+      <svg lucideClipboardList />
+      All
+    </label>
+    <!--Pending-->
+    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('pending')">
+      <input type="radio" name="my_tabs_4" />
+      <svg lucideClock5 />
+      Pending
+    </label>
+    <!--In progress-->
+    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('in_progress')">
+      <input type="radio" name="my_tabs_4" />
+      <svg lucideCircleEllipsis />
+      In Progress
+    </label>
+    <!--Completed-->
+    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('completed')">
+      <input type="radio" name="my_tabs_4" />
+      <svg lucideCircleCheck />
+      Completed
+    </label>
   </div>
 
-  <!-- Tasks -->
-  <div class="flex flex-col gap-3 overflow-y-auto">
-    <mat-card>
-      <mat-card-content>  
-        @for (todo of todos(); track todo.id) {
-          @if (todo.status === currentFilterSelected() || currentFilterSelected() === 'all') {
-            <!-- 1. Moved matRipple and (click) here. Added relative, overflow-hidden, cursor-pointer, and padding -->
-            <div
-              class="flex items-center gap-4 p-3 rounded-lg relative overflow-hidden cursor-pointer hover:bg-blue-100 transition-colors"
-              matRipple
-              (click)="selectedTodo = todo; openTodoDetail()"
-            >
-              <!-- Removed mb-7 to balance the padding we added to the parent -->
-              <div class="flex-1 py-2">
-                <!-- Inside your row -->
-                <h3
-                  class="text-lg font-semibold transition-all"
-                  [ngClass]="
-                    todo.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900'
-                  "
-                >
-                  {{ todo.name }}
-                </h3>
-                <p class="mt-1 text-sm text-gray-500">{{ todo.description }}</p>
-
-                <div class="mt-3 flex items-center gap-3">
-                  <mat-chip
-                    [ngClass]="{
-                      'bg-green-100! text-green-700!': todo.status === 'completed',
-                      'bg-blue-100! text-blue-700!': todo.status === 'in_progress',
-                      'bg-gray-100! text-gray-700!': todo.status === 'pending',
-                      'opacity-50': todo.status === 'completed',
-                    }"
-                  >
-                    {{ todo.status }}
-                  </mat-chip>
-                  <span class="text-sm text-gray-500">
-                    Due: {{ formatDateTime(todo.duedate) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- 3. Added $event.stopPropagation() so clicking the menu doesn't open the dialog -->
-              <button
-                mat-icon-button
-                [matMenuTriggerFor]="menu"
-                (click)="$event.stopPropagation(); selectedTodo = todo"
-              >
-                <mat-icon>more_vert</mat-icon>
-              </button>
-            </div>
-          }
-        } @empty {
-          <app-empty-todos (createTodo)="openCreateTodoFormDialog()"></app-empty-todos>
-        }
-      </mat-card-content>
-    </mat-card>
+  <div class="flex flex-col overflow-y-auto">
+    @for (todo of todosToDisplay(); track todo.id) {
+      <div
+        class="flex items-center cursor-pointer hover:bg-app-button-hover-gray p-4 rounded-md"
+        (click)="selectedModal.set('todo-details-dialog'); selectedTodo.set(todo)"
+      >
+        <div class="flex flex-col">
+          <p class="text-[18px] font-medium">{{ todo.name | titlecase }}</p>
+          <p class="mt-2 italic">{{ todo.description }}</p>
+          <div class="flex gap-3 mt-3">
+            <app-tasks-status-badge [status]="todo.status" />
+            <p class="font-extralight">Due: {{ todo.duedate | date: 'medium' }}</p>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="flex flex-col items-center justify-center h-screen">
+        <img [src]="emptyState().image" alt="sd" class="w-35" />
+        <p class="text-[18px] italic font-extralight">{{ emptyState().message }}</p>
+      </div>
+    }
   </div>
 </div>
 
-<!-- Menu -->
-<mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="selectedTodo && openEditTodoFormDialog()">
-    <mat-icon>edit</mat-icon>
-    <span>Edit</span>
-  </button>
-
-  <button mat-menu-item (click)="selectedTodo && openDeleteTodoDialog(selectedTodo)">
-    <mat-icon>delete</mat-icon>
-    <span>Delete</span>
-  </button>
-</mat-menu>
+@if (selectedModal() === 'todo-details-dialog' && selectedTodo(); as todo) {
+  <app-task-details-dialog [todo]="todo" (closed)="closeModal()" [isClosing]="closedModal()" />
+}

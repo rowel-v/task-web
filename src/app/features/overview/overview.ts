@@ -1,6 +1,5 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { TodoService } from '../../core/services/todo-service';
-import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { Todo } from '../../shared/models/todo';
 import { formatDateTime } from '../../shared/utils/date-utils';
@@ -10,7 +9,7 @@ import { PendingTasksDetailsModal } from './pending-tasks-details-modal/pending-
 import { InprogressTasksDetailsModal } from './inprogress-tasks-details-modal/inprogress-tasks-details-modal';
 import { CompletedTasksDetailsModal } from './completed-tasks-details-modal/completed-tasks-details-modal';
 import { LucideArrowRight, LucidePlus } from '@lucide/angular';
-import { TasksStatusBadge } from './tasks-status-badge/tasks-status-badge';
+import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 

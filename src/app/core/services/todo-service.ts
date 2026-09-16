@@ -219,7 +219,7 @@ export class TodoService {
       description: 'Clean up duplicated logic and improve component responsibilities.',
       priority: 'medium',
       status: 'in_progress',
-      duedate: new Date('2026-09-08T13:00:00Z'),
+      duedate: new Date('2026-09-08T13:05:00Z'),
       createdAt: new Date('2026-09-02T11:00:00Z'),
       updatedAt: new Date('2026-09-05T09:30:00Z'),
     },

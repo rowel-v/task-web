@@ -1,27 +1,27 @@
 @switch (status()) {
-  @case ('Pending') {
+  @case ('pending') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#f4ff9d] text-app-text-green text-[13px] font-medium"
     >
       <svg lucideClock5 [size]="17" />
-      <p>{{ status() }}</p>
+      <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
-  @case ('In Progress') {
+  @case ('in_progress') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#c5c8fc] text-app-text-green text-[13px] font-medium"
     >
       <svg lucideCircleEllipsis [size]="17" />
 
-      <p>{{ status() }}</p>
+      <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
-  @case ('Completed') {
+  @case ('completed') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#68f8b5] text-app-text-green text-[13px] font-medium"
     >
       <svg lucideCircleCheck [size]="17" />
-      <p>{{ status() }}</p>
+      <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
 }
