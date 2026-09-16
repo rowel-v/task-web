@@ -9,9 +9,7 @@
     <div class="shrink-0">
       @if (openSideNav()) {
         <div class="flex items-center justify-between ps-6 pe-3 py-3">
-          <h1
-            class="text-[21px] text-[#FFD580] wobble-hor-bottom font-medium whitespace-nowrap"
-          >
+          <h1 class="text-[21px] text-[#FFD580] wobble-hor-bottom font-medium whitespace-nowrap">
             My Tasks
           </h1>
           <button class="btn btn-square btn-ghost" (click)="openSideNav.set(false)">
@@ -106,6 +104,21 @@
         </h1>
         <p class="pt-1">{{ description() }}</p>
       </div>
+
+      @if (currentSideNav() === 'tasks') {
+        <label
+          class="input ms-100 bg-app-background-green text-app-text-white focus-within:outline-0"
+        >
+          <svg lucideSearch />
+          <input
+            type="search"
+            required
+            placeholder="Search"
+            class="[&::-webkit-search-cancel-button]:cursor-pointer [&::-webkit-search-cancel-button]:brightness-0 [&::-webkit-search-cancel-button]:invert [&::-webkit-search-cancel-button]:opacity-70"
+            [(ngModel)]="searchService.searchTerm"
+          />
+        </label>
+      }
 
       <!-- User profile-->
       <div class="flex flex-col relative" (click)="$event.stopPropagation()">

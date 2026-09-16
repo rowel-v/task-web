@@ -10,6 +10,7 @@ import {
   LucideCircleEllipsis,
   LucideCircleCheck,
 } from '@lucide/angular';
+import { SearchService } from '../../core/services/search-service/search-service';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-dialog' | null;
@@ -30,19 +31,36 @@ type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-
 })
 export class Tasks {
   private readonly todoService = inject(TodoService);
+  private readonly searchService = inject(SearchService);
   protected todos: Signal<Todo[]> = this.todoService.todos;
   protected selectedTab = signal<TabSelection>('all');
   protected todosToDisplay = computed(() => {
+    const term = this.searchService.searchTerm().toLowerCase().trim();
+    console.log(term);
+
+    let filtered: Todo[];
     switch (this.selectedTab()) {
       case 'all':
-        return this.todos();
+        filtered = this.todos();
+        break;
       case 'pending':
-        return this.todos().filter((t) => t.status === 'pending');
+        filtered = this.todos().filter((t) => t.status === 'pending');
+        break;
       case 'in_progress':
-        return this.todos().filter((t) => t.status === 'in_progress');
+        filtered = this.todos().filter((t) => t.status === 'in_progress');
+        break;
       case 'completed':
-        return this.todos().filter((t) => t.status === 'completed');
+        filtered = this.todos().filter((t) => t.status === 'completed');
+        break;
     }
+
+    if (!term) {
+      return filtered;
+    }
+
+    return filtered.filter(
+      (t) => t.name.toLowerCase().includes(term) || t.description?.toLowerCase().includes(term),
+    );
   });
   protected selectedTodo = signal<Todo | null>(null); // use for manage todo
   protected selectedModal = signal<ModalSelection>(null);

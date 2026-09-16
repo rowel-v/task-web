@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import {
   LucideMenu,
@@ -8,7 +8,10 @@ import {
   LucideX,
   LucideUser,
   LucideLogOut,
+  LucideSearch,
 } from '@lucide/angular';
+import { SearchService } from '../../core/services/search-service/search-service';
+import { FormsModule } from '@angular/forms';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 
@@ -24,6 +27,8 @@ type CurrentSidenav = 'home' | 'tasks' | 'settings';
     LucideX,
     LucideUser,
     LucideLogOut,
+    LucideSearch,
+    FormsModule,
   ],
   templateUrl: './main-layout.html',
   styles: ``,
@@ -53,6 +58,8 @@ export class MainLayout {
   });
   protected openedProfile = signal<boolean>(false);
   protected closingProfile = signal<boolean>(false);
+
+  protected readonly searchService = inject(SearchService);
 
   protected openProfile() {
     this.closingProfile.set(false);
