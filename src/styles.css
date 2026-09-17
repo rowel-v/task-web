@@ -200,7 +200,7 @@
 }
 
 /* used in sidebar title */
-.wobble-hor-bottom {
+.animate-wobble-hor-bottom {
   animation: wobble-hor-bottom 4s infinite both;
 }
 

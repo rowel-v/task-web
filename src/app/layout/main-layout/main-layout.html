@@ -1,7 +1,7 @@
 <div class="flex h-screen bg-app-background-green text-app-text-white" (click)="closeProfile()">
   <!-- Sidebar -->
   <aside
-    class="flex flex-col h-screen transition-all duration-300 overflow-hidden border-r border-[#166169]"
+    class="flex flex-col h-screen transition-all duration-300 border-r border-[#166169]"
     [class.w-54]="openSideNav()"
     [class.w-16]="!openSideNav()"
   >
@@ -9,7 +9,7 @@
     <div class="shrink-0">
       @if (openSideNav()) {
         <div class="flex items-center justify-between ps-6 pe-3 py-3">
-          <h1 class="text-[21px] text-[#FFD580] wobble-hor-bottom font-medium whitespace-nowrap">
+          <h1 class="text-[21px] text-[#FFD580] animate-wobble-hor-bottom font-medium whitespace-nowrap">
             My Tasks
           </h1>
           <button class="btn btn-square btn-ghost" (click)="openSideNav.set(false)">
@@ -27,71 +27,49 @@
 
     <!-- Navigation -->
     <div class="flex flex-col text-[18px]">
-      <!-- Home -->
-      <div
-        class="flex items-center cursor-pointer"
-        [class]="openSideNav() ? 'hover:bg-gray-500' : ''"
-        [class.gap-4]="openSideNav()"
-        [class.px-6]="openSideNav()"
-        [class.py-3]="openSideNav()"
-        [class.py-1]="!openSideNav()"
-        [class.justify-center]="!openSideNav()"
-        routerLink="/overview"
-        (click)="currentSideNav.set('home')"
-      >
-        @if (openSideNav()) {
-          <svg lucideHome class="shrink-0"></svg>
-          <p class="whitespace-nowrap">Home</p>
-        } @else {
-          <button class="btn btn-square btn-ghost">
-            <svg lucideHome class="shrink-0"></svg>
-          </button>
-        }
-      </div>
-
-      <!-- Tasks -->
-      <div
-        class="flex items-center cursor-pointer"
-        [class]="openSideNav() ? 'hover:bg-gray-500' : ''"
-        [class.gap-4]="openSideNav()"
-        [class.px-6]="openSideNav()"
-        [class.py-3]="openSideNav()"
-        [class.py-1]="!openSideNav()"
-        [class.justify-center]="!openSideNav()"
-        routerLink="/tasks"
-        (click)="currentSideNav.set('tasks')"
-      >
-        @if (openSideNav()) {
-          <svg lucideBadgeCheck class="shrink-0"></svg>
-          <p class="whitespace-nowrap">Tasks</p>
-        } @else {
-          <button class="btn btn-square btn-ghost">
-            <svg lucideBadgeCheck class="shrink-0"></svg>
-          </button>
-        }
-      </div>
-
-      <!-- Settings -->
-      <div
-        class="flex items-center cursor-pointer"
-        [class]="openSideNav() ? 'hover:bg-gray-500' : ''"
-        [class.gap-4]="openSideNav()"
-        [class.px-6]="openSideNav()"
-        [class.py-3]="openSideNav()"
-        [class.py-1]="!openSideNav()"
-        [class.justify-center]="!openSideNav()"
-        routerLink="/settings"
-        (click)="currentSideNav.set('settings')"
-      >
-        @if (openSideNav()) {
-          <svg lucideSettings class="shrink-0"></svg>
-          <p class="whitespace-nowrap">Settings</p>
-        } @else {
-          <button class="btn btn-square btn-ghost">
-            <svg lucideSettings class="shrink-0"></svg>
-          </button>
-        }
-      </div>
+      @for (item of navItems; track item.key) {
+        <div
+          class="flex items-center cursor-pointer"
+          [class]="openSideNav() ? 'gap-4 px-6 py-3' : 'py-1 justify-center tooltip tooltip-right'"
+          [attr.data-tip]="!openSideNav() ? item.label : null"
+          style="--tt-bg: #1f585c; --tt-color: #e5e7eb;"
+          #rla="routerLinkActive"
+          [class.hover:bg-gray-600]="!rla.isActive"
+          [routerLink]="item.route"
+          routerLinkActive="bg-app-button-hover-gray"
+        >
+          @if (openSideNav()) {
+            @switch (item.key) {
+              @case ('home') {
+                <svg lucideHouse class="shrink-0"></svg>
+              }
+              @case ('tasks') {
+                <svg lucideBadgeCheck class="shrink-0"></svg>
+              }
+              @case ('settings') {
+                <svg lucideSettings class="shrink-0"></svg>
+              }
+            }
+            <p class="whitespace-nowrap overflow-hidden transition-all duration-300">
+              {{ item.label }}
+            </p>
+          } @else {
+            <button class="btn btn-square btn-ghost pointer-events-none">
+              @switch (item.key) {
+                @case ('home') {
+                  <svg lucideHouse class="shrink-0"></svg>
+                }
+                @case ('tasks') {
+                  <svg lucideBadgeCheck class="shrink-0"></svg>
+                }
+                @case ('settings') {
+                  <svg lucideSettings class="shrink-0"></svg>
+                }
+              }
+            </button>
+          }
+        </div>
+      }
     </div>
   </aside>
 
