@@ -1,9 +1,9 @@
-@if (!selectedTodo()) {
-  @for (todo of todos(); track todo.id) {
+@if (!selectedTask()) {
+  @for (task of tasks(); track task.id) {
     <div
       class="flex items-center gap-3 p-2.5 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
       [class.slide-in-right]="isEnteringDetail()"
-      (click)="selectedTodo.set(todo)"
+      (click)="selectedTask.set(task)"
     >
       @switch (icon()) {
         @case ('completed') {
@@ -34,7 +34,7 @@
           <svg lucideCalendarCheck />
         }
       }
-      <p class="truncate text-sm font-medium">{{ todo.name }}</p>
+      <p class="truncate text-sm font-medium">{{ task.name }}</p>
     </div>
   } @empty {
     <div
@@ -55,12 +55,12 @@
   >
     <div class="min-h-0 flex-1 text-app-text-green overflow-y-auto overflow-x-hidden pr-2">
       <h3 class="text-base font-bold leading-tight">
-        {{ selectedTodo()?.name }}
+        {{ selectedTask()?.name }}
       </h3>
 
-      @if (selectedTodo()?.description) {
+      @if (selectedTask()?.description) {
         <p class="mt-2 wrap-break-word text-sm leading-relaxed italic text-base-content/65">
-          {{ selectedTodo()?.description }}
+          {{ selectedTask()?.description }}
         </p>
       } @else {
         <p class="mt-2 text-sm italic text-base-content/40">No description provided.</p>
@@ -68,7 +68,7 @@
     </div>
 
     <div class="flex gap-2 absolute bottom-2 right-4">
-      <button type="button" class="btn btn-ghost btn-sm gap-1.5 hover:bg-app-background-hover" (click)="selectedTodo.set(null)">
+      <button type="button" class="btn btn-ghost btn-sm gap-1.5 hover:bg-app-background-hover" (click)="selectedTask.set(null)">
         <span>Back</span>
       </button>
       <a routerLink="/tasks" class="btn btn-sm btn-accent hover:bg-app-background-hover gap-1.5 shadow-sm">

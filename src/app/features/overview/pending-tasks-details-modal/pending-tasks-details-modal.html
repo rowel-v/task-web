@@ -38,9 +38,9 @@
     <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
       @switch (selectedCategory()) {
         @case ('pending') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="pendingTodos()"
+            [tasks]="pendingTasks()"
             icon="pending"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No pending tasks"
@@ -48,9 +48,9 @@
           />
         }
         @case ('high_priority') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="pendingHighPriority()"
+            [tasks]="pendingHighPriority()"
             icon="high_priority"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No high-priority tasks"
@@ -58,9 +58,9 @@
           />
         }
         @case ('due_today') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="pendingDueToday()"
+            [tasks]="pendingDueToday()"
             icon="due_today"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No tasks due today"
@@ -68,9 +68,9 @@
           />
         }
         @case ('overdue') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="overdueTodos()"
+            [tasks]="overdueTasks()"
             icon="overdue"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No overdue tasks"
@@ -89,7 +89,7 @@
                 <svg lucideClock5 />
                 <span>Pending</span>
               </div>
-              <span class="font-semibold">{{ pendingTodos().length }} </span>
+              <span class="font-semibold">{{ pendingTasks().length }} </span>
             </div>
             <!-- High-priority pending tasks -->
             <div
@@ -122,7 +122,7 @@
                 <svg lucideTriangleAlert />
                 <span>Overdue</span>
               </div>
-              <span class="font-semibold">{{ overdueTodos().length }}</span>
+              <span class="font-semibold">{{ overdueTasks().length }}</span>
             </div>
           </div>
         }

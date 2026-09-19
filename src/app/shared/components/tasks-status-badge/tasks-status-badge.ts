@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { LucideClock5, LucideCircleEllipsis, LucideCircleCheck } from '@lucide/angular';
-import { TodoStatus } from '../../models/todo';
+import { TaskStatus } from '../../models/task';
 import { TitleCasePipe } from '@angular/common';
 
 @Component({
@@ -10,5 +10,5 @@ import { TitleCasePipe } from '@angular/common';
   styles: ``,
 })
 export class TasksStatusBadge {
-  status = input.required<TodoStatus>();
+  status = input.required<TaskStatus>();
 }

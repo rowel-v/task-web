@@ -38,9 +38,9 @@
     <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
       @switch (selectedCategory()) {
         @case ('completed') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="completedTodos()"
+            [tasks]="completedTasks()"
             icon="completed"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No completed tasks"
@@ -48,9 +48,9 @@
           />
         }
         @case ('pending') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="pendingTodos()"
+            [tasks]="pendingTasks()"
             icon="pending"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No pending tasks"
@@ -58,9 +58,9 @@
           />
         }
         @case ('overdue') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="overdueTodos()"
+            [tasks]="overdueTasks()"
             icon="overdue"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No overdue tasks"
@@ -68,9 +68,9 @@
           />
         }
         @case ('upcoming') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="upcomingTodos()"
+            [tasks]="upcomingTasks()"
             icon="upcoming"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No upcoming tasks"
@@ -89,7 +89,7 @@
                 <svg lucideCircleCheck />
                 <span>Completed</span>
               </div>
-              <span class="font-semibold">{{ completedTodos().length }} </span>
+              <span class="font-semibold">{{ completedTasks().length }} </span>
             </div>
             <!-- Total pending tasks -->
             <div
@@ -100,7 +100,7 @@
                 <svg lucideClock5 />
                 <span>Pending</span>
               </div>
-              <span class="font-semibold">{{ pendingTodos().length }}</span>
+              <span class="font-semibold">{{ pendingTasks().length }}</span>
             </div>
             <!-- Total overdue tasks -->
             <div
@@ -111,7 +111,7 @@
                 <svg lucideTriangleAlert />
                 <span>Overdue</span>
               </div>
-              <span class="font-semibold">{{ overdueTodos().length }}</span>
+              <span class="font-semibold">{{ overdueTasks().length }}</span>
             </div>
             <!-- Total upcoming tasks -->
             <div
@@ -122,7 +122,7 @@
                 <svg lucideCalendarClock />
                 <span>Upcoming</span>
               </div>
-              <span class="font-semibold">{{ upcomingTodos().length }}</span>
+              <span class="font-semibold">{{ upcomingTasks().length }}</span>
             </div>
           </div>
         }

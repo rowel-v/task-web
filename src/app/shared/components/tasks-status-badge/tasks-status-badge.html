@@ -1,5 +1,5 @@
 @switch (status()) {
-  @case ('pending') {
+  @case ('PENDING') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#f4ff9d] text-app-text-green text-[13px] font-medium"
     >
@@ -7,7 +7,7 @@
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
-  @case ('in_progress') {
+  @case ('IN_PROGRESS') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#c5c8fc] text-app-text-green text-[13px] font-medium"
     >
@@ -16,7 +16,7 @@
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
-  @case ('completed') {
+  @case ('COMPLETED') {
     <div
       class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#68f8b5] text-app-text-green text-[13px] font-medium"
     >

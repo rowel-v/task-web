@@ -15,7 +15,7 @@
     <div class="mb-4 flex justify-between">
       <h2 class="text-lg font-bold">Completed Tasks</h2>
       <!-- Close button -->
-     @if (selectedCategory() === null) {
+      @if (selectedCategory() === null) {
         <button
           class="cursor-pointer rounded hover:bg-gray-300"
           [class.rotate-in-center]="true"
@@ -38,9 +38,9 @@
     <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
       @switch (selectedCategory()) {
         @case ('completed') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="completedTodos()"
+            [tasks]="completedTasks()"
             icon="completed"
             iconWhenEmpty="task_alt"
             titleWhenEmpty="No completed tasks"
@@ -48,9 +48,9 @@
           />
         }
         @case ('high_priority') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="completedHighPriority()"
+            [tasks]="completedHighPriority()"
             icon="high_priority"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No high-priority tasks"
@@ -58,9 +58,9 @@
           />
         }
         @case ('completed_today') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="completedToday()"
+            [tasks]="completedToday()"
             icon="completed_today"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No tasks completed today"
@@ -68,9 +68,9 @@
           />
         }
         @case ('completed_this_week') {
-          <app-todo-details-list
+          <app-task-details-list
             [isEnteringDetail]="true"
-            [todos]="completedThisWeek()"
+            [tasks]="completedThisWeek()"
             icon="completed_this_week"
             iconWhenEmpty="check_circle"
             titleWhenEmpty="No tasks completed this week"
@@ -86,10 +86,10 @@
               (click)="selectCategory('completed')"
             >
               <div class="flex items-center gap-2">
-               <svg lucideCircleCheck />
+                <svg lucideCircleCheck />
                 <span>Completed</span>
               </div>
-              <span class="font-semibold">{{ completedTodos().length }} </span>
+              <span class="font-semibold">{{ completedTasks().length }} </span>
             </div>
             <!-- High-priority completed tasks -->
             <div

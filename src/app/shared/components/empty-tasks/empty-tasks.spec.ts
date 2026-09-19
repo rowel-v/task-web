@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeleteTodoDialog } from './delete-todo-dialog';
+import { EmptyTasks } from './empty-tasks';
 
-describe('DeleteTodoDialog', () => {
-  let component: DeleteTodoDialog;
-  let fixture: ComponentFixture<DeleteTodoDialog>;
+describe('EmptyTasks', () => {
+  let component: EmptyTasks;
+  let fixture: ComponentFixture<EmptyTasks>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeleteTodoDialog],
+      imports: [EmptyTasks],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DeleteTodoDialog);
+    fixture = TestBed.createComponent(EmptyTasks);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

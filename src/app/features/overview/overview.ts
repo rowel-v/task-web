@@ -1,8 +1,7 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
-import { TodoService } from '../../core/services/todo-service';
+import { TaskService } from '../../core/services/task-service/task-service';
 import { RouterLink } from '@angular/router';
-import { Todo } from '../../shared/models/todo';
-import { formatDateTime } from '../../shared/utils/date-utils';
+import { Task } from '../../shared/models/task';
 import { TotalTasksDetailsModal } from './total-tasks-details-modal/total-tasks-details-modal';
 import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
 import { PendingTasksDetailsModal } from './pending-tasks-details-modal/pending-tasks-details-modal';
@@ -12,9 +11,10 @@ import { LucideArrowRight, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { DatePipe } from '@angular/common';
 
-type TodosDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
-type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-dialog' | null;
+type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
+type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-dialog' | null;
 
 @Component({
   selector: 'app-overview',
@@ -30,20 +30,20 @@ type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-
     LucideArrowRight,
     CreateTaskDialog,
     TaskDetailsDialog,
+    DatePipe
   ],
   templateUrl: './overview.html',
   styles: ``,
 })
 export class Overview {
-  private readonly todoService = inject(TodoService);
-  protected readonly todos: Signal<Todo[]> = this.todoService.todos;
-  protected selectedTodo = signal<Todo | null>(null);
-  protected readonly formatDateTime: (d: Date) => string = formatDateTime;
-  protected modalTodosDetails: TodosDetailsFlag = null;
-  protected todosDetailsFlag = signal<TodosDetailsFlag>(null);
+  private readonly taskService = inject(TaskService);
+  protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
+  protected selectedTask = signal<Task | null>(null);
+  protected modalTasksDetails: TasksDetailsFlag = null;
+  protected tasksDetailsFlag = signal<TasksDetailsFlag>(null);
   protected isClosing = signal(false);
   // limit to 5 the displayed tasks in overview
-  protected displayedTodaysTasks = computed(() => this.todoService.todaysTasks().slice(0, 5));
+  protected displayedTodaysTasks = computed(() => this.taskService.todaysTasks().slice(0, 5));
 
   protected openModal = signal<ModalSelection>(null);
 
@@ -58,46 +58,46 @@ export class Overview {
     }, 300);
   }
 
-  protected openModalTodosDetailsFlag(currentTodosDetailsSelected: TodosDetailsFlag) {
-    this.todosDetailsFlag.set(currentTodosDetailsSelected);
+  protected openModalTasksDetailsFlag(currentTasksDetailsSelected: TasksDetailsFlag) {
+    this.tasksDetailsFlag.set(currentTasksDetailsSelected);
   }
 
-  protected closeTodosDetails(event: Event) {
+  protected closeTasksDetails(event: Event) {
     event.stopPropagation();
 
     this.isClosing.set(true);
 
     setTimeout(() => {
-      this.todosDetailsFlag.set(null);
+      this.tasksDetailsFlag.set(null);
       this.isClosing.set(false);
     }, 200);
   }
-  
+
   protected totalTasks(): number {
-    return this.todoService.totalTasks();
+    return this.taskService.totalTasks();
   }
 
   protected totalPendingTasks(): number {
-    return this.todoService.totalPendingTasks();
+    return this.taskService.totalPendingTasks();
   }
 
   protected totalInProgressTasks(): number {
-    return this.todoService.totalInProgressTasks();
+    return this.taskService.totalInProgressTasks();
   }
 
   protected totalCompletedTasks(): number {
-    return this.todoService.totalCompletedTasks();
+    return this.taskService.totalCompletedTasks();
   }
 
   protected completionRate(): number {
-    return this.todoService.completionRate();
+    return this.taskService.completionRate();
   }
 
-  protected todaysTasks(): Todo[] {
-    return this.todoService.todaysTasks();
+  protected todaysTasks(): Task[] {
+    return this.taskService.todaysTasks();
   }
 
-  protected upcomingTodos(): Todo[] {
-    return this.todoService.upcomingTodos();
+  protected upcomingTasks(): Task[] {
+    return this.taskService.upcomingTasks();
   }
 }

@@ -1,5 +1,5 @@
 import { Component, input, signal } from '@angular/core';
-import { Todo } from '../../models/todo';
+import { Task } from '../../models/task';
 import {
   LucideGhost,
   LucideCircleCheck,
@@ -25,7 +25,7 @@ type LucidIconSelection =
   | 'completed_this_week';
 
 @Component({
-  selector: 'app-todo-details-list',
+  selector: 'app-task-details-list',
   imports: [
     LucideGhost,
     LucideCircleCheck,
@@ -38,15 +38,15 @@ type LucidIconSelection =
     LucideBadgeCheck,
     LucideCalendarCheck,
   ],
-  templateUrl: './todo-details-list.html',
+  templateUrl: './task-details-list.html',
   styles: ``,
 })
-export class TodoDetailsList {
-  todos = input.required<Todo[]>();
+export class TaskDetailsList {
+  tasks = input.required<Task[]>();
   icon = input.required<LucidIconSelection>();
   iconWhenEmpty = input.required<string>();
   titleWhenEmpty = input.required<string>();
   descriptionWhenEmpty = input.required<string>();
-  isEnteringDetail = input.required<boolean>(); // for animation when navigate to specific todo
-  selectedTodo = signal<Todo | null>(null);
+  isEnteringDetail = input.required<boolean>(); // for animation when navigate to specific task
+  selectedTask = signal<Task | null>(null);
 }

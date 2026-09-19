@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Todo, TodoPriority, TodoStatus } from '../../../models/todo';
+import { Task, TaskPriority, TaskStatus } from '../../../models/task';
 import { LucideX } from '@lucide/angular';
 
 @Component({
@@ -11,10 +11,10 @@ import { LucideX } from '@lucide/angular';
 })
 export class CreateTaskDialog {
 
-  submitted = output<Todo>();
+  submitted = output<Task>();
   cancelled = output<void>();
   isClosing = input.required<boolean>();
-  todoForm = new FormGroup({
+  taskForm = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -24,11 +24,11 @@ export class CreateTaskDialog {
       nonNullable: true,
     }),
 
-    priority: new FormControl<TodoPriority>('low', {
+    priority: new FormControl<TaskPriority>('LOW', {
       nonNullable: true,
     }),
 
-    status: new FormControl<TodoStatus>('pending', {
+    status: new FormControl<TaskStatus>('PENDING', {
       nonNullable: true,
     }),
 

@@ -27,17 +27,17 @@
   </div>
 
   <div class="flex flex-col overflow-y-auto">
-    @for (todo of todosToDisplay(); track todo.id) {
+    @for (task of tasksToDisplay(); track task.id) {
       <div
         class="flex items-center cursor-pointer hover:bg-app-button-hover-gray p-4 rounded-md"
-        (click)="selectedModal.set('todo-details-dialog'); selectedTodo.set(todo)"
+        (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
       >
         <div class="flex flex-col">
-          <p class="text-[18px] font-medium">{{ todo.name | titlecase }}</p>
-          <p class="mt-2 italic">{{ todo.description }}</p>
+          <p class="text-[18px] font-medium">{{ task.name | titlecase }}</p>
+          <p class="mt-2 italic">{{ task.description }}</p>
           <div class="flex gap-3 mt-3">
-            <app-tasks-status-badge [status]="todo.status" />
-            <p class="font-extralight">Due: {{ todo.duedate | date: 'medium' }}</p>
+            <app-tasks-status-badge [status]="task.status" />
+            <p class="font-extralight">Due: {{ task.duedate | date: 'medium' }}</p>
           </div>
         </div>
       </div>
@@ -57,6 +57,6 @@
   </div>
 </div>
 
-@if (selectedModal() === 'todo-details-dialog' && selectedTodo(); as todo) {
-  <app-task-details-dialog [todo]="todo" (closed)="closeModal()" [isClosing]="closedModal()" />
+@if (selectedModal() === 'task-details-dialog' && selectedTask(); as task) {
+  <app-task-details-dialog [task]="task" (closed)="closeModal()" [isClosing]="closedModal()" />
 }

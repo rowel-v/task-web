@@ -1,6 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { Todo } from '../../../shared/models/todo';
-import { TodoDetailsList } from '../../../shared/components/todo-details-list/todo-details-list';
+import { TaskDetailsList } from '../../../shared/components/task-details-list/task-details-list';
+import { Task } from '../../../shared/models/task';
 import {
   LucideX,
   LucideArrowLeft,
@@ -9,13 +9,14 @@ import {
   LucideBadgeCheck,
   LucideCalendarCheck,
 } from '@lucide/angular';
+
 type TaskCategory =
   'completed' | 'high_priority' | 'completed_today' | 'completed_this_week' | null;
 
 @Component({
   selector: 'app-completed-tasks-details-modal',
   imports: [
-    TodoDetailsList,
+    TaskDetailsList,
     LucideX,
     LucideArrowLeft,
     LucideCircleCheck,
@@ -27,18 +28,18 @@ type TaskCategory =
   styles: ``,
 })
 export class CompletedTasksDetailsModal {
-  todos = input.required<Todo[]>(); // Input todos from the parent component.
-  protected completedTodos = computed(() => this.todos().filter((t) => t.status === 'completed'));
-  // Gets completed todos with high priority.
+  tasks = input.required<Task[]>(); // Input tasks from the parent component.
+  protected completedTasks = computed(() => this.tasks().filter((t) => t.status === 'COMPLETED'));
+  // Gets completed tasks with high priority.
   protected completedHighPriority = computed(() =>
-    this.completedTodos().filter((t) => t.priority === 'high'),
+    this.completedTasks().filter((t) => t.priority === 'HIGH'),
   );
-  // Gets todos completed today.
+  // Gets tasks completed today.
   protected completedToday = computed(() => {
     const today = new Date().toDateString();
-    return this.completedTodos().filter((t) => t.completedAt?.toDateString() === today);
+    return this.completedTasks().filter((t) => new Date(t.completedAt).toDateString() === today);
   });
-  // Gets completed todos from this week.
+  // Gets completed tasks from this week.
   protected completedThisWeek = computed(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -49,7 +50,9 @@ export class CompletedTasksDetailsModal {
     startOfWeek.setDate(startOfWeek.getDate() - diff);
     startOfWeek.setHours(0, 0, 0, 0);
 
-    return this.completedTodos().filter((t) => t.completedAt && t.completedAt >= startOfWeek);
+    return this.completedTasks().filter(
+      (t) => t.completedAt && new Date(t.completedAt) >= startOfWeek,
+    );
   });
   closed = output<void>(); // used to notify the parent when the modal is closed.
   protected isClosing = signal(false); // Controls the modal closing animation.

@@ -3,11 +3,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-empty-todos',
+  selector: 'app-empty-tasks',
   imports: [MatButtonModule, MatIconModule],
-  templateUrl: './empty-todos.html',
+  templateUrl: './empty-tasks.html',
   styles: ``,
 })
-export class EmptyTodos {
-  createTodo = output<void>();
+export class EmptyTasks {
+  createTask = output<void>();
 }

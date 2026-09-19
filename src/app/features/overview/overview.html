@@ -12,10 +12,10 @@
       title="Total Tasks"
       [value]="totalTasks()"
       [description]="'All your tasks'"
-      (click)="openModalTodosDetailsFlag('total')"
+      (click)="openModalTasksDetailsFlag('total')"
     >
-      @if (todosDetailsFlag() === 'total') {
-        <app-total-tasks-details-modal [todos]="todos()" (closed)="todosDetailsFlag.set(null)" />
+      @if (tasksDetailsFlag() === 'total') {
+        <app-total-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
       }
     </app-tasks-status-card>
 
@@ -25,10 +25,10 @@
       title="Pending"
       [value]="totalPendingTasks()"
       [description]="'Tasks waiting to start'"
-      (click)="openModalTodosDetailsFlag('pending')"
+      (click)="openModalTasksDetailsFlag('pending')"
     >
-      @if (todosDetailsFlag() === 'pending') {
-        <app-pending-tasks-details-modal [todos]="todos()" (closed)="todosDetailsFlag.set(null)" />
+      @if (tasksDetailsFlag() === 'pending') {
+        <app-pending-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
       }
     </app-tasks-status-card>
 
@@ -38,12 +38,12 @@
       title="In Progress"
       [value]="totalInProgressTasks()"
       [description]="'Currently working on'"
-      (click)="openModalTodosDetailsFlag('in_progress')"
+      (click)="openModalTasksDetailsFlag('in_progress')"
     >
-      @if (todosDetailsFlag() === 'in_progress') {
+      @if (tasksDetailsFlag() === 'in_progress') {
         <app-inprogress-tasks-details-modal
-          [todos]="todos()"
-          (closed)="todosDetailsFlag.set(null)"
+          [tasks]="tasks()"
+          (closed)="tasksDetailsFlag.set(null)"
         />
       }
     </app-tasks-status-card>
@@ -54,12 +54,12 @@
       title="Completed"
       [value]="totalCompletedTasks()"
       [description]="completionRate() + '% completion rate'"
-      (click)="openModalTodosDetailsFlag('completed')"
+      (click)="openModalTasksDetailsFlag('completed')"
     >
-      @if (todosDetailsFlag() === 'completed') {
+      @if (tasksDetailsFlag() === 'completed') {
         <app-completed-tasks-details-modal
-          [todos]="todos()"
-          (closed)="todosDetailsFlag.set(null)"
+          [tasks]="tasks()"
+          (closed)="tasksDetailsFlag.set(null)"
         />
       }
     </app-tasks-status-card>
@@ -81,49 +81,49 @@
             @if (todaysTasks().length !== 0) {
               <button
                 class="btn btn-sm bg-app-button-purple hover:bg-app-button-hover-gray border-none"
-                (click)="openModal.set('create-todo-dialog')"
+                (click)="openModal.set('create-task-dialog')"
               >
                 <svg lucidePlus />
-                <span class="hidden sm:inline">Add Todo</span>
+                <span class="hidden sm:inline">Add Task</span>
               </button>
             }
           </div>
 
           <!-- Tasks -->
           <div class="mt-5 flex flex-col gap-2">
-            @for (todo of displayedTodaysTasks(); track todo.id) {
+            @for (task of displayedTodaysTasks(); track task.id) {
               <div
                 class="group flex items-center hover:bg-app-button-hover-gray text-app-text-white gap-4 rounded-sm p-4 transition cursor-pointer"
-                (click)="openModal.set('todo-details-dialog'); selectedTodo.set(todo)"
+                (click)="openModal.set('task-details-dialog'); selectedTask.set(task)"
               >
                 <!-- Task information -->
                 <div class="min-w-0 flex-1">
                   <h3
                     class="truncate font-medium"
-                    [class.line-through]="todo.status === 'completed'"
+                    [class.line-through]="task.status === 'COMPLETED'"
                   >
-                    {{ todo.name }}
+                    {{ task.name }}
                   </h3>
 
-                  @if (todo.description) {
+                  @if (task.description) {
                     <p class="mt-1 truncate text-sm">
-                      {{ todo.description }}
+                      {{ task.description }}
                     </p>
                   }
                 </div>
 
                 <!-- Status -->
-                @switch (todo.status) {
-                  @case ('pending') {
-                    <app-tasks-status-badge status="pending" />
+                @switch (task.status) {
+                  @case ('PENDING') {
+                    <app-tasks-status-badge status="PENDING" />
                   }
 
-                  @case ('in_progress') {
-                    <app-tasks-status-badge status="in_progress" />
+                  @case ('IN_PROGRESS') {
+                    <app-tasks-status-badge status="IN_PROGRESS" />
                   }
 
-                  @case ('completed') {
-                    <app-tasks-status-badge status="completed" />
+                  @case ('COMPLETED') {
+                    <app-tasks-status-badge status="COMPLETED" />
                   }
                 }
               </div>
@@ -137,10 +137,10 @@
 
                   <button
                     class="mt-4 btn btn-sm bg-app-button-purple size-fit hover:bg-app-button-hover-gray border-none"
-                    (click)="openModal.set('create-todo-dialog')"
+                    (click)="openModal.set('create-task-dialog')"
                   >
                     <svg lucidePlus />
-                    <span class="hidden sm:inline">Add Todo</span>
+                    <span class="hidden sm:inline">Add Task</span>
                   </button>
                 </div>
               </div>
@@ -234,38 +234,38 @@
               </tr>
             </thead>
             <tbody>
-              @for (upcomingTodo of upcomingTodos(); track upcomingTodo.id) {
+              @for (upcomingTask of upcomingTasks(); track upcomingTask.id) {
                 <tr
                   class="group transition hover:bg-app-button-hover-gray hover:rounded-2xl cursor-pointer"
-                  (click)="openModal.set('todo-details-dialog'); selectedTodo.set(upcomingTodo)"
+                  (click)="openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)"
                 >
                   <td class="rounded-l-md">
-                    <div class="font-medium">{{ upcomingTodo.name }}</div>
+                    <div class="font-medium">{{ upcomingTask.name }}</div>
                   </td>
 
                   <td>
                     <div
                       class="font-medium"
-                      [class.text-[#68F8B5]]="upcomingTodo.priority === 'low'"
-                      [class.text-[#FFD580]]="upcomingTodo.priority === 'medium'"
-                      [class.text-[#FF9B9B]]="upcomingTodo.priority === 'high'"
+                      [class.text-[#68F8B5]]="upcomingTask.priority === 'LOW'"
+                      [class.text-[#FFD580]]="upcomingTask.priority === 'MEDIUM'"
+                      [class.text-[#FF9B9B]]="upcomingTask.priority === 'HIGH'"
                     >
-                      {{ upcomingTodo.priority }}
+                      {{ upcomingTask.priority }}
                     </div>
                   </td>
 
-                  <td>{{ formatDateTime(upcomingTodo.duedate) }}</td>
+                  <td>{{ upcomingTask.duedate | date: 'short' }}</td>
 
                   <td class="rounded-r-md">
-                    @switch (upcomingTodo.status) {
-                      @case ('pending') {
-                        <app-tasks-status-badge status="pending" />
+                    @switch (upcomingTask.status) {
+                      @case ('PENDING') {
+                        <app-tasks-status-badge status="PENDING" />
                       }
-                      @case ('in_progress') {
-                        <app-tasks-status-badge status="in_progress" />
+                      @case ('IN_PROGRESS') {
+                        <app-tasks-status-badge status="IN_PROGRESS" />
                       }
-                      @case ('completed') {
-                        <app-tasks-status-badge status="completed" />
+                      @case ('COMPLETED') {
+                        <app-tasks-status-badge status="COMPLETED" />
                       }
                     }
                   </td>
@@ -279,10 +279,10 @@
   </div>
 </div>
 
-@if (openModal() === 'create-todo-dialog') {
+@if (openModal() === 'create-task-dialog') {
   <app-create-task-dialog [isClosing]="isClosing()" (cancelled)="closeModal()" />
 }
 
-@if (openModal() === 'todo-details-dialog' && selectedTodo(); as todo) {
-  <app-task-details-dialog [todo]="todo" [isClosing]="isClosing()" (closed)="closeModal()" />
+@if (openModal() === 'task-details-dialog' && selectedTask(); as task) {
+  <app-task-details-dialog [task]="task" [isClosing]="isClosing()" (closed)="closeModal()" />
 }

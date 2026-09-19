@@ -43,19 +43,19 @@ interface NavItem {
   styles: ``,
 })
 export class MainLayout {
-  private router = inject(Router);
+  private readonly router = inject(Router);
   protected readonly searchService = inject(SearchService);
-  protected openSideNav = signal<boolean>(true);
-  protected navItems: NavItem[] = [
+  protected readonly openSideNav = signal<boolean>(true);
+  protected readonly navItems: NavItem[] = [
     { key: 'home', label: 'Home', route: '/overview' },
     { key: 'tasks', label: 'Tasks', route: '/tasks' },
     { key: 'settings', label: 'Settings', route: '/settings' },
   ];
-  protected openedProfile = signal<boolean>(false);
-  protected closingProfile = signal<boolean>(false);
+  protected readonly openedProfile = signal<boolean>(false);
+  protected readonly closingProfile = signal<boolean>(false);
 
   // Derived from the actual route — correct on load, refresh, back/forward, not just clicks
-  private url = toSignal(
+  private readonly url = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       map((e) => e.urlAfterRedirects),
@@ -64,14 +64,14 @@ export class MainLayout {
     { initialValue: this.router.url },
   );
 
-  protected currentSideNav = computed<CurrentSidenav>(() => {
+  protected readonly currentSideNav = computed<CurrentSidenav>(() => {
     const url = this.url();
     if (url.startsWith('/tasks')) return 'tasks';
     if (url.startsWith('/settings')) return 'settings';
     return 'home';
   });
 
-  protected title = computed(() => {
+  protected readonly title = computed(() => {
     switch (this.currentSideNav()) {
       case 'home':
         return 'Good morning';
@@ -82,12 +82,12 @@ export class MainLayout {
     }
   });
 
-  protected description = computed(() => {
+  protected readonly description = computed(() => {
     switch (this.currentSideNav()) {
       case 'home':
         return "Here's your task overview for today.";
       case 'tasks':
-        return 'Manage your todos and stay organized.';
+        return 'Manage your tasks and stay organized.';
       case 'settings':
         return 'Settings Description later.';
     }

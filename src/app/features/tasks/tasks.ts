@@ -1,19 +1,19 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
-import { TodoService } from '../../core/services/todo-service';
-import { Todo } from '../../shared/models/todo';
+import { TaskService } from '../../core/services/task-service/task-service';
+import { Task } from '../../shared/models/task';
 import { CommonModule } from '@angular/common';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { SearchService } from '../../core/services/search-service/search-service';
 import {
   LucideClipboardList,
   LucideClock5,
   LucideCircleEllipsis,
   LucideCircleCheck,
 } from '@lucide/angular';
-import { SearchService } from '../../core/services/search-service/search-service';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
-type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-dialog' | null;
+type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-dialog' | null;
 
 @Component({
   selector: 'app-tasks',
@@ -30,27 +30,27 @@ type ModalSelection = 'create-todo-dialog' | 'edit-todo-dialog' | 'todo-details-
   styles: ``,
 })
 export class Tasks {
-  private readonly todoService = inject(TodoService);
+  private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
-  protected todos: Signal<Todo[]> = this.todoService.todos;
+  protected tasks: Signal<Task[]> = this.taskService.tasks;
   protected selectedTab = signal<TabSelection>('all');
-  protected todosToDisplay = computed(() => {
+  protected tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
     console.log(term);
 
-    let filtered: Todo[] = [];
+    let filtered: Task[] = [];
     switch (this.selectedTab()) {
       case 'all':
-        filtered = this.todos();
+        filtered = this.tasks();
         break;
       case 'pending':
-        filtered = this.todos().filter((t) => t.status === 'pending');
+        filtered = this.tasks().filter((t) => t.status === 'PENDING');
         break;
       case 'in_progress':
-        filtered = this.todos().filter((t) => t.status === 'in_progress');
+        filtered = this.tasks().filter((t) => t.status === 'IN_PROGRESS');
         break;
       case 'completed':
-        filtered = this.todos().filter((t) => t.status === 'completed');
+        filtered = this.tasks().filter((t) => t.status === 'COMPLETED');
         break;
     }
 
@@ -62,7 +62,7 @@ export class Tasks {
       (t) => t.name.toLowerCase().includes(term) || t.description?.toLowerCase().includes(term),
     );
   });
-  protected selectedTodo = signal<Todo | null>(null); // use for manage todo
+  protected selectedTask = signal<Task | null>(null); // use for manage task
   protected selectedModal = signal<ModalSelection>(null);
   protected closedModal = signal<boolean>(false); // for rendering animation
   protected closeModal() {
@@ -72,14 +72,14 @@ export class Tasks {
     this.closedModal.set(true);
     setTimeout(() => {
       this.selectedModal.set(null);
-      this.selectedTodo.set(null);
+      this.selectedTask.set(null);
       this.closedModal.set(false);
     }, 200);
   }
 
   protected emptyState = computed(() => {
     const term = this.searchService.searchTerm().trim();
-    const hasResults = this.todosToDisplay().length > 0;
+    const hasResults = this.tasksToDisplay().length > 0;
 
     if (term && !hasResults) {
       return {

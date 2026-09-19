@@ -1,6 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { Todo } from '../../../shared/models/todo';
-import { TodoDetailsList } from '../../../shared/components/todo-details-list/todo-details-list';
+import { Task } from '../../../shared/models/task';
+import { TaskDetailsList } from '../../../shared/components/task-details-list/task-details-list';
 import {
   LucideClock5,
   LucideFlagTriangleRight,
@@ -15,7 +15,7 @@ type TaskCategory = 'pending' | 'high_priority' | 'due_today' | 'overdue' | null
 @Component({
   selector: 'app-pending-tasks-details-modal',
   imports: [
-    TodoDetailsList,
+    TaskDetailsList,
     LucideX,
     LucideArrowLeft,
     LucideClock5,
@@ -27,25 +27,25 @@ type TaskCategory = 'pending' | 'high_priority' | 'due_today' | 'overdue' | null
   styles: ``,
 })
 export class PendingTasksDetailsModal {
-  todos = input.required<Todo[]>(); // Input todos from the parent component.
-  protected pendingTodos = computed(() => this.todos().filter((t) => t.status === 'pending'));
-  // Gets pending todos with high priority.
+  tasks = input.required<Task[]>(); // Input tasks from the parent component.
+  protected pendingTasks = computed(() => this.tasks().filter((t) => t.status === 'PENDING'));
+  // Gets pending tasks with high priority.
   protected pendingHighPriority = computed(() =>
-    this.pendingTodos().filter((t) => t.priority === 'high'),
+    this.pendingTasks().filter((t) => t.priority === 'HIGH'),
   );
-  // Gets pending todos that are due today.
+  // Gets pending tasks that are due today.
   protected pendingDueToday = computed(() => {
     const today = new Date().toDateString();
-    return this.pendingTodos().filter((t) => {
+    return this.pendingTasks().filter((t) => {
       return new Date(t.duedate).toDateString() === today;
     });
   });
-  // Gets overdue todos that are not completed.
-  protected overdueTodos = computed(() => {
+  // Gets overdue tasks that are not completed.
+  protected overdueTasks = computed(() => {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-    return this.todos()
-      .filter((t) => t.status !== 'completed')
+    return this.tasks()
+      .filter((t) => t.status !== 'COMPLETED')
       .filter((t) => new Date(t.duedate) < startOfDay);
   });
   closed = output<void>(); // used to notify the parent when the modal is closed.
