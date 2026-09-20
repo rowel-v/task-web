@@ -22,7 +22,7 @@
     <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('completed')">
       <input type="radio" name="my_tabs_4" />
       <svg lucideCircleCheck />
-      Completed
+      Completed 
     </label>
   </div>
 
@@ -37,7 +37,7 @@
           <p class="mt-2 italic">{{ task.description }}</p>
           <div class="flex gap-3 mt-3">
             <app-tasks-status-badge [status]="task.status" />
-            <p class="font-extralight">Due: {{ task.duedate | date: 'medium' }}</p>
+            <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
           </div>
         </div>
       </div>
@@ -54,9 +54,29 @@
         <p class="text-[18px] italic font-extralight">{{ emptyState().message }}</p>
       </div>
     }
+
+    <div class="fixed right-0 bottom-0 mr-12 mb-12">
+      <button
+        class="btn btn-md bg-app-button-purple hover:bg-app-button-hover-gray text-app-text-green border-none"
+        (click)="selectedModal.set('create-task-dialog')"
+      >
+        <svg lucidePlus />
+        <span class="hidden sm:inline">Add Task</span>
+      </button>
+    </div>
   </div>
 </div>
 
 @if (selectedModal() === 'task-details-dialog' && selectedTask(); as task) {
   <app-task-details-dialog [task]="task" (closed)="closeModal()" [isClosing]="closedModal()" />
+}
+
+@if (selectedModal() === 'create-task-dialog') {
+  <app-create-task-dialog
+    [isClosing]="closedModal()"
+    [errorMessage]="createTaskError()"
+    [isLoading]="isCreatingTask()"
+    (cancelled)="closeModal()"
+    (submitted)="onTaskSubmitted($event)"
+  />
 }

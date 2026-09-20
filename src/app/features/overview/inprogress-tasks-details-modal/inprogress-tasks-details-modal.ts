@@ -39,7 +39,7 @@ export class InprogressTasksDetailsModal {
   protected inProgressDueToday = computed(() => {
     const today = new Date().toDateString();
     return this.inProgressTasks().filter((t) => {
-      return new Date(t.duedate).toDateString() === today;
+      return new Date(t.dueDate).toDateString() === today;
     });
   });
   // Gets tasks that are not completed and past their due date.
@@ -48,7 +48,7 @@ export class InprogressTasksDetailsModal {
     startOfDay.setHours(0, 0, 0, 0);
     return this.tasks()
       .filter((t) => t.status !== 'COMPLETED')
-      .filter((t) => new Date(t.duedate) < startOfDay);
+      .filter((t) => new Date(t.dueDate) < startOfDay);
   });
   closed = output<void>(); // used to notify the parent when the modal is closed.
   protected isClosing = signal(false); // Controls the modal closing animation.

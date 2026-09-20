@@ -1,15 +1,19 @@
-import { Component, computed, inject, Signal, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, Signal, signal } from '@angular/core';
 import { TaskService } from '../../core/services/task-service/task-service';
 import { Task } from '../../shared/models/task';
 import { CommonModule } from '@angular/common';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import { SearchService } from '../../core/services/search-service/search-service';
+import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
+import { finalize } from 'rxjs';
 import {
   LucideClipboardList,
   LucideClock5,
   LucideCircleEllipsis,
   LucideCircleCheck,
+  LucidePlus,
 } from '@lucide/angular';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
@@ -25,11 +29,16 @@ type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-
     LucideCircleCheck,
     TasksStatusBadge,
     TaskDetailsDialog,
+    LucidePlus,
+    CreateTaskDialog,
   ],
   templateUrl: './tasks.html',
   styles: ``,
 })
-export class Tasks {
+export class Tasks implements OnInit {
+  ngOnInit(): void {
+    this.taskService.getAllTask().subscribe();
+  }
   private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
   protected tasks: Signal<Task[]> = this.taskService.tasks;
@@ -116,4 +125,24 @@ export class Tasks {
         };
     }
   });
+
+  protected readonly isCreatingTask = signal<boolean>(false);
+  protected readonly createTaskError = signal<string | null>(null);
+  protected onTaskSubmitted(req: CreateTaskRequest) {
+    this.createTaskError.set(null); // clear previous error
+    this.isCreatingTask.set(true);
+
+   setTimeout(() => {
+     this.taskService
+      .createTask(req)
+      .pipe(finalize(() => this.isCreatingTask.set(false)))
+      .subscribe({
+        next: () => this.closeModal(),
+        error: (err) => {
+          console.error('Failed to create task', err);
+          this.createTaskError.set('Failed to create task. Please try again.');
+        },
+      });
+   }, 5000);
+  }
 }

@@ -254,7 +254,7 @@
                     </div>
                   </td>
 
-                  <td>{{ upcomingTask.duedate | date: 'short' }}</td>
+                  <td>{{ upcomingTask.dueDate | date: 'short' }}</td>
 
                   <td class="rounded-r-md">
                     @switch (upcomingTask.status) {
@@ -280,7 +280,8 @@
 </div>
 
 @if (openModal() === 'create-task-dialog') {
-  <app-create-task-dialog [isClosing]="isClosing()" (cancelled)="closeModal()" />
+  <!--todo-->
+  <!-- <app-create-task-dialog [isClosing]="isClosing()" (cancelled)="closeModal()" /> -->
 }
 
 @if (openModal() === 'task-details-dialog' && selectedTask(); as task) {

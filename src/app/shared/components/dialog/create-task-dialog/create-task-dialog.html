@@ -1,10 +1,7 @@
-<div
-  class="fixed inset-0 z-100 bg-black/20 flex items-center justify-center p-4"
-  (click)="cancelled.emit()"
->
+<div class="fixed inset-0 z-100 bg-black/20 flex items-center justify-center p-4">
   <!--Modal-->
   <div
-    class="flex flex-col px-6 pt-6 bg-app-background-white text-app-text-green w-full max-w-md h-100 rounded-md"
+    class="flex flex-col px-6 pt-6 bg-app-background-white text-app-text-green w-full max-w-md min-h-100 rounded-md"
     [class.scale-in-center]="!isClosing()"
     [class.scale-out-center]="isClosing()"
     (click)="$event.stopPropagation()"
@@ -23,13 +20,24 @@
     </div>
 
     <!--Modal Content-->
-    <form class="flex flex-col gap-6 mt-5">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 gap-6 mt-5">
       <!--Task name-->
-      <input type="text" placeholder="Task name" class="border-b me-2 h-7 text-lg outline-none" />
+      <div class="flex flex-col gap-1">
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="Task name"
+          class="border-b me-2 h-7 text-lg outline-none"
+        />
+        @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
+          <span class="text-red-500 text-sm">Task name is required.</span>
+        }
+      </div>
 
       <!--Task Description-->
       <input
         type="text"
+        formControlName="description"
         placeholder="Description (optional)"
         class="border-b me-2 h-7 text-lg outline-none"
       />
@@ -39,45 +47,74 @@
         <span>Priority</span>
 
         <label class="flex items-center text-sm gap-1">
-          <input type="radio" name="priority" value="low" checked />
+          <input type="radio" formControlName="priority" value="LOW" />
           Low
         </label>
 
         <label class="flex items-center text-sm gap-1">
-          <input type="radio" name="priority" value="medium" />
+          <input type="radio" formControlName="priority" value="MEDIUM" />
           Medium
         </label>
 
         <label class="flex items-center text-sm gap-1">
-          <input type="radio" name="priority" value="high" />
+          <input type="radio" formControlName="priority" value="HIGH" />
           High
         </label>
       </div>
-
       <div class="flex flex-wrap gap-6 text-[17px]">
         <!--Task Due date-->
-        <label class="inline-flex items-center gap-3">
-          Due date
-          <input type="date" class="border-b h-7 w-35 outline-none bg-transparent" />
-        </label>
+        <div class="flex flex-col gap-1">
+          <label class="inline-flex items-center gap-3">
+            Due date
+            <input
+              type="date"
+              formControlName="dueDate"
+              class="border-b h-7 w-35 outline-none bg-transparent"
+            />
+          </label>
+          <span class="text-red-500 text-sm">Due date is required.</span>
+        </div>
 
         <!--Task Due time-->
-        <label class="inline-flex items-center gap-3">
-          Due time
-          <input type="time" class="border-b h-7 w-35 outline-none bg-transparent" />
-        </label>
+        <div class="flex flex-col gap-1">
+          <label class="inline-flex items-center gap-3">
+            Due time
+            <input
+              type="time"
+              formControlName="dueTime"
+              class="border-b h-7 w-35 outline-none bg-transparent"
+            />
+          </label>
+          <span class="text-red-500 text-sm">Due time is required.</span>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="text-red-500 text-sm">{{ errorMessage() }}</p>
+      }
+
+      <!--Modal Footer-->
+      <div class="flex justify-end gap-3 mt-auto mb-5">
+        <button
+          class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
+          [disabled]="isLoading()"
+          (click)="cancelled.emit()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
+        >
+          @if (isLoading()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Saving...
+          } @else {
+            Save
+          }
+        </button>
       </div>
     </form>
-
-    <!--Modal Footer-->
-    <div class="flex justify-end gap-3 mt-auto pb-5">
-      <button
-        class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
-        (click)="cancelled.emit()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-accent hover:bg-app-background-hover">Save</button>
-    </div>
   </div>
 </div>

@@ -37,7 +37,7 @@ export class TaskService {
     const today = new Date();
 
     return this.tasksState().filter((task) => {
-      const dueDate = new Date(task.duedate);
+      const dueDate = new Date(task.dueDate);
 
       return (
         dueDate.getFullYear() === today.getFullYear() &&
@@ -50,8 +50,8 @@ export class TaskService {
   readonly upcomingTasks = computed(() => {
     const now = new Date();
     return this.tasksState()
-      .filter((task) => task.duedate && new Date(task.duedate) > now)
-      .sort((a, b) => new Date(a.duedate!).getTime() - new Date(b.duedate!).getTime());
+      .filter((task) => task.dueDate && new Date(task.dueDate) > now)
+      .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
   });
 
   getAllTask(): Observable<Task[]> {
