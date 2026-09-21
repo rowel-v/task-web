@@ -85,6 +85,12 @@ export class TaskService {
     );
   }
 
+  deleteTask(taskId: number): Observable<void> {
+    return this.http
+      .delete<void>(`http://localhost:8080/tasks/${taskId}`)
+      .pipe(tap(() => this.tasksState.update((tasks) => tasks.filter((t) => t.id !== taskId))));
+  }
+
   // addTodo(todo: Todo) {
   //   this.todosState.update((todos) => [
   //     ...todos,

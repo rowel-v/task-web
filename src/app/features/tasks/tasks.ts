@@ -7,6 +7,7 @@ import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-d
 import { SearchService } from '../../core/services/search-service/search-service';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
+import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
 import { finalize } from 'rxjs';
 import {
   LucideClipboardList,
@@ -14,23 +15,30 @@ import {
   LucideCircleEllipsis,
   LucideCircleCheck,
   LucidePlus,
+  LucideTrash,
+  LucideSquarePen,
 } from '@lucide/angular';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
-type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-dialog' | null;
+type ModalSelection =
+  'task-details-dialog' | 'create-task-dialog' | 'edit-task-dialog' | 'delete-task-dialog' | null;
 
 @Component({
   selector: 'app-tasks',
   imports: [
-    CommonModule,
     LucideClipboardList,
     LucideClock5,
     LucideCircleEllipsis,
     LucideCircleCheck,
+    LucidePlus,
+    LucideTrash,
+    LucideSquarePen,
+    CommonModule,
+
     TasksStatusBadge,
     TaskDetailsDialog,
-    LucidePlus,
     CreateTaskDialog,
+    DeleteTaskDialog,
   ],
   templateUrl: './tasks.html',
   styles: ``,
@@ -41,9 +49,11 @@ export class Tasks implements OnInit {
   }
   private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
-  protected tasks: Signal<Task[]> = this.taskService.tasks;
-  protected selectedTab = signal<TabSelection>('all');
-  protected tasksToDisplay = computed(() => {
+  protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
+  protected readonly selectedTab = signal<TabSelection>('all');
+  protected readonly selectedTask = signal<Task | null>(null); // use for manage task
+  protected readonly selectedModal = signal<ModalSelection>(null);
+  protected readonly tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
     console.log(term);
 
@@ -71,8 +81,7 @@ export class Tasks implements OnInit {
       (t) => t.name.toLowerCase().includes(term) || t.description?.toLowerCase().includes(term),
     );
   });
-  protected selectedTask = signal<Task | null>(null); // use for manage task
-  protected selectedModal = signal<ModalSelection>(null);
+
   protected closedModal = signal<boolean>(false); // for rendering animation
   protected closeModal() {
     if (this.closedModal()) {
@@ -86,7 +95,7 @@ export class Tasks implements OnInit {
     }, 200);
   }
 
-  protected emptyState = computed(() => {
+  protected readonly emptyState = computed(() => {
     const term = this.searchService.searchTerm().trim();
     const hasResults = this.tasksToDisplay().length > 0;
 
@@ -128,21 +137,39 @@ export class Tasks implements OnInit {
 
   protected readonly isCreatingTask = signal<boolean>(false);
   protected readonly createTaskError = signal<string | null>(null);
-  protected onTaskSubmitted(req: CreateTaskRequest) {
+  protected onTaskCreated(req: CreateTaskRequest): void {
     this.createTaskError.set(null); // clear previous error
     this.isCreatingTask.set(true);
 
-   setTimeout(() => {
-     this.taskService
-      .createTask(req)
-      .pipe(finalize(() => this.isCreatingTask.set(false)))
+    setTimeout(() => {
+      this.taskService
+        .createTask(req)
+        .pipe(finalize(() => this.isCreatingTask.set(false)))
+        .subscribe({
+          next: () => this.closeModal(),
+          error: (err) => {
+            console.error('Failed to create task', err);
+            this.createTaskError.set('Failed to create task. Please try again.');
+          },
+        });
+    }, 5000);
+  }
+  
+  protected readonly isDeletingTask = signal<boolean>(false);
+  protected readonly deleteTaskError = signal<string | null>(null);
+  protected onTaskDeleted(task: Task): void {
+    this.deleteTaskError.set(null);
+    this.isDeletingTask.set(true);
+
+    this.taskService
+      .deleteTask(task.id)
+      .pipe(finalize(() => this.isDeletingTask.set(false)))
       .subscribe({
         next: () => this.closeModal(),
         error: (err) => {
-          console.error('Failed to create task', err);
-          this.createTaskError.set('Failed to create task. Please try again.');
+          console.error('Failed to delete task', err);
+          this.deleteTaskError.set('Failed to delete task. Please try again.');
         },
       });
-   }, 5000);
   }
 }

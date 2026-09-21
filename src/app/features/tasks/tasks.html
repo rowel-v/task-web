@@ -22,14 +22,14 @@
     <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('completed')">
       <input type="radio" name="my_tabs_4" />
       <svg lucideCircleCheck />
-      Completed 
+      Completed
     </label>
   </div>
 
   <div class="flex flex-col overflow-y-auto">
     @for (task of tasksToDisplay(); track task.id) {
       <div
-        class="flex items-center cursor-pointer hover:bg-app-button-hover-gray p-4 rounded-md"
+        class="group flex items-center justify-between cursor-pointer hover:bg-app-button-hover-gray p-4 rounded-md"
         (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
       >
         <div class="flex flex-col">
@@ -39,6 +39,27 @@
             <app-tasks-status-badge [status]="task.status" />
             <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
           </div>
+        </div>
+
+        <!--Edit-->
+        <div class="group-hover:opacity-100 flex gap-3 opacity-0">
+          <button
+            class="btn btn-sm btn-circle bg-[#00D3BB] text-app-text-green border-0 hover:bg-[#15c2ae]"
+          >
+            <svg lucideSquarePen class="w-4 h-4" />
+          </button>
+
+          <!--Delete-->
+          <button
+            class="btn btn-sm btn-circle bg-red-500/90 text-app-text-white border-0 hover:bg-red-500/75"
+            (click)="
+              $event.stopPropagation();
+              selectedModal.set('delete-task-dialog');
+              selectedTask.set(task)
+            "
+          >
+            <svg lucideTrash2 class="w-4 h-4" />
+          </button>
         </div>
       </div>
     } @empty {
@@ -77,6 +98,17 @@
     [errorMessage]="createTaskError()"
     [isLoading]="isCreatingTask()"
     (cancelled)="closeModal()"
-    (submitted)="onTaskSubmitted($event)"
+    (submitted)="onTaskCreated($event)"
+  />
+}
+
+@if (selectedModal() === 'delete-task-dialog' && selectedTask(); as task) {
+  <app-delete-task-dialog
+    [task]="task"
+    [isClosing]="closedModal()"
+    [isDeleting]="isDeletingTask()"
+    [errorMessage]="deleteTaskError()"
+    (cancelled)="closeModal()"
+    (confirmed)="onTaskDeleted($event)"
   />
 }
