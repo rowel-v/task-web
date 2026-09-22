@@ -1,5 +1,6 @@
 @import url('https://googleapis.com');
 @import 'tailwindcss';
+@import 'vanilla-calendar-pro/styles/index.css';
 
 @plugin 'daisyui';
 
@@ -16,6 +17,75 @@
   --color-app-button-purple: #a47bd4;
   --color-app-button-hover-gray: #8f6bb8;
 }
+
+/* Vanilla Calendar Pro — custom theme*/
+:root {
+  /* Base */
+  --vc-bg: #12464a;
+  --vc-color: #e5e7eb;
+  --vc-header-color: #e5e7eb;
+  --vc-title-color: #e5e7eb;
+  --vc-title-color-hover: #00d3bb;
+
+  /* Weekdays (no red distinction) */
+  --vc-week-day-color: #e5e7eb;
+  --vc-week-day-color-hover: #00d3bb;
+  --vc-week-day-off-color: #e5e7eb;
+  --vc-week-day-off-color-hover: #00d3bb;
+
+  /* Dates */
+  --vc-date-bg: #12464a;
+  --vc-date-color: #e5e7eb;
+  --vc-date-bg-hover: #3b7e76;
+  --vc-date-today-bg: #1a5b60;
+  --vc-date-today-color: #00d3bb;
+  --vc-date-selected-bg: #8b5fbf;
+  --vc-date-selected-color: #ffffff;
+  --vc-date-outside-color: #5ca598;
+  --vc-date-disabled-color: #6b9490;
+
+  /* Weekends — matched to regular dates, no red */
+  --vc-date-weekend-color: #e5e7eb;
+  --vc-date-weekend-bg-hover: #3b7e76;
+  --vc-date-weekend-today-color: #00d3bb;
+  --vc-date-weekend-selected-bg: #8b5fbf;
+  --vc-date-weekend-selected-color: #ffffff;
+  --vc-date-weekend-disabled-color: #6b9490;
+  --vc-date-weekend-today-disabled-color: #6b9490;
+  --vc-date-weekend-outside-color: #5ca598;
+  --vc-date-weekend-outside-bg: #12464a;
+  --vc-date-weekend-disabled-outside-color: #6b9490;
+
+  /* Time controls */
+  --vc-time-border-color: #3b7e76;
+  --vc-time-separator-color: #e5e7eb;
+  --vc-time-input-bg: #12464a;
+  --vc-time-input-color: #e5e7eb;
+  --vc-time-range-track-color: #3b7e76;
+  --vc-time-range-thumb-bg: #00d3bb;
+  --vc-time-keeping-color: #e5e7eb;
+  --vc-time-keeping-color-hover: #00d3bb;
+
+  /* Month / year picker */
+  --vc-months-years-bg: #12464a;
+  --vc-months-years-color: #e5e7eb;
+  --vc-months-years-bg-hover: #3b7e76;
+  --vc-months-years-color-disabled: #6b9490;
+  --vc-months-years-bg-selected: #8b5fbf;
+  --vc-months-years-color-selected: #ffffff;
+
+  /* Time controls */
+  --vc-time-border-color: #3b7e76;
+  --vc-time-separator-color: #e5e7eb;
+  --vc-time-input-bg: #12464a;
+  --vc-time-input-color: #e5e7eb;
+  --vc-time-range-bg: #12464a;
+  --vc-time-range-track-color: #3b7e76;
+  --vc-time-range-thumb-bg: #00d3bb;
+  --vc-time-range-thumb-border: #00d3bb;
+  --vc-time-range-thumb-border-hover: #21b9a8;
+}
+
 
 /* Animations */
 
@@ -206,9 +276,9 @@
 
 /* used in create task dialog   */
 .scale-in-center {
-	animation: scale-in-center 0.3s cubic-bezier(0.445, 0.050, 0.550, 0.950) both;
+  animation: scale-in-center 0.3s cubic-bezier(0.445, 0.05, 0.55, 0.95) both;
 }
 
 .scale-out-center {
-	animation: scale-out-center 0.3s cubic-bezier(0.445, 0.050, 0.550, 0.950) reverse both;
+  animation: scale-out-center 0.3s cubic-bezier(0.445, 0.05, 0.55, 0.95) reverse both;
 }

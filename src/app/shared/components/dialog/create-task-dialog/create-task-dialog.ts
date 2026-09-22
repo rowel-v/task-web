@@ -3,10 +3,11 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TaskPriority } from '../../../models/task';
 import { LucideX } from '@lucide/angular';
 import { CreateTaskRequest } from '../../../models/request/create-task-request';
+import { DateTimePicker } from '../../date-time-picker/date-time-picker';
 
 @Component({
   selector: 'app-create-task-dialog',
-  imports: [LucideX, ReactiveFormsModule],
+  imports: [LucideX, ReactiveFormsModule, DateTimePicker],
   templateUrl: './create-task-dialog.html',
   styles: ``,
 })
@@ -33,9 +34,6 @@ export class CreateTaskDialog {
     dueDate: new FormControl<string | null>(null, {
       validators: [Validators.required],
     }),
-    dueTime: new FormControl<string | null>(null, {
-      validators: [Validators.required],
-    }),
   });
 
   onSubmit() {
@@ -44,9 +42,9 @@ export class CreateTaskDialog {
       return;
     }
 
-    const { dueDate, dueTime, ...rest } = this.taskForm.getRawValue();
+    const { dueDate, ...rest } = this.taskForm.getRawValue();
     // dueDate: "2026-01-15", dueTime: "14:30"
-    const parsedDueDate = new Date(`${dueDate}T${dueTime}`);
+    const parsedDueDate = new Date(`${dueDate}`);
     const payload: CreateTaskRequest = {
       ...rest,
       dueDate: parsedDueDate.toISOString(),
@@ -54,5 +52,17 @@ export class CreateTaskDialog {
 
     console.log(payload);
     this.submitted.emit(payload);
+  }
+
+  protected readonly minDate = new Date().toISOString().split('T')[0]; // "2026-09-21"
+
+  protected isToday(): boolean {
+    const selected = this.taskForm.controls.dueDate.value;
+    return selected === this.minDate;
+  }
+
+  protected get minTime(): string {
+    const now = new Date();
+    return now.toTimeString().slice(0, 5); // "HH:mm"
   }
 }

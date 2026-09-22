@@ -30,6 +30,7 @@
           class="border-b me-2 h-7 text-lg outline-none"
         />
         @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
+          <!--Error label-->
           <span class="text-red-500 text-sm">Task name is required.</span>
         }
       </div>
@@ -61,32 +62,15 @@
           High
         </label>
       </div>
-      <div class="flex flex-wrap gap-6 text-[17px]">
-        <!--Task Due date-->
-        <div class="flex flex-col gap-1">
-          <label class="inline-flex items-center gap-3">
-            Due date
-            <input
-              type="date"
-              formControlName="dueDate"
-              class="border-b h-7 w-35 outline-none bg-transparent"
-            />
-          </label>
-          <span class="text-red-500 text-sm">Due date is required.</span>
-        </div>
 
-        <!--Task Due time-->
-        <div class="flex flex-col gap-1">
-          <label class="inline-flex items-center gap-3">
-            Due time
-            <input
-              type="time"
-              formControlName="dueTime"
-              class="border-b h-7 w-35 outline-none bg-transparent"
-            />
-          </label>
-          <span class="text-red-500 text-sm">Due time is required.</span>
-        </div>
+      <!--Task Due date-->
+      <div class="flex flex-col gap-1">
+        <app-date-time-picker (dateSelected)="taskForm.patchValue({ dueDate: $event })" />
+
+        @if (taskForm.controls.dueDate.invalid && taskForm.controls.dueDate.touched) {
+          <!--Error label-->
+          <span class="text-red-500 text-sm">Due date is required.</span>
+        }
       </div>
 
       @if (errorMessage()) {

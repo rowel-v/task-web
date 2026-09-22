@@ -1,0 +1,24 @@
+<div #calendarRef class="flex flex-wrap text-[17px] w-fit items-center gap-2">
+  <label class="inline-flex items-center gap-3">
+    Due
+    <input
+      type="text"
+      placeholder="Select"
+      class="border-b h-7 outline-none bg-transparent"
+      readonly
+      [value]="selectedDate() | date: 'MMM d, y, h:mm a'"
+    />
+  </label>
+
+  <!--Clear button-->
+  @if (selectedDate()) {
+    <button
+      type="button"
+      aria-label="Clear selected date"
+      (click)="$event.stopPropagation(); dateSelected.emit(''); selectedDate.set('')"
+      class="cursor-pointer hover:rounded-md hover:bg-gray-300"
+    >
+      <svg lucideX size="20" />
+    </button>
+  }
+</div>
