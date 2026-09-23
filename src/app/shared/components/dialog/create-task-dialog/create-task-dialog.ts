@@ -1,9 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskPriority } from '../../../models/task';
 import { LucideX } from '@lucide/angular';
 import { CreateTaskRequest } from '../../../models/request/create-task-request';
 import { DateTimePicker } from '../../date-time-picker/date-time-picker';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-create-task-dialog',
@@ -17,7 +18,7 @@ export class CreateTaskDialog {
   isClosing = input.required<boolean>();
   isLoading = input.required<boolean>();
   errorMessage = input<string | null>(null);
-  taskForm = new FormGroup({
+  protected readonly taskForm = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -36,33 +37,27 @@ export class CreateTaskDialog {
     }),
   });
 
-  onSubmit() {
+  private readonly taskFormValueSignal = toSignal(this.taskForm.valueChanges, {
+    initialValue: this.taskForm.value,
+  });
+
+  taskFormLogger = effect(() => {
+    const currentValue = this.taskFormValueSignal();
+    console.log('current taskform value: ', currentValue);
+  });
+
+  protected onSubmit() {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
       return;
     }
 
     const { dueDate, ...rest } = this.taskForm.getRawValue();
-    // dueDate: "2026-01-15", dueTime: "14:30"
     const parsedDueDate = new Date(`${dueDate}`);
     const payload: CreateTaskRequest = {
       ...rest,
       dueDate: parsedDueDate.toISOString(),
     };
-
-    console.log(payload);
     this.submitted.emit(payload);
-  }
-
-  protected readonly minDate = new Date().toISOString().split('T')[0]; // "2026-09-21"
-
-  protected isToday(): boolean {
-    const selected = this.taskForm.controls.dueDate.value;
-    return selected === this.minDate;
-  }
-
-  protected get minTime(): string {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5); // "HH:mm"
   }
 }

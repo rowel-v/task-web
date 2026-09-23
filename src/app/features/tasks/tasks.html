@@ -1,62 +1,71 @@
 <div class="mx-auto w-full h-full flex flex-col text-app-text-white">
-  <!--All-->
+  <!--Tab list-->
   <div class="tabs tabs-border gap-1 mb-3">
-    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('all')">
-      <input type="radio" name="my_tabs_4" checked="checked" />
+    <!--All-->
+    <label class="tab gap-1 text-[15px]">
+      <input type="radio" name="my_tabs_4" checked="checked" (change)="selectedTab.set('all')" />
       <svg lucideClipboardList />
       All
     </label>
     <!--Pending-->
-    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('pending')">
-      <input type="radio" name="my_tabs_4" />
+    <label class="tab gap-1 text-[15px]">
+      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('pending')" />
       <svg lucideClock5 />
       Pending
     </label>
     <!--In progress-->
-    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('in_progress')">
-      <input type="radio" name="my_tabs_4" />
+    <label class="tab gap-1 text-[15px]">
+      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('in_progress')" />
       <svg lucideCircleEllipsis />
       In Progress
     </label>
     <!--Completed-->
-    <label class="tab gap-1 text-[15px]" (click)="selectedTab.set('completed')">
-      <input type="radio" name="my_tabs_4" />
+    <label class="tab gap-1 text-[15px]">
+      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('completed')" />
       <svg lucideCircleCheck />
       Completed
     </label>
   </div>
 
   <div class="flex flex-col overflow-y-auto">
+    <!--list of Task-->
     @for (task of tasksToDisplay(); track task.id) {
       <div
-        class="group flex items-center justify-between cursor-pointer hover:bg-app-button-hover-gray p-4 rounded-md"
-        (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
+        class="group relative flex items-center justify-between hover:bg-app-button-hover-gray focus-within:bg-app-button-hover-gray rounded-md"
       >
-        <div class="flex flex-col">
-          <p class="text-[18px] font-medium">{{ task.name | titlecase }}</p>
-          <p class="mt-2 italic">{{ task.description }}</p>
-          <div class="flex gap-3 mt-3">
-            <app-tasks-status-badge [status]="task.status" />
-            <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
+        <!--Clickable task info-->
+        <button
+          type="button"
+          class="flex-1 flex items-center justify-between text-left p-4 focus:outline-none rounded-md"
+          (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
+        >
+          <div class="flex flex-col">
+            <p class="text-[18px] font-medium">{{ task.name | titlecase }}</p>
+            <p class="mt-2 italic">{{ task.description }}</p>
+            <div class="flex gap-3 mt-3">
+              <app-tasks-status-badge [status]="task.status" />
+              <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
+            </div>
           </div>
-        </div>
+        </button>
 
-        <!--Edit-->
-        <div class="group-hover:opacity-100 flex gap-3 opacity-0">
+        <div
+          class="flex gap-3 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pr-4"
+        >
+          <!--Edit Button-->
           <button
+            type="button"
             class="btn btn-sm btn-circle bg-[#00D3BB] text-app-text-green border-0 hover:bg-[#15c2ae]"
+            (click)="selectedModal.set('edit-task-dialog'); selectedTask.set(task)"
           >
             <svg lucideSquarePen class="w-4 h-4" />
           </button>
 
-          <!--Delete-->
+          <!--Delete Button-->
           <button
+            type="button"
             class="btn btn-sm btn-circle bg-red-500/90 text-app-text-white border-0 hover:bg-red-500/75"
-            (click)="
-              $event.stopPropagation();
-              selectedModal.set('delete-task-dialog');
-              selectedTask.set(task)
-            "
+            (click)="selectedModal.set('delete-task-dialog'); selectedTask.set(task)"
           >
             <svg lucideTrash2 class="w-4 h-4" />
           </button>
@@ -76,6 +85,7 @@
       </div>
     }
 
+    <!-- Floating "Add Task" button, fixed to bottom-right corner of the viewport -->
     <div class="fixed right-0 bottom-0 mr-12 mb-12">
       <button
         class="btn btn-md bg-app-button-purple hover:bg-app-button-hover-gray text-app-text-green border-none"
@@ -88,10 +98,12 @@
   </div>
 </div>
 
+<!--Task details dialog-->
 @if (selectedModal() === 'task-details-dialog' && selectedTask(); as task) {
   <app-task-details-dialog [task]="task" (closed)="closeModal()" [isClosing]="closedModal()" />
 }
 
+<!--Create task dialog-->
 @if (selectedModal() === 'create-task-dialog') {
   <app-create-task-dialog
     [isClosing]="closedModal()"
@@ -102,6 +114,7 @@
   />
 }
 
+<!--Delete task confirmation dialog-->
 @if (selectedModal() === 'delete-task-dialog' && selectedTask(); as task) {
   <app-delete-task-dialog
     [task]="task"
@@ -110,5 +123,16 @@
     [errorMessage]="deleteTaskError()"
     (cancelled)="closeModal()"
     (confirmed)="onTaskDeleted($event)"
+  />
+}
+
+@if (selectedModal() === 'edit-task-dialog' && selectedTask(); as task) {
+  <app-edit-task-dialog
+    [task]="task"
+    [isClosing]="closedModal()"
+    [isUpdating]="isUpdatingTask()"
+    [errorMessage]="updateTaskError()"
+    (cancelled)="closeModal()"
+    (submitted)="onTaskUpdated($event.taskId, $event.req)"
   />
 }

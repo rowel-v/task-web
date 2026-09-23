@@ -1,18 +1,18 @@
 import { Calendar } from 'vanilla-calendar-pro';
 import { AfterViewInit, Component, ElementRef, output, signal, viewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { LucideX } from '@lucide/angular';
+import { LucideCalendarDays, LucideX } from '@lucide/angular';
 
 @Component({
   selector: 'app-date-time-picker',
   standalone: true,
-  imports: [DatePipe, LucideX],
+  imports: [DatePipe, LucideX, LucideCalendarDays],
   templateUrl: './date-time-picker.html',
 })
 export class DateTimePicker implements AfterViewInit {
-  calendarEl = viewChild.required<ElementRef>('calendarRef');
-  dateSelected = output<string>(); // emits the chosen date string
-  protected readonly selectedDate = signal<string>('');
+  private readonly calendarEl = viewChild.required<ElementRef>('calendarRef');
+  dateSelected = output<string>(); // emits the chosen date as string format
+  protected readonly selectedDate = signal<string>(''); // for display in its template
   private calendar!: Calendar;
   ngAfterViewInit(): void {
     this.calendar = new Calendar(this.calendarEl().nativeElement, {
@@ -41,6 +41,8 @@ export class DateTimePicker implements AfterViewInit {
           <button type="button" data-vc-save class="btn btn-accent btn-sm w-full mt-1">Confirm</button>
         `,
       },
+      selectedDates: this.getCurrentDate(), // default selected date
+      selectedTime: this.getCurrentTimeFormatted(), // default selected time
       onShow: (self) => {
         const popup = self.context.mainElement as HTMLElement;
         if (popup) {
@@ -83,7 +85,10 @@ export class DateTimePicker implements AfterViewInit {
     this.calendar.init();
   }
 
-  // for converting 12 hours format time into 24 hours format
+  /**
+   * Converts a 12-hour time string
+   * (e.g. "02:37 PM") into 24-hour format ("14:37").
+   */
   private to24Hour(time: string): string {
     const [timePart, period] = time.split(' ');
 
@@ -99,5 +104,26 @@ export class DateTimePicker implements AfterViewInit {
     }
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Returns the current time formatted as "hh:mm aa" (e.g. "02:37 PM"),
+   * matching the format vanilla-calendar-pro's `selectedTime` option expects.
+   */
+  private getCurrentTimeFormatted(): string {
+    return new Date().toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  }
+
+  /**
+   * Returns today's date as a single-item array in "YYYY-MM-DD" format
+   * (e.g. ["2026-09-22"]),  matching the format vanilla-calendar-pro's
+   * what `selectedDates` expects.
+   */
+  private getCurrentDate(): string[] {
+    return [new Date().toISOString().split('T')[0]];
   }
 }

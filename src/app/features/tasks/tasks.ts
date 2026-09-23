@@ -18,6 +18,8 @@ import {
   LucideTrash,
   LucideSquarePen,
 } from '@lucide/angular';
+import { UpdateTaskRequest } from '../../shared/models/request/update-task-request';
+import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
@@ -39,6 +41,7 @@ type ModalSelection =
     TaskDetailsDialog,
     CreateTaskDialog,
     DeleteTaskDialog,
+    EditTaskDialog,
   ],
   templateUrl: './tasks.html',
   styles: ``,
@@ -49,13 +52,12 @@ export class Tasks implements OnInit {
   }
   private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
-  protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
   protected readonly selectedTab = signal<TabSelection>('all');
   protected readonly selectedTask = signal<Task | null>(null); // use for manage task
   protected readonly selectedModal = signal<ModalSelection>(null);
+  private readonly tasks: Signal<Task[]> = this.taskService.tasks;
   protected readonly tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
-    console.log(term);
 
     let filtered: Task[] = [];
     switch (this.selectedTab()) {
@@ -154,7 +156,7 @@ export class Tasks implements OnInit {
         });
     }, 5000);
   }
-  
+
   protected readonly isDeletingTask = signal<boolean>(false);
   protected readonly deleteTaskError = signal<string | null>(null);
   protected onTaskDeleted(task: Task): void {
@@ -169,6 +171,24 @@ export class Tasks implements OnInit {
         error: (err) => {
           console.error('Failed to delete task', err);
           this.deleteTaskError.set('Failed to delete task. Please try again.');
+        },
+      });
+  }
+
+  protected readonly isUpdatingTask = signal<boolean>(false);
+  protected readonly updateTaskError = signal<string | null>(null);
+  protected onTaskUpdated(taskId: number, req: UpdateTaskRequest): void {
+    this.updateTaskError.set(null);
+    this.isUpdatingTask.set(true);
+
+    this.taskService
+      .updateTask(taskId, req)
+      .pipe(finalize(() => this.isUpdatingTask.set(false)))
+      .subscribe({
+        next: () => this.closeModal(),
+        error: (err) => {
+          console.error('Failed to delete task', err);
+          this.updateTaskError.set('Failed to delete task. Please try again.');
         },
       });
   }

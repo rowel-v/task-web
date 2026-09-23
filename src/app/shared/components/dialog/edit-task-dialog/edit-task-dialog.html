@@ -1,4 +1,145 @@
-<p cli>{{ s }}</p>
-<div cl >
+<dialog
+  class="fixed inset-0 z-100 bg-black/20 flex items-center justify-center p-4 w-full h-full max-w-full max-h-full"
+  open
+>
+  <!--Modal-->
+  <div
+    class="flex flex-col px-6 pt-6 bg-app-background-white text-app-text-green w-full max-w-md min-h-100 rounded-md"
+    [class.scale-in-center]="!isClosing()"
+    [class.scale-out-center]="isClosing()"
+    (click)="$event.stopPropagation()"
+    (keydown)="$event.stopPropagation()"
+    tabindex="-1"
+  >
+    <!--Modal header-->
+    <div class="flex justify-between items-start">
+      <div class="flex flex-col gap-1">
+        <p class="text-2xl font-bold">Edit Task</p>
+        <p>Update the details of your task.</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Close dialog"
+        class="cursor-pointer hover:rounded-md hover:bg-gray-300"
+        (click)="cancelled.emit()"
+      >
+        <svg lucideX />
+      </button>
+    </div>
 
-</div>
+    <!--Modal Content-->
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 gap-6 mt-5">
+      <!--Task name-->
+      <div class="flex items-start gap-3 text-lg">
+        <label for="task-name" class="shrink-0"> Task name: </label>
+
+        <div class="flex flex-col flex-1 gap-1 text-lg">
+          <input
+            id="task-name"
+            type="text"
+            formControlName="name"
+            placeholder="Enter task name"
+            class="flex-1 border-b h-7 outline-none"
+          />
+          @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
+            <!--Error label-->
+            <span class="text-red-500 text-sm">Task name is required.</span>
+          }
+        </div>
+      </div>
+
+      <!--Task Description-->
+      <div class="flex items-start gap-2">
+        <label for="task-desc" class="text-lg shrink-0"> Description: </label>
+
+        <div class="flex flex-1">
+          <input
+            id="task-desc"
+            type="text"
+            formControlName="description"
+            placeholder="(optional)"
+            class="flex-1 border-b h-7 text-lg outline-none"
+          />
+        </div>
+      </div>
+
+      <!--Task Priority-->
+      <div class="flex items-center justify-start gap-3 text-[17px]">
+        <span>Priority:</span>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="priority" value="LOW" />
+          Low
+        </label>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="priority" value="MEDIUM" />
+          Medium
+        </label>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="priority" value="HIGH" />
+          High
+        </label>
+      </div>
+
+      <!--Task Status-->
+      <div class="flex items-center justify-start gap-3 text-[17px]">
+        <span>Status:</span>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="status" value="PENDING" />
+          Pending
+        </label>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="status" value="IN_PROGRESS" />
+          In Progress
+        </label>
+
+        <label class="flex items-center text-sm gap-1">
+          <input type="radio" formControlName="status" value="COMPLETED" />
+          Completed
+        </label>
+      </div>
+
+      <!--Task Due date-->
+      <div class="flex flex-col gap-1">
+        <app-date-time-picker (dateSelected)="taskForm.patchValue({ dueDate: $event })" />
+
+        @if (taskForm.controls.dueDate.invalid && taskForm.controls.dueDate.touched) {
+          <!--Error label-->
+          <span class="text-red-500 text-sm">Due date is required.</span>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="text-red-500 text-sm">{{ errorMessage() }}</p>
+      }
+
+      <!--Modal Footer-->
+      <div class="flex justify-end gap-3 mt-auto mb-5">
+        <button
+          type="button"
+          class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
+          [disabled]="isUpdating()"
+          (click)="cancelled.emit()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="isUpdating()"
+          class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
+        >
+          @if (isUpdating()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Updating...
+          } @else {
+            Save
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
