@@ -5,6 +5,7 @@ import { map, Observable, tap } from 'rxjs';
 import { ApiResponse } from '../../../shared/models/response/api-response';
 import { CreateTaskRequest } from '../../../shared/models/request/create-task-request';
 import { UpdateTaskRequest } from '../../../shared/models/request/update-task-request';
+import { TaskStatusAction } from '../../../shared/components/dialog/task-details-dialog/task-details-dialog';
 
 @Injectable({
   providedIn: 'root',
@@ -89,6 +90,19 @@ export class TaskService {
     return this.http
       .delete<void>(`http://localhost:8080/tasks/${taskId}`)
       .pipe(tap(() => this.tasksState.update((tasks) => tasks.filter((t) => t.id !== taskId))));
+  }
+
+  updateTaskStatus(taskId: number, taskStatusAction: TaskStatusAction): Observable<Task> {
+    return this.http
+      .patch<ApiResponse<Task>>(`http://localhost:8080/tasks/${taskId}/${taskStatusAction}`, null)
+      .pipe(
+        tap((result) =>
+          this.tasksState.update((task) =>
+            task.map((t) => (t.id === result.data.id ? result.data : t)),
+          ),
+        ),
+        map((result) => result.data),
+      );
   }
 
   // addTodo(todo: Todo) {

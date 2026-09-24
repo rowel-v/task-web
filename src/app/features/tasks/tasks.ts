@@ -3,7 +3,10 @@ import { TaskService } from '../../core/services/task-service/task-service';
 import { Task } from '../../shared/models/task';
 import { CommonModule } from '@angular/common';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
-import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import {
+  TaskDetailsDialog,
+  TaskStatusAction,
+} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import { SearchService } from '../../core/services/search-service/search-service';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
@@ -181,7 +184,7 @@ export class Tasks implements OnInit {
     this.updateTaskError.set(null);
     this.isUpdatingTask.set(true);
 
-    console.log("Emitted Value: ", req);
+    console.log('Emitted Value: ', req);
 
     this.taskService
       .updateTask(taskId, req)
@@ -191,6 +194,24 @@ export class Tasks implements OnInit {
         error: (err) => {
           console.error('Failed to delete task', err);
           this.updateTaskError.set('Failed to delete task. Please try again.');
+        },
+      });
+  }
+  
+  protected readonly isUpdatingTaskStatus = signal<boolean>(false);
+  protected readonly updateTaskStatusError = signal<string | null>(null);
+  protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
+    this.updateTaskStatusError.set(null);
+    this.isUpdatingTaskStatus.set(true);
+
+    this.taskService
+      .updateTaskStatus(targetTask.id, taskStatusAction)
+      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)  ))
+      .subscribe({
+        next: () => setTimeout(() => this.closeModal(), 5000),
+        error: (err) => {
+          console.error('Failed to update task status', err);
+          this.updateTaskStatusError.set('Failed to update task status. Please try again.');
         },
       });
   }

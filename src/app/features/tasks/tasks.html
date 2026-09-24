@@ -100,15 +100,22 @@
 
 <!--Task details dialog-->
 @if (selectedModal() === 'task-details-dialog' && selectedTask(); as task) {
-  <app-task-details-dialog [task]="task" (closed)="closeModal()" [isClosing]="closedModal()" />
+  <app-task-details-dialog
+    [task]="task"
+    [isClosing]="closedModal()"
+    [isLoading]="isUpdatingTaskStatus()"
+    [errorMessage]="updateTaskStatusError()"
+    (closed)="closeModal()"
+    (statusChangeRequested)="onTaskUpdatedStatus($event.targetTask, $event.action)"
+  />
 }
 
 <!--Create task dialog-->
 @if (selectedModal() === 'create-task-dialog') {
   <app-create-task-dialog
     [isClosing]="closedModal()"
-    [errorMessage]="createTaskError()"
     [isLoading]="isCreatingTask()"
+    [errorMessage]="createTaskError()"
     (cancelled)="closeModal()"
     (submitted)="onTaskCreated($event)"
   />

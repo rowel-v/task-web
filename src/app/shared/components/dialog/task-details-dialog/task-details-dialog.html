@@ -8,18 +8,10 @@
   (keydown.escape)="closed.emit()"
 >
   <!--Header-->
-  <div class="flex items-start justify-between px-6 pt-6 pb-4">
-    <div class="flex items-center gap-2">
-      <p class="text-2xl font-bold" [class.line-through]="task().status === 'COMPLETED'">
-        {{ task().name | titlecase }}
-      </p>
-      <span class="text-app-text-green opacity-40">—</span>
-      <span
-        class="w-fit px-2.5 py-0.5 rounded-md text-[11px] font-semibold border"
-        [class]="statusClasses()"
-      >
-        {{ task().status.replace('_', ' ') }}
-      </span>
+  <div class="flex items-center justify-between px-6 pt-6 pb-4">
+    <div class="flex items-center gap-4">
+      <p class="text-2xl font-bold">{{ task().name | titlecase }}</p>
+      <app-tasks-status-badge [status]="task().status" />
     </div>
 
     <button tabindex="0" (click)="closed.emit()" (keydown.enter)="closed.emit()">
@@ -30,6 +22,7 @@
       />
     </button>
   </div>
+
   <!--Content-->
   <div class="flex flex-col gap-4 px-6 pb-5 overflow-y-auto text-[17px]">
     @if (task().description) {
@@ -64,28 +57,60 @@
         <span>Completed: {{ task().completedAt | date: 'short' }}</span>
       }
     </div>
+
+    @if (errorMessage()) {
+      <p class="text-sm text-red-500">{{ errorMessage() }}</p>
+    }
   </div>
 
   <!--Footer-->
   <div class="flex justify-end gap-3 px-6 pb-5 pt-3">
     <button
       class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
+      [disabled]="isLoading()"
       (click)="closed.emit()"
     >
       Cancel
     </button>
 
     @if (task().status === 'PENDING') {
-      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
-        <svg lucidePlay class="w-4 h-4" /> Start
+      <button
+        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        [disabled]="isLoading()"
+        (click)="onStatusChangeRequested('START')"
+      >
+        @if (isLoading()) {
+        <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+        } @else {
+          <svg lucidePlay class="w-4 h-4" />
+        }
+        Start
       </button>
     } @else if (task().status === 'IN_PROGRESS') {
-      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
-        <svg lucideCheck class="w-4 h-4" /> Complete
+      <button
+        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        [disabled]="isLoading()"
+        (click)="onStatusChangeRequested('COMPLETE')"
+      >
+        @if (isLoading()) {
+         <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+        } @else {
+          <svg lucideCheck class="w-4 h-4" />
+        }
+        Complete
       </button>
     } @else if (task().status === 'COMPLETED') {
-      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
-        <svg lucideRotateCcw class="w-4 h-4" /> Reopen
+      <button
+        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        [disabled]="isLoading()"
+        (click)="onStatusChangeRequested('REOPEN')"
+      >
+        @if (isLoading()) {
+         <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+        } @else {
+          <svg lucideRotateCcw class="w-4 h-4" />
+        }
+        Reopen
       </button>
     }
   </div>

@@ -17,6 +17,9 @@ import {
 } from '@lucide/angular';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { Task } from '../../../models/task';
+import { TasksStatusBadge } from '../../tasks-status-badge/tasks-status-badge';
+
+export type TaskStatusAction = 'START' | 'COMPLETE' | 'REOPEN';
 
 @Component({
   selector: 'app-task-details-dialog',
@@ -29,6 +32,7 @@ import { Task } from '../../../models/task';
     LucideRotateCcw,
     DatePipe,
     TitleCasePipe,
+    TasksStatusBadge,
   ],
   templateUrl: './task-details-dialog.html',
   styles: ``,
@@ -37,6 +41,12 @@ export class TaskDetailsDialog {
   task = input.required<Task>();
   closed = output<void>();
   isClosing = input(false);
+  isLoading = input(false);
+  errorMessage = input<string | null>(null);
+  statusChangeRequested = output<{ action: TaskStatusAction; targetTask: Task }>();
+  protected onStatusChangeRequested(action: TaskStatusAction) {
+    this.statusChangeRequested.emit({ action, targetTask: this.task() });
+  }
 
   private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dialogRef');
   constructor() {
@@ -60,8 +70,8 @@ export class TaskDetailsDialog {
   protected readonly priorityClasses = computed(() => {
     const map = {
       LOW: 'text-app-background-green',
-      MEDIUM: 'text-[#FFD580]',
-      HIGH: 'text-[#FF9B9B]',
+      MEDIUM: 'text-blue-500',
+      HIGH: 'text-red-500',
     };
     return map[this.task().priority];
   });
