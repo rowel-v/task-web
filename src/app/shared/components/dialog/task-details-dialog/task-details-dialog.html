@@ -1,82 +1,92 @@
-<div
-  class="fixed inset-0 z-100 bg-black/20 flex items-center justify-center p-4"
-  (click)="closed.emit()"
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<dialog
+  #dialogRef
+  class="fixed inset-0 m-auto flex flex-col bg-app-background-white text-app-text-green w-full max-w-md rounded-md overflow-hidden"
+  [class.scale-in-center]="!isClosing()"
+  [class.scale-out-center]="isClosing()"
+  (click)="onBackdropClick($event)"
+  (keydown.escape)="closed.emit()"
 >
-  <!--Modal-->
-  <div
-    class="flex flex-col px-6 pt-6 bg-app-background-white text-app-text-green w-full max-w-md h-100 rounded-md"
-    [class.scale-in-center]="!isClosing()"
-    [class.scale-out-center]="isClosing()"
-    (click)="$event.stopPropagation()"
-  >
-    <!--Modal header-->
-    <div class="flex justify-between">
-      <div class="flex flex-col gap-1">
-        <p class="text-2xl font-bold">Task</p>
-      </div>
+  <!--Header-->
+  <div class="flex items-start justify-between px-6 pt-6 pb-4">
+    <div class="flex items-center gap-2">
+      <p class="text-2xl font-bold" [class.line-through]="task().status === 'COMPLETED'">
+        {{ task().name | titlecase }}
+      </p>
+      <span class="text-app-text-green opacity-40">—</span>
+      <span
+        class="w-fit px-2.5 py-0.5 rounded-md text-[11px] font-semibold border"
+        [class]="statusClasses()"
+      >
+        {{ task().status.replace('_', ' ') }}
+      </span>
+    </div>
+
+    <button tabindex="0" (click)="closed.emit()" (keydown.enter)="closed.emit()">
       <svg
         lucideX
-        class="cursor-pointer hover:rounded-md hover:bg-gray-300"
-        (click)="closed.emit()"
+        class="cursor-pointer shrink-0 rounded-md p-1 w-7 h-7 hover:bg-app-background-hover"
+        aria-label="Close modal"
       />
-    </div>
+    </button>
+  </div>
+  <!--Content-->
+  <div class="flex flex-col gap-4 px-6 pb-5 overflow-y-auto text-[17px]">
+    @if (task().description) {
+      <p class="opacity-80 leading-relaxed italic">{{ task().description }}</p>
+    }
 
-    <!--Modal Content-->
-    <div class="flex flex-col gap-4 mt-5 overflow-y-auto">
-      <!--Task name-->
-      <div>
-        <h3 class="text-xl font-semibold" [class.line-through]="task().status === 'COMPLETED'">
-          {{ task().name | titlecase }}
-        </h3>
+    <div class="flex flex-col gap-3 py-3">
+      <div class="flex items-center gap-3">
+        <svg lucideFlag class="w-4 h-4 shrink-0" />
+        <span class="w-16">Priority</span>
+        <span [class]="priorityClasses()" class="font-medium">{{
+          task().priority | titlecase
+        }}</span>
       </div>
 
-      <!--Task Description-->
-      @if (task().description) {
-        <p class="text-sm">{{ task().description }}</p>
-      }
-
-      <!--Status & Priority-->
-      <div class="flex items-center gap-3 text-sm">
-        <span class="font-medium">Priority:</span>
-        <span
-          [class.text-app-background-green]="task().priority === 'LOW'"
-          [class.text-[#FFD580]]="task().priority === 'MEDIUM'"
-          [class.text-[#FF9B9B]]="task().priority === 'HIGH'"
-        >
-          {{ task().priority | titlecase }}
+      <div class="flex items-center gap-3">
+        <svg lucideCalendar class="w-4 h-4 shrink-0" />
+        <span class="w-16">Due</span>
+        <span [class.text-red-500]="isOverdue()" class="font-medium">
+          {{ task().dueDate | date: 'MMM d, y, h:mm a' }}
+          @if (isOverdue()) {
+            <span class="ml-1">(overdue)</span>
+          }
         </span>
       </div>
-
-      <div class="flex items-center gap-3 text-sm">
-        <span class="font-medium">Status:</span>
-        <span class="capitalize">{{ task().status.replace('_', ' ') }}</span>
-      </div>
-
-      <!--Due date-->
-      <div class="flex items-center gap-3 text-sm">
-        <span class="font-medium">Due:</span>
-        <span>{{ task().dueDate | date: 'medium' }}</span>
-      </div>
-
-      <!--Timestamps-->
-      <div class="flex flex-col gap-1 text-xs opacity-70 mt-2">
-        <span>Created: {{ task().createdAt | date: 'short' }}</span>
-        <span>Updated: {{ task().updatedAt | date: 'short' }}</span>
-        @if (task().completedAt) {
-          <span>Completed: {{ task().completedAt | date: 'short' }}</span>
-        }
-      </div>
     </div>
 
-    <!--Modal Footer-->
-    <!-- <div class="flex justify-end gap-3 mt-auto pb-5">
-      <button
-        class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
-        (click)="closed.emit()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-accent hover:bg-app-background-hover">Save</button>
-    </div> -->
+    <div class="flex flex-col gap-1 text-sm opacity-60">
+      <span>Created: {{ task().createdAt | date: 'short' }}</span>
+      <span>Updated: {{ task().updatedAt | date: 'short' }}</span>
+      @if (task().completedAt) {
+        <span>Completed: {{ task().completedAt | date: 'short' }}</span>
+      }
+    </div>
   </div>
-</div>
+
+  <!--Footer-->
+  <div class="flex justify-end gap-3 px-6 pb-5 pt-3">
+    <button
+      class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
+      (click)="closed.emit()"
+    >
+      Cancel
+    </button>
+
+    @if (task().status === 'PENDING') {
+      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
+        <svg lucidePlay class="w-4 h-4" /> Start
+      </button>
+    } @else if (task().status === 'IN_PROGRESS') {
+      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
+        <svg lucideCheck class="w-4 h-4" /> Complete
+      </button>
+    } @else if (task().status === 'COMPLETED') {
+      <button class="btn btn-accent hover:bg-app-background-hover gap-1.5">
+        <svg lucideRotateCcw class="w-4 h-4" /> Reopen
+      </button>
+    }
+  </div>
+</dialog>

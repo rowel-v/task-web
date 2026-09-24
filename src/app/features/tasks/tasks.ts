@@ -181,6 +181,8 @@ export class Tasks implements OnInit {
     this.updateTaskError.set(null);
     this.isUpdatingTask.set(true);
 
+    console.log("Emitted Value: ", req);
+
     this.taskService
       .updateTask(taskId, req)
       .pipe(finalize(() => this.isUpdatingTask.set(false)))
