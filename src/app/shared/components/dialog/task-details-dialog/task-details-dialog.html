@@ -75,12 +75,12 @@
 
     @if (task().status === 'PENDING') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('START')"
       >
         @if (isLoading()) {
-        <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+          <span class="loading loading-spinner loading-sm"></span>
         } @else {
           <svg lucidePlay class="w-4 h-4" />
         }
@@ -88,12 +88,12 @@
       </button>
     } @else if (task().status === 'IN_PROGRESS') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('COMPLETE')"
       >
         @if (isLoading()) {
-         <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+          <span class="loading loading-spinner loading-sm"></span>
         } @else {
           <svg lucideCheck class="w-4 h-4" />
         }
@@ -101,12 +101,12 @@
       </button>
     } @else if (task().status === 'COMPLETED') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover gap-1.5"
+        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('REOPEN')"
       >
         @if (isLoading()) {
-         <span class="loading loading-spinner loading-sm !w-4 !h-4"></span>
+          <span class="loading loading-spinner loading-sm"></span>
         } @else {
           <svg lucideRotateCcw class="w-4 h-4" />
         }

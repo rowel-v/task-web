@@ -197,7 +197,7 @@ export class Tasks implements OnInit {
         },
       });
   }
-  
+
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
   protected readonly updateTaskStatusError = signal<string | null>(null);
   protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
@@ -206,7 +206,7 @@ export class Tasks implements OnInit {
 
     this.taskService
       .updateTaskStatus(targetTask.id, taskStatusAction)
-      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)  ))
+      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)))
       .subscribe({
         next: () => setTimeout(() => this.closeModal(), 5000),
         error: (err) => {
