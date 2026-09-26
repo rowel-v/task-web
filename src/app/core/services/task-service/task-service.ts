@@ -53,7 +53,7 @@ export class TaskService {
     return this.tasksState()
       .filter((task) => task.dueDate && new Date(task.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
-  });
+  }); 
 
   getAllTask(): Observable<Task[]> {
     return this.http.get<ApiResponse<Task[]>>('http://localhost:8080/tasks').pipe(

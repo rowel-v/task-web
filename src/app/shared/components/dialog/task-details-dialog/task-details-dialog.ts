@@ -18,6 +18,8 @@ import {
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { Task } from '../../../models/task';
 import { TasksStatusBadge } from '../../tasks-status-badge/tasks-status-badge';
+import { AppButtonVariant } from '../../../directives/app-button-variant';
+import { ButtonIcon } from '../../button-icon/button-icon';
 
 export type TaskStatusAction = 'START' | 'COMPLETE' | 'REOPEN';
 
@@ -33,7 +35,9 @@ export type TaskStatusAction = 'START' | 'COMPLETE' | 'REOPEN';
     DatePipe,
     TitleCasePipe,
     TasksStatusBadge,
-  ],
+    AppButtonVariant,
+    ButtonIcon
+],
   templateUrl: './task-details-dialog.html',
   styles: ``,
 })

@@ -65,51 +65,47 @@
 
   <!--Footer-->
   <div class="flex justify-end gap-3 px-6 pb-5 pt-3">
-    <button
-      class="btn btn-ghost border-0 shadow-none text-app-background-green gap-1.5 hover:bg-app-background-hover"
-      [disabled]="isLoading()"
-      (click)="closed.emit()"
-    >
+    <button appButtonVariant [variant]="'ghost'" [disabled]="isLoading()" (click)="closed.emit()">
       Cancel
     </button>
 
     @if (task().status === 'PENDING') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
+        appButtonVariant
+        [variant]="'green'"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('START')"
       >
-        @if (isLoading()) {
-          <span class="loading loading-spinner loading-sm"></span>
-        } @else {
-          <svg lucidePlay class="w-4 h-4" />
-        }
+        <app-button-icon [loading]="isLoading()">
+          <svg lucidePlay size="16" />
+        </app-button-icon>
+
         Start
       </button>
     } @else if (task().status === 'IN_PROGRESS') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
+        appButtonVariant
+        [variant]="'green'"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('COMPLETE')"
       >
-        @if (isLoading()) {
-          <span class="loading loading-spinner loading-sm"></span>
-        } @else {
-          <svg lucideCheck class="w-4 h-4" />
-        }
+        <app-button-icon [loading]="isLoading()">
+          <svg lucideCheck size="16" />
+        </app-button-icon>
+
         Complete
       </button>
     } @else if (task().status === 'COMPLETED') {
       <button
-        class="btn btn-accent hover:bg-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green"
+        appButtonVariant
+        [variant]="'green'"
         [disabled]="isLoading()"
         (click)="onStatusChangeRequested('REOPEN')"
       >
-        @if (isLoading()) {
-          <span class="loading loading-spinner loading-sm"></span>
-        } @else {
-          <svg lucideRotateCcw class="w-4 h-4" />
-        }
+        <app-button-icon [loading]="isLoading()">
+          <svg lucideCheck size="16" />
+        </app-button-icon>
+
         Reopen
       </button>
     }

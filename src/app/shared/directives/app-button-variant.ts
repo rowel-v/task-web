@@ -1,0 +1,20 @@
+import { Directive, HostBinding, input } from '@angular/core';
+
+@Directive({
+  selector: '[appButtonVariant]',
+})
+export class AppButtonVariant {
+  readonly variant = input.required<'green' | 'ghost'>();
+
+  private readonly classMap = {
+    green:
+      'btn btn-accent hover:bg-app-background-hover hover:border-app-background-hover disabled:bg-app-background-hover disabled:text-app-text-green',
+    ghost:
+      'btn btn-ghost hover:bg-app-background-hover text-app-background-green shadow-none border-0',
+  };
+
+  @HostBinding('class')
+  get hostClass(): string {
+    return this.classMap[this.variant()];
+  }
+}
