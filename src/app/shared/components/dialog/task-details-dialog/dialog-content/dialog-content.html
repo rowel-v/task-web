@@ -1,0 +1,41 @@
+@let t = task();
+@let createdAt = t.createdAt | date: 'short';
+@let updatedAt = t.updatedAt | date: 'short';
+@let completedAt = t.completedAt | date: 'short';
+
+<div class="flex flex-col gap-4 px-6 pb-5 overflow-y-auto text-[17px] max-h-[50vh]">
+  @if (t.description) {
+    <p class="opacity-80 leading-relaxed italic">{{ t.description }}</p>
+  }
+
+  <div class="flex flex-col gap-3 py-3">
+    <div class="flex items-center gap-3">
+      <svg lucideFlag class="w-4 h-4 shrink-0" />
+      <span class="w-16">Priority</span>
+      <span [class]="priorityClasses()" class="font-medium">{{ t.priority | titlecase }}</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <svg lucideCalendar class="w-4 h-4 shrink-0" />
+      <span class="w-16">Due</span>
+      <span [class.text-red-500]="isOverdue()" class="font-medium">
+        {{ t.dueDate | date: 'MMM d, y, h:mm a' }}
+        @if (isOverdue()) {
+          <span class="ml-1">(overdue)</span>
+        }
+      </span>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-1 text-sm opacity-60">
+    <span>Created: {{ createdAt }}</span>
+    <span>Updated: {{ updatedAt }}</span>
+    @if (t.completedAt) {
+      <span>Completed: {{ completedAt }}</span>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="text-sm text-red-500">{{ errorMessage() }}</p>
+  }
+</div>

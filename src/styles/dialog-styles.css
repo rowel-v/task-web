@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+.dialog-header-container {
+  @apply flex items-center justify-between px-6 pt-6 pb-4;
+
+  .dialog-title-group {
+    @apply flex items-center gap-4;
+  }
+
+  .dialog-header {
+    @apply text-2xl font-bold;
+  }
+}

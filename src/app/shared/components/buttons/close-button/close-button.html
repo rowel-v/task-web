@@ -1,0 +1,10 @@
+<button
+  appButtonVariant
+  variant="close"
+  tabindex="0"
+  [disabled]="unclickable()"
+  (click)="closed.emit()"
+  (keydown.enter)="!unclickable() && closed.emit()"
+>
+  <svg lucideX aria-label="Close modal" />
+</button>

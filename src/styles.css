@@ -1,6 +1,7 @@
 @import url('https://googleapis.com');
 @import 'tailwindcss';
 @import 'vanilla-calendar-pro/styles/index.css';
+@import './styles/dialog-styles.css';
 
 @plugin 'daisyui';
 
@@ -85,7 +86,6 @@
   --vc-time-range-thumb-border: #00d3bb;
   --vc-time-range-thumb-border-hover: #21b9a8;
 }
-
 
 /* Animations */
 
