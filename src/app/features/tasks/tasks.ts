@@ -92,7 +92,14 @@ export class Tasks implements OnInit {
     if (this.closedModal()) {
       return;
     }
+
+    this.updateTaskStatusError.set(null);
+    this.updateTaskError.set(null);
+    this.deleteTaskError.set(null);
+    this.createTaskError.set(null);
+
     this.closedModal.set(true);
+
     setTimeout(() => {
       this.selectedModal.set(null);
       this.selectedTask.set(null);

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CancelButton } from './cancel-button';
+import { TaskDetailsDialogFooter } from './task-details-dialog-footer';
 
-describe('CancelButton', () => {
-  let component: CancelButton;
-  let fixture: ComponentFixture<CancelButton>;
+describe('TaskDetailsDialogFooter', () => {
+  let component: TaskDetailsDialogFooter;
+  let fixture: ComponentFixture<TaskDetailsDialogFooter>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CancelButton],
+      imports: [TaskDetailsDialogFooter],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CancelButton);
+    fixture = TestBed.createComponent(TaskDetailsDialogFooter);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

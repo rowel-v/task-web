@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CloseButton } from './close-button';
+import { TaskDetailsDialogHeader } from './task-details-dialog-header';
 
-describe('CloseButton', () => {
-  let component: CloseButton;
-  let fixture: ComponentFixture<CloseButton>;
+describe('TaskDetailsDialogHeader', () => {
+  let component: TaskDetailsDialogHeader;
+  let fixture: ComponentFixture<TaskDetailsDialogHeader>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CloseButton],
+      imports: [TaskDetailsDialogHeader],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CloseButton);
+    fixture = TestBed.createComponent(TaskDetailsDialogHeader);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

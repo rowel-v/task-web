@@ -1,0 +1,25 @@
+@let disabled = unclickable();
+
+@if (variant() === 'close') {
+  <button appButtonVariant variant="close" [disabled]="unclickable()" (click)="pressed.emit()">
+    <svg lucideX aria-label="Close modal" />
+  </button>
+} @else {
+  <button
+    appButtonVariant
+    [variant]="variant()"
+    [type]="type()"
+    (click)="pressed.emit()"
+    [disabled]="unclickable()"
+  >
+    @if (disabled) {
+      @if (withLoadingSpinner()) {
+        <span class="loading loading-spinner loading-sm"></span>
+      }
+    } @else {
+      <ng-content select="svg" />
+    }
+
+    <ng-content select=":not(svg)" />
+  </button>
+}

@@ -1,0 +1,36 @@
+@let status = task().status;
+
+<div class="flex justify-end gap-3 px-6 pb-5 pt-3">
+  <app-button variant="cancel" [unclickable]="isLoading()" (pressed)="cancelled.emit()">
+    Cancel</app-button
+  >
+
+  @if (status === 'PENDING') {
+    <app-button
+      variant="green"
+      [unclickable]="isLoading()"
+      (pressed)="onStatusChangeRequested('START')"
+    >
+      <svg lucidePlay size="16" />
+      Start
+    </app-button>
+  } @else if (status === 'IN_PROGRESS') {
+    <app-button
+      variant="green"
+      [unclickable]="isLoading()"
+      (pressed)="onStatusChangeRequested('COMPLETE')"
+    >
+      <svg lucideCheck size="16" />
+      Complete
+    </app-button>
+  } @else if (status === 'COMPLETED') {
+    <app-button
+      variant="green"
+      [unclickable]="isLoading()"
+      (pressed)="onStatusChangeRequested('REOPEN')"
+    >
+      <svg lucideCheck size="16" />
+      Reopen
+    </app-button>
+  }
+</div>

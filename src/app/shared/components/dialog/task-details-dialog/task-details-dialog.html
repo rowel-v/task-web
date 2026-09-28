@@ -8,18 +8,18 @@
   (keydown.escape)="!isLoading() && closed.emit()"
 >
   <!--Header-->
-  <app-dialog-header
+  <app-task-details-dialog-header
     [title]="task().name"
     [status]="task().status"
-    [isLoading]="isLoading()"
+    [disableCloseButton]="isLoading()"
     (closed)="closed.emit()"
   />
 
   <!--Content-->
-  <app-dialog-content [task]="task()" [errorMessage]="errorMessage()" />
+  <app-task-details-dialog-content [task]="task()" [errorMessage]="errorMessage()" />
 
   <!--Footer-->
-  <app-dialog-footer
+  <app-task-details-dialog-footer
     [task]="task()"
     [isLoading]="isLoading()"
     (cancelled)="closed.emit()"

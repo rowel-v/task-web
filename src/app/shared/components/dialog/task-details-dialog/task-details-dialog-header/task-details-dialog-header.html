@@ -10,6 +10,6 @@
   </div>
   <div class="flex items-center shrink-0">
     <app-tasks-status-badge class="mx-3" [status]="status()" />
-    <app-close-button [unclickable]="isLoading()" (closed)="closed.emit()" />
+    <app-button variant="close" [unclickable]="disableCloseButton()" (pressed)="closed.emit()" />
   </div>
 </div>

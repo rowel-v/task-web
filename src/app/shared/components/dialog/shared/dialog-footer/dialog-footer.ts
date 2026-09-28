@@ -1,25 +1,20 @@
 import { Component, input, output } from '@angular/core';
-import { Task } from '../../../../models/task';
-import {
-  TaskStatusAction,
-  TaskStatusChangeRequest,
-} from '../../task-details-dialog/task-details-dialog';
-import { LucideCheck, LucidePlay } from '@lucide/angular';
-import { CancelButton } from '../../../buttons/cancel-button/cancel-button';
-import { Button } from '../../../buttons/button/button';
+import { Button } from '../../../button/button';
 
 @Component({
   selector: 'app-dialog-footer',
-  imports: [LucidePlay, LucideCheck, CancelButton, Button],
+  imports: [Button],
   templateUrl: './dialog-footer.html',
   styles: ``,
 })
 export class DialogFooter {
-  task = input.required<Task>();
+  label = input.required<string>();
+  labelWhenLoading = input.required<string>();
+  type = input<'button' | 'submit'>('button');
   isLoading = input.required<boolean>();
-  cancelled = output<void>();
-  statusChangeRequested = output<TaskStatusChangeRequest>();
-  protected onStatusChangeRequested(action: TaskStatusAction) {
-    this.statusChangeRequested.emit({ action, targetTask: this.task() });
+  closed = output<void>();
+  confirmed = output<void>();
+  protected onConfirmed() {
+    this.confirmed.emit();
   }
 }

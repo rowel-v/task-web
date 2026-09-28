@@ -1,9 +1,0 @@
-<button appButtonVariant [variant]="variant()" [disabled]="unclickable()" (click)="clicked.emit()">
-  @if (loading()) {
-    <span class="loading loading-spinner loading-sm"></span>
-  } @else {
-    <ng-content select="svg" />
-  }
-
-  <ng-content select=":not(svg)" />
-</button>

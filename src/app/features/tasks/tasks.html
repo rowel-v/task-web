@@ -1,6 +1,6 @@
-<div class="mx-auto w-full h-full flex flex-col text-app-text-white">
+<div class="mx-auto flex size-full flex-col text-app-text-white">
   <!--Tab list-->
-  <div class="tabs tabs-border gap-1 mb-3">
+  <div class="tabs tabs-border mb-3 gap-1">
     <!--All-->
     <label class="tab gap-1 text-[15px]">
       <input type="radio" name="my_tabs_4" checked="checked" (change)="selectedTab.set('all')" />
@@ -31,18 +31,25 @@
     <!--list of Task-->
     @for (task of tasksToDisplay(); track task.id) {
       <div
-        class="group relative flex items-center justify-between hover:bg-app-button-hover-gray focus-within:bg-app-button-hover-gray rounded-md"
+        class="
+          group relative flex items-center justify-between rounded-md
+          focus-within:bg-app-button-hover-gray
+          hover:bg-app-button-hover-gray
+        "
       >
         <!--Clickable task info-->
         <button
           type="button"
-          class="flex-1 flex items-center justify-between text-left p-4 focus:outline-none rounded-md"
+          class="
+            flex flex-1 items-center justify-between rounded-md p-4 text-left
+            focus:outline-none
+          "
           (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
         >
           <div class="flex flex-col">
             <p class="text-[18px] font-medium">{{ task.name | titlecase }}</p>
             <p class="mt-2 italic">{{ task.description }}</p>
-            <div class="flex gap-3 mt-3">
+            <div class="mt-3 flex gap-3">
               <app-tasks-status-badge [status]="task.status" />
               <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
             </div>
@@ -50,49 +57,67 @@
         </button>
 
         <div
-          class="flex gap-3 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pr-4"
+          class="
+            flex gap-3 pr-4 opacity-0
+            group-focus-within:opacity-100
+            group-hover:opacity-100
+          "
         >
           <!--Edit Button-->
           <button
             type="button"
-            class="btn btn-sm btn-circle bg-[#00D3BB] text-app-text-green border-0 hover:bg-[#15c2ae]"
+            class="
+              btn btn-circle border-0 bg-[#00D3BB] text-app-text-green btn-sm
+              hover:bg-[#15c2ae]
+            "
             (click)="selectedModal.set('edit-task-dialog'); selectedTask.set(task)"
           >
-            <svg lucideSquarePen class="w-4 h-4" />
+            <svg lucideSquarePen class="size-4" />
           </button>
 
           <!--Delete Button-->
           <button
             type="button"
-            class="btn btn-sm btn-circle bg-red-500/90 text-app-text-white border-0 hover:bg-red-500/75"
+            class="
+              btn btn-circle border-0 bg-red-500/90 text-app-text-white btn-sm
+              hover:bg-red-500/75
+            "
             (click)="selectedModal.set('delete-task-dialog'); selectedTask.set(task)"
           >
-            <svg lucideTrash2 class="w-4 h-4" />
+            <svg lucideTrash2 class="size-4" />
           </button>
         </div>
       </div>
     } @empty {
-      <div class="bg flex flex-col items-center justify-center h-screen overflow-hidden">
+      <div class="
+        bg flex h-screen flex-col items-center justify-center overflow-hidden
+      ">
         <img
           [src]="emptyState().image"
           alt="Empty state"
           width="400"
           height="400"
-          class="object-contain max-w-full max-h-full"
+          class="max-h-full max-w-full object-contain"
           [class]="emptyState().imageWidth"
         />
-        <p class="text-[18px] italic font-extralight">{{ emptyState().message }}</p>
+        <p class="text-[18px] font-extralight italic">{{ emptyState().message }}</p>
       </div>
     }
 
     <!-- Floating "Add Task" button, fixed to bottom-right corner of the viewport -->
     <div class="fixed right-0 bottom-0 mr-12 mb-12">
       <button
-        class="btn btn-md bg-app-button-purple hover:bg-app-button-hover-gray text-app-text-green border-none"
+        class="
+          btn border-none bg-app-button-purple text-app-text-green btn-md
+          hover:bg-app-button-hover-gray
+        "
         (click)="selectedModal.set('create-task-dialog')"
       >
         <svg lucidePlus />
-        <span class="hidden sm:inline">Add Task</span>
+        <span class="
+          hidden
+          sm:inline
+        ">Add Task</span>
       </button>
     </div>
   </div>
@@ -116,7 +141,7 @@
     [isClosing]="closedModal()"
     [isLoading]="isCreatingTask()"
     [errorMessage]="createTaskError()"
-    (cancelled)="closeModal()"
+    (closed)="closeModal()"
     (submitted)="onTaskCreated($event)"
   />
 }

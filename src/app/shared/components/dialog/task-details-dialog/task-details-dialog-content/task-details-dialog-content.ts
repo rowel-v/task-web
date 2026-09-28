@@ -3,12 +3,12 @@ import { Task } from '../../../../models/task';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-dialog-content',
+  selector: 'app-task-details-dialog-content',
   imports: [TitleCasePipe, DatePipe],
-  templateUrl: './dialog-content.html',
+  templateUrl: './task-details-dialog-content.html',
   styles: ``,
 })
-export class DialogContent {
+export class TaskDetailsDialogContent {
   task = input.required<Task>();
   errorMessage = input.required<string | null>();
 

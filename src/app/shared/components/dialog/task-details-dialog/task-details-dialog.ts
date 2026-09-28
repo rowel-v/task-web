@@ -1,9 +1,8 @@
 import { afterNextRender, Component, ElementRef, input, output, viewChild } from '@angular/core';
 import { Task } from '../../../models/task';
-
-import { DialogContent } from './dialog-content/dialog-content';
-import { DialogHeader } from './dialog-header/dialog-header';
-import { DialogFooter } from '../shared/dialog-footer/dialog-footer';
+import { TaskDetailsDialogFooter } from './task-details-dialog-footer/task-details-dialog-footer';
+import { TaskDetailsDialogContent } from './task-details-dialog-content/task-details-dialog-content';
+import { TaskDetailsDialogHeader } from './task-details-dialog-header/task-details-dialog-header';
 
 export type TaskStatusAction = 'START' | 'COMPLETE' | 'REOPEN';
 export interface TaskStatusChangeRequest {
@@ -13,7 +12,7 @@ export interface TaskStatusChangeRequest {
 
 @Component({
   selector: 'app-task-details-dialog',
-  imports: [DialogHeader, DialogContent, DialogFooter],
+  imports: [TaskDetailsDialogHeader, TaskDetailsDialogContent, TaskDetailsDialogFooter],
   templateUrl: './task-details-dialog.html',
   styles: ``,
 })
