@@ -1,10 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { Button } from '../../../button/button';
-import { LucideX } from '@lucide/angular';
 
 @Component({
   selector: 'app-dialog-header',
-  imports: [Button, LucideX],
+  imports: [Button],
   styles: ``,
   templateUrl: './dialog-header.html',
 })

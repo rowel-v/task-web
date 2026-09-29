@@ -1,7 +1,10 @@
 <div class="flex justify-end gap-3">
-  <app-button variant="cancel" [type]="type()" [unclickable]="isLoading()" (pressed)="closed.emit()"
-    >Cancel</app-button
-  >
+  <app-button
+    variant="cancel"
+    [type]="type()"
+    [unclickable]="isLoading()"
+    (pressed)="closed.emit()"
+  />
 
   <app-button variant="green" [type]="type()" [unclickable]="isLoading()" (pressed)="onConfirmed()">
     {{ isLoading() ? labelWhenLoading() : label() }}

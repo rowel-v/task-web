@@ -175,9 +175,15 @@ export class Tasks implements OnInit {
 
     this.taskService
       .deleteTask(task.id)
-      .pipe(finalize(() => this.isDeletingTask.set(false)))
+      .pipe(
+        finalize(() =>
+          setTimeout(() => {
+            this.isDeletingTask.set(false);
+          }, 5000),
+        ),
+      )
       .subscribe({
-        next: () => this.closeModal(),
+        next: () => setTimeout(() => this.closeModal(), 5000),
         error: (err) => {
           console.error('Failed to delete task', err);
           this.deleteTaskError.set('Failed to delete task. Please try again.');

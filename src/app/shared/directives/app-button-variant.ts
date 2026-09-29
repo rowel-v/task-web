@@ -1,6 +1,6 @@
 import { Directive, HostBinding, input } from '@angular/core';
 
-export type ButtonVariant = 'green' | 'cancel' | 'close';
+export type ButtonVariant = 'green' | 'cancel' | 'close' | 'delete';
 
 @Directive({
   selector: '[appButtonVariant]',
@@ -15,6 +15,7 @@ export class AppButtonVariant {
       'btn btn-ghost hover:bg-app-background-hover text-app-background-green shadow-none border-0',
     close:
       'btn btn-ghost btn-circle size-8 hover:bg-app-background-hover text-app-background-green shadow-none border-0',
+    delete: 'btn border-0 bg-red-500/90 text-white hover:bg-red-500/75',
   };
 
   @HostBinding('class')

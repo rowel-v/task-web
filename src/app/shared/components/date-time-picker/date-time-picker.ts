@@ -45,23 +45,30 @@ export class DateTimePicker implements AfterViewInit {
       selectedTime: this.getCurrentTimeFormatted(), // default selected time
       onShow: (self) => {
         const popup = self.context.mainElement as HTMLElement;
-        if (popup) {
-          popup.style.position = 'fixed';
-          popup.style.top = '52%';
-          popup.style.left = '58%';
+        const dialogEl = this.calendarEl().nativeElement.closest('dialog');
+
+        if (popup && dialogEl) {
+          popup.style.position = 'absolute';
+          popup.style.top = '50%';
+          popup.style.left = '70%';
           popup.style.transform = 'translate(-50%, -50%)';
           popup.style.zIndex = '9999';
+
+          dialogEl.appendChild(popup);
+          dialogEl.classList.remove('overflow-hidden');
+          dialogEl.classList.add('overflow-visible');
         }
+
         const backdrop = document.createElement('div');
         backdrop.dataset['vcBackdrop'] = '';
-        backdrop.style.position = 'fixed';
+        backdrop.style.position = 'absolute';
         backdrop.style.inset = '0';
-        backdrop.style.zIndex = '9998'; // just below the calendar's z-index (9999)
-        backdrop.style.background = 'transparent';
+        backdrop.style.zIndex = '9998';
+        backdrop.style.background = 'rgba(0,0,0,0.2)';
         backdrop.onclick = () => this.calendar.hide();
-        document.body.appendChild(backdrop);
 
-        // Wire up the Confirm button
+        dialogEl?.appendChild(backdrop);
+
         const saveBtn = popup.querySelector('[data-vc-save]') as HTMLButtonElement;
         if (saveBtn) {
           saveBtn.onclick = () => {
@@ -69,7 +76,6 @@ export class DateTimePicker implements AfterViewInit {
             const time = this.to24Hour(self.context.selectedTime);
             if (date) {
               const value = time ? `${date}T${time}` : date;
-
               this.selectedDate.set(value);
               this.dateSelected.emit(value);
             }
@@ -78,6 +84,9 @@ export class DateTimePicker implements AfterViewInit {
         }
       },
       onHide: () => {
+        const dialogEl = this.calendarEl().nativeElement.closest('dialog');
+        dialogEl?.classList.remove('overflow-visible');
+        dialogEl?.classList.add('overflow-hidden');
         document.querySelector('[data-vc-backdrop]')?.remove();
       },
     });

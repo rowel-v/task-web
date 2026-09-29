@@ -1,12 +1,12 @@
-<div #calendarRef class="flex flex-wrap text-[17px] w-fit items-center gap-2">
+<div #calendarRef class="flex w-fit flex-wrap items-center gap-2 text-[17px]">
   <label for="due" class="inline-flex items-center gap-3">Due:</label>
 
-  <div class="flex items-center border-b h-7">
+  <div class="flex h-7 items-center border-b">
     <input
       id="due"
       type="text"
       placeholder="Enter task due date"
-      class="outline-none bg-transparent border-0"
+      class="border-0 bg-transparent outline-none"
       readonly
       [value]="selectedDate() | date: 'MMM d, y, h:mm a'"
     />
@@ -15,7 +15,10 @@
       <button
         type="button"
         aria-label="Calendar Button"
-        class="btn-circle cursor-pointer hover:rounded-md hover:bg-gray-300"
+        class="
+          btn-circle cursor-pointer
+          hover:rounded-md hover:bg-gray-300
+        "
       >
         <svg lucideCalendarDays size="20" />
       </button>
@@ -25,7 +28,10 @@
         type="button"
         aria-label="Clear selected date"
         (click)="$event.stopPropagation(); dateSelected.emit(''); selectedDate.set('')"
-        class="btn-circle cursor-pointer hover:rounded-md hover:bg-gray-300"
+        class="
+          btn-circle cursor-pointer
+          hover:rounded-md hover:bg-gray-300
+        "
       >
         <svg lucideX size="20" />
       </button>

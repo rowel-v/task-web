@@ -1,25 +1,69 @@
 @let disabled = unclickable();
 
-@if (variant() === 'close') {
-  <button appButtonVariant variant="close" [disabled]="unclickable()" (click)="pressed.emit()">
-    <svg lucideX aria-label="Close modal" />
-  </button>
-} @else {
-  <button
-    appButtonVariant
-    [variant]="variant()"
-    [type]="type()"
-    (click)="pressed.emit()"
-    [disabled]="unclickable()"
-  >
-    @if (disabled) {
-      @if (withLoadingSpinner()) {
-        <span class="loading loading-spinner loading-sm"></span>
+@switch (variant()) {
+  @case ('green') {
+    <button
+      appButtonVariant
+      [variant]="variant()"
+      [type]="type()"
+      (click)="pressed.emit()"
+      [disabled]="unclickable()"
+      [aria-label]="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
+    >
+      @if (disabled) {
+        @if (withLoadingSpinner()) {
+          <span class="loading loading-sm loading-spinner"></span>
+        }
+      } @else {
+        <ng-content select="svg" />
       }
-    } @else {
-      <ng-content select="svg" />
-    }
 
-    <ng-content select=":not(svg)" />
-  </button>
+      <ng-content select=":not(svg)" />
+    </button>
+  }
+
+  @case ('delete') {
+    <button
+      appButtonVariant
+      [variant]="variant()"
+      [type]="type()"
+      (click)="pressed.emit()"
+      [disabled]="unclickable()"
+      [aria-label]="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
+    >
+      @if (disabled) {
+        @if (withLoadingSpinner()) {
+          <span class="loading loading-sm loading-spinner"></span>
+        }
+        Deleting...
+      } @else {
+        Delete
+      }
+    </button>
+  }
+
+  @case ('cancel') {
+    <button
+      appButtonVariant
+      [variant]="variant()"
+      [type]="type()"
+      (click)="pressed.emit()"
+      [disabled]="unclickable()"
+      aria-label="Cancel Button"
+    >
+      Cancel
+    </button>
+  }
+
+  @case ('close') {
+    <button
+      appButtonVariant
+      variant="close"
+      [disabled]="unclickable()"
+      (click)="pressed.emit()"
+      aria-label="Close Button"
+    >
+      <svg lucideX aria-label="Close modal" />
+    </button>
+  }
 }

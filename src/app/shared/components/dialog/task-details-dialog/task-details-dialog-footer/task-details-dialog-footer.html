@@ -1,6 +1,6 @@
 @let status = task().status;
 
-<div class="flex justify-end gap-3 px-6 pb-5 pt-3">
+<div class="flex justify-end gap-3 px-6 pt-3 pb-5">
   <app-button variant="cancel" [unclickable]="isLoading()" (pressed)="cancelled.emit()">
     Cancel</app-button
   >

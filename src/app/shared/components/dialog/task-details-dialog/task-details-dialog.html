@@ -1,7 +1,10 @@
 <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <dialog
   #dialogRef
-  class="fixed inset-0 m-auto flex flex-col bg-app-background-white text-app-text-green w-full max-w-md rounded-md overflow-hidden"
+  class="
+    fixed inset-0 m-auto flex w-full max-w-md flex-col overflow-hidden
+    rounded-md bg-app-background-white text-app-text-green
+  "
   [class.scale-in-center]="!isClosing()"
   [class.scale-out-center]="isClosing()"
   (click)="onBackdropClick($event)"
