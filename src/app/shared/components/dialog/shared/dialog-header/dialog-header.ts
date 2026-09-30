@@ -10,6 +10,6 @@ import { Button } from '../../../button/button';
 export class DialogHeader {
   title = input.required<string>();
   subTitle = input<string | null>(null);
-  disableCloseButton = input.required<boolean>(); // disable close button {{ X }}
+  disableCloseButton = input.required<boolean>();
   closed = output<void>();
 }

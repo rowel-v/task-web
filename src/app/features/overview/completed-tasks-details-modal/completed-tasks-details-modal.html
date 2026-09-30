@@ -3,13 +3,16 @@
 
 <!-- Modal container, positioned beside the Pending Tasks stat. -->
 <div
-  class="absolute right-full top-0 z-9999 mr-2 cursor-default"
+  class="absolute top-0 right-full z-9999 mr-2 cursor-default"
   [class.scale-in-tr]="!isClosing()"
   [class.scale-out-tr]="isClosing()"
 >
   <!-- Modal content -->
   <div
-    class="flex flex-col w-80 h-72 bg-app-background-white text-app-background-green rounded-xl p-5 shadow-xl"
+    class="
+      flex h-72 w-80 flex-col rounded-xl bg-app-background-white p-5
+      text-app-background-green shadow-xl
+    "
   >
     <!-- Header -->
     <div class="mb-4 flex justify-between">
@@ -17,16 +20,22 @@
       <!-- Close button -->
       @if (selectedCategory() === null) {
         <button
-          class="cursor-pointer rounded hover:bg-gray-300"
-          [class.rotate-in-center]="true"
+          animate.enter="rotate-in-center"
+          class="
+            cursor-pointer rounded-sm
+            hover:bg-gray-300
+          "
           (click)="closeModal()"
         >
           <svg lucideX />
         </button>
       } @else {
         <button
-          class="cursor-pointer rounded hover:bg-gray-300"
-          [class.rotate-in-center]="true"
+          animate.enter="rotate-in-center"
+          class="
+            cursor-pointer rounded-sm
+            hover:bg-gray-300
+          "
           (click)="selectCategory(null)"
         >
           <svg lucideArrowLeft />
@@ -35,7 +44,7 @@
     </div>
 
     <!-- Content -->
-    <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+    <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
       @switch (selectedCategory()) {
         @case ('completed') {
           <app-task-details-list
@@ -82,7 +91,11 @@
           <div class="space-y-3" [class.slide-in-left]="isReturning()">
             <!-- Total completed tasks -->
             <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
+              class="
+                flex cursor-pointer items-center justify-between rounded-lg p-2
+                transition-colors duration-200
+                hover:bg-app-background-hover
+              "
               (click)="selectCategory('completed')"
             >
               <div class="flex items-center gap-2">
@@ -93,7 +106,11 @@
             </div>
             <!-- High-priority completed tasks -->
             <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
+              class="
+                flex cursor-pointer items-center justify-between rounded-lg p-2
+                transition-colors duration-200
+                hover:bg-app-background-hover
+              "
               (click)="selectCategory('high_priority')"
             >
               <div class="flex items-center gap-2">
@@ -104,7 +121,11 @@
             </div>
             <!-- tasks completed today -->
             <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
+              class="
+                flex cursor-pointer items-center justify-between rounded-lg p-2
+                transition-colors duration-200
+                hover:bg-app-background-hover
+              "
               (click)="selectCategory('completed_today')"
             >
               <div class="flex items-center gap-2">
@@ -115,7 +136,11 @@
             </div>
             <!-- tasks completed this week -->
             <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
+              class="
+                flex cursor-pointer items-center justify-between rounded-lg p-2
+                transition-colors duration-200
+                hover:bg-app-background-hover
+              "
               (click)="selectCategory('completed_this_week')"
             >
               <div class="flex items-center gap-2">

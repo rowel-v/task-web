@@ -1,0 +1,25 @@
+<div
+  class="
+    group flex cursor-pointer items-center gap-4 rounded-sm p-4
+    text-app-text-white transition
+    hover:bg-app-button-hover-gray
+  "
+>
+  @let t = task();
+
+  <!-- Task information -->
+  <div class="min-w-0 flex-1">
+    <h3 class="truncate font-medium" [class.line-through]="isCompleted()">
+      {{ t.name }}
+    </h3>
+
+    @if (t.description) {
+      <p class="mt-1 truncate text-sm">
+        {{ t.description }}
+      </p>
+    }
+  </div>
+
+  <!-- Status -->
+  <app-tasks-status-badge [status]="t.status" />
+</div>

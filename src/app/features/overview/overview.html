@@ -1,10 +1,15 @@
 <div
-  class="flex flex-col gap-2 bg-app-background-green text-app-background-white h-full"
+  class="
+    flex h-full flex-col gap-2 bg-app-background-green text-app-background-white
+  "
   data-theme="light"
 >
   <!-- Statistics -->
   <div
-    class="stats stats-vertical w-full gap-2 shadow-sm md:stats-horizontal shrink-0 overflow-visible"
+    class="
+      stats w-full shrink-0 stats-vertical gap-2 overflow-visible shadow-sm
+      md:stats-horizontal
+    "
   >
     <!-- Total -->
     <app-tasks-status-card
@@ -13,6 +18,9 @@
       [value]="totalTasks()"
       [description]="'All your tasks'"
       (click)="openModalTasksDetailsFlag('total')"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="openModalTasksDetailsFlag('total')"
     >
       @if (tasksDetailsFlag() === 'total') {
         <app-total-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -26,6 +34,9 @@
       [value]="totalPendingTasks()"
       [description]="'Tasks waiting to start'"
       (click)="openModalTasksDetailsFlag('pending')"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="openModalTasksDetailsFlag('pending')"
     >
       @if (tasksDetailsFlag() === 'pending') {
         <app-pending-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -39,6 +50,9 @@
       [value]="totalInProgressTasks()"
       [description]="'Currently working on'"
       (click)="openModalTasksDetailsFlag('in_progress')"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="openModalTasksDetailsFlag('in_progress')"
     >
       @if (tasksDetailsFlag() === 'in_progress') {
         <app-inprogress-tasks-details-modal
@@ -55,6 +69,9 @@
       [value]="totalCompletedTasks()"
       [description]="completionRate() + '% completion rate'"
       (click)="openModalTasksDetailsFlag('completed')"
+      role="button"
+      tabindex="0"
+      (keydown.enter)="openModalTasksDetailsFlag('completed')"
     >
       @if (tasksDetailsFlag() === 'completed') {
         <app-completed-tasks-details-modal
@@ -67,9 +84,15 @@
 
   <!-- Main Dashboard -->
   <div class="flex flex-col overflow-y-auto">
-    <div class="grid gap-2 lg:grid-cols-3 items-start">
+    <div class="
+      grid items-start gap-2
+      lg:grid-cols-3
+    ">
       <!-- Today's Tasks -->
-      <div class="card shadow-sm lg:col-span-2">
+      <div class="
+        card shadow-sm
+        lg:col-span-2
+      ">
         <div class="card-body">
           <!-- Header -->
           <div class="flex items-center justify-between gap-4">
@@ -80,11 +103,17 @@
 
             @if (todaysTasks().length !== 0) {
               <button
-                class="btn btn-sm bg-app-button-purple hover:bg-app-button-hover-gray border-none"
+                class="
+                  btn border-none bg-app-button-purple shadow-none btn-sm
+                  hover:bg-app-button-hover-gray
+                "
                 (click)="openModal.set('create-task-dialog')"
               >
                 <svg lucidePlus />
-                <span class="hidden sm:inline">Add Task</span>
+                <span class="
+                  hidden
+                  sm:inline
+                ">Add Task</span>
               </button>
             }
           </div>
@@ -92,66 +121,26 @@
           <!-- Tasks -->
           <div class="mt-5 flex flex-col gap-2">
             @for (task of displayedTodaysTasks(); track task.id) {
-              <div
-                class="group flex items-center hover:bg-app-button-hover-gray text-app-text-white gap-4 rounded-sm p-4 transition cursor-pointer"
+              <app-task-item
+                [task]="task"
                 (click)="openModal.set('task-details-dialog'); selectedTask.set(task)"
-              >
-                <!-- Task information -->
-                <div class="min-w-0 flex-1">
-                  <h3
-                    class="truncate font-medium"
-                    [class.line-through]="task.status === 'COMPLETED'"
-                  >
-                    {{ task.name }}
-                  </h3>
-
-                  @if (task.description) {
-                    <p class="mt-1 truncate text-sm">
-                      {{ task.description }}
-                    </p>
-                  }
-                </div>
-
-                <!-- Status -->
-                @switch (task.status) {
-                  @case ('PENDING') {
-                    <app-tasks-status-badge status="PENDING" />
-                  }
-
-                  @case ('IN_PROGRESS') {
-                    <app-tasks-status-badge status="IN_PROGRESS" />
-                  }
-
-                  @case ('COMPLETED') {
-                    <app-tasks-status-badge status="COMPLETED" />
-                  }
-                }
-              </div>
+                role="button"
+                tabindex="0"
+                (keydown.enter)="openModal.set('task-details-dialog'); selectedTask.set(task)"
+              />
             } @empty {
-              <div class="flex items-center justify-center py-12">
-                <img src="images/stick-man-empty-today-tasks.png" alt="No Tasks" />
-
-                <div class="flex flex-col">
-                  <p class="text-md italic">You don't have any tasks</p>
-                  <p class="text-md italic">assigned for today.</p>
-
-                  <button
-                    class="mt-4 btn btn-sm bg-app-button-purple size-fit hover:bg-app-button-hover-gray border-none"
-                    (click)="openModal.set('create-task-dialog')"
-                  >
-                    <svg lucidePlus />
-                    <span class="hidden sm:inline">Add Task</span>
-                  </button>
-                </div>
-              </div>
+              <app-task-empty-state (pressedAddTaskBtn)="openModal.set('create-task-dialog')" />
             }
           </div>
 
           <!-- Footer -->
-          <div class="flex mt-4 justify-end">
+          <div class="mt-4 flex justify-end">
             <a
               routerLink="/tasks"
-              class="flex gap-1 items-center hover:bg-app-button-hover-gray rounded-sm px-2"
+              class="
+                flex items-center gap-1 rounded-sm px-2
+                hover:bg-app-button-hover-gray
+              "
             >
               View all tasks
               <svg lucideArrowRight [size]="17" class="mb-1" />
@@ -170,14 +159,25 @@
 
           <!-- Radial progress -->
           <div class="flex flex-col items-center">
-            <div
-              class="radial-progress text-[#00D3BB] bg-[#0E6261] hover-shadow-drop-center cursor-grab"
-              style="--size: 10rem; --thickness: 9px"
-              [style.--value]="completionRate()"
-              [attr.aria-valuenow]="completionRate()"
-              role="progressbar"
-            >
-              <span class="text-2xl text-app-text-white font-bold"> {{ completionRate() }}% </span>
+            <div class="flex flex-col items-center">
+              <div
+                class="
+                  hover-shadow-drop-center radial-progress cursor-grab
+                  bg-[#0E6261] text-[#00D3BB]
+                "
+                style="--size: 10rem; --thickness: 9px"
+                [style.--value]="completionRate()"
+                aria-hidden="true"
+              >
+                <span class="text-2xl font-bold text-app-text-white">{{ completionRate() }}%</span>
+              </div>
+
+              <progress
+                class="sr-only"
+                [value]="completionRate()"
+                max="100"
+                aria-label="Task completion rate"
+              ></progress>
             </div>
 
             <p class="mt-5 text-sm">
@@ -193,14 +193,14 @@
           </div>
         </div>
         <!-- Progress footer -->
-        <div class="flex flex-col mt-2">
+        <div class="mt-2 flex flex-col">
           <div class="flex items-center justify-between text-sm">
             <span class=""> Overall progress </span>
             <span class="font-medium"> {{ completionRate() }}% </span>
           </div>
 
           <progress
-            class="progress progress-accent mt-2 w-full"
+            class="progress mt-2 w-full progress-accent"
             [value]="completionRate()"
             max="100"
           ></progress>
@@ -218,8 +218,6 @@
 
             <p class="mt-1 text-sm">What's coming next?</p>
           </div>
-
-          <!-- <a routerLink="/tasks" class="btn btn-sm"> View all </a> -->
         </div>
 
         <!-- Table -->
@@ -236,8 +234,15 @@
             <tbody>
               @for (upcomingTask of upcomingTasks(); track upcomingTask.id) {
                 <tr
-                  class="group transition hover:bg-app-button-hover-gray hover:rounded-2xl cursor-pointer"
+                  class="
+                    group cursor-pointer transition
+                    hover:rounded-2xl hover:bg-app-button-hover-gray
+                  "
                   (click)="openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)"
+                  tabindex="0"
+                  (keydown.enter)="
+                    openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)
+                  "
                 >
                   <td class="rounded-l-md">
                     <div class="font-medium">{{ upcomingTask.name }}</div>
@@ -257,17 +262,7 @@
                   <td>{{ upcomingTask.dueDate | date: 'short' }}</td>
 
                   <td class="rounded-r-md">
-                    @switch (upcomingTask.status) {
-                      @case ('PENDING') {
-                        <app-tasks-status-badge status="PENDING" />
-                      }
-                      @case ('IN_PROGRESS') {
-                        <app-tasks-status-badge status="IN_PROGRESS" />
-                      }
-                      @case ('COMPLETED') {
-                        <app-tasks-status-badge status="COMPLETED" />
-                      }
-                    }
+                    <app-tasks-status-badge [status]="upcomingTask.status" />
                   </td>
                 </tr>
               }
@@ -279,11 +274,29 @@
   </div>
 </div>
 
-@if (openModal() === 'create-task-dialog') {
-  <!--todo-->
-  <!-- <app-create-task-dialog [isClosing]="isClosing()" (cancelled)="closeModal()" /> -->
-}
+@let openedDialog = openModal();
 
-@if (openModal() === 'task-details-dialog' && selectedTask(); as task) {
-  <app-task-details-dialog [task]="task" [isClosing]="isClosing()" (closed)="closeModal()" />
+@switch (openedDialog) {
+  @case ('create-task-dialog') {
+    <app-create-task-dialog
+      [isClosing]="isClosing()"
+      [isLoading]="isCreatingTask()"
+      [errorMessage]="createTaskError()"
+      (closed)="closeModal()"
+      (submitted)="onTaskCreated($event)"
+    />
+  }
+
+  @case ('task-details-dialog') {
+    @if (selectedTask(); as task) {
+      <app-task-details-dialog
+        [task]="task"
+        [isClosing]="isClosing()"
+        [isLoading]="isUpdatingTaskStatus()"
+        [errorMessage]="updateTaskStatusError()"
+        (closed)="closeModal()"
+        (statusChangeRequested)="onTaskUpdatedStatus($event.targetTask, $event.action)"
+      />
+    }
+  }
 }

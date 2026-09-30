@@ -7,7 +7,7 @@ import {
   LucideCircleCheck,
 } from '@lucide/angular';
 
-type StatusCardIcon= 'total' | 'pending' | 'in_progress' | 'completed';
+type StatusCardIcon = 'total' | 'pending' | 'in_progress' | 'completed';
 
 @Component({
   selector: 'app-tasks-status-card',
@@ -24,6 +24,6 @@ type StatusCardIcon= 'total' | 'pending' | 'in_progress' | 'completed';
 export class TasksStatusCard {
   icon = input.required<StatusCardIcon>();
   title = input.required<string>();
-  value = input.required<number>();
+  value = input.required<number>();  // pass the total number of specific task base on status [all tasks, pending, in progress, completed]
   description = input.required<string>();
 }
