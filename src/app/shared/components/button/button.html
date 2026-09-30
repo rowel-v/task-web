@@ -8,7 +8,7 @@
       [type]="type()"
       (click)="pressed.emit()"
       [disabled]="unclickable()"
-      [aria-label]="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
+      [attr.aria-label]="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
     >
       @if (disabled) {
         @if (withLoadingSpinner()) {
@@ -29,7 +29,7 @@
       [type]="type()"
       (click)="pressed.emit()"
       [disabled]="unclickable()"
-      [aria-label]="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
+      []="variant() === 'green' ? 'Primary Button' : 'Cancel Button'"
     >
       @if (disabled) {
         @if (withLoadingSpinner()) {

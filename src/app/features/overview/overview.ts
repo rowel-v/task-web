@@ -10,11 +10,18 @@ import { CompletedTasksDetailsModal } from './completed-tasks-details-modal/comp
 import { LucideArrowRight, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
-import { TaskDetailsDialog } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import {
+  TaskDetailsDialog,
+  TaskStatusAction,
+} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import { DatePipe } from '@angular/common';
+import { TaskItem } from './task-item/task-item';
+import { TaskEmptyState } from './task-empty-state/task-empty-state';
+import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
+import { finalize } from 'rxjs';
 
 type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
-type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-dialog' | null;
+type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
 
 @Component({
   selector: 'app-overview',
@@ -30,7 +37,9 @@ type ModalSelection = 'create-task-dialog' | 'edit-task-dialog' | 'task-details-
     LucideArrowRight,
     CreateTaskDialog,
     TaskDetailsDialog,
-    DatePipe
+    DatePipe,
+    TaskItem,
+    TaskEmptyState,
   ],
   templateUrl: './overview.html',
   styles: ``,
@@ -99,5 +108,43 @@ export class Overview {
 
   protected upcomingTasks(): Task[] {
     return this.taskService.upcomingTasks();
+  }
+
+  protected readonly isCreatingTask = signal<boolean>(false);
+  protected readonly createTaskError = signal<string | null>(null);
+  protected onTaskCreated(req: CreateTaskRequest): void {
+    this.createTaskError.set(null); // clear previous error
+    this.isCreatingTask.set(true);
+
+    setTimeout(() => {
+      this.taskService
+        .createTask(req)
+        .pipe(finalize(() => this.isCreatingTask.set(false)))
+        .subscribe({
+          next: () => this.closeModal(),
+          error: (err) => {
+            console.error('Failed to create task', err);
+            this.createTaskError.set('Failed to create task. Please try again.');
+          },
+        });
+    }, 5000);
+  }
+
+  protected readonly isUpdatingTaskStatus = signal<boolean>(false);
+  protected readonly updateTaskStatusError = signal<string | null>(null);
+  protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
+    this.updateTaskStatusError.set(null);
+    this.isUpdatingTaskStatus.set(true);
+
+    this.taskService
+      .updateTaskStatus(targetTask.id, taskStatusAction)
+      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)))
+      .subscribe({
+        next: () => setTimeout(() => this.closeModal(), 5000),
+        error: (err) => {
+          console.error('Failed to update task status', err);
+          this.updateTaskStatusError.set('Failed to update task status. Please try again.');
+        },
+      });
   }
 }

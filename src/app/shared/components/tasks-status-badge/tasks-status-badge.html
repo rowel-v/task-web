@@ -1,7 +1,10 @@
 @switch (status()) {
   @case ('PENDING') {
     <div
-      class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#f4ff9d] text-app-text-green text-[13px] font-medium"
+      class="
+        inline-flex items-center gap-2 rounded-sm bg-[#f4ff9d] px-2 text-[13px]
+        font-medium text-app-text-green
+      "
     >
       <svg lucideClock5 [size]="17" />
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
@@ -9,7 +12,10 @@
   }
   @case ('IN_PROGRESS') {
     <div
-      class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#c5c8fc] text-app-text-green text-[13px] font-medium"
+      class="
+        inline-flex items-center gap-2 rounded-sm bg-[#c5c8fc] px-2 text-[13px]
+        font-medium text-app-text-green
+      "
     >
       <svg lucideCircleEllipsis [size]="17" />
 
@@ -18,7 +24,10 @@
   }
   @case ('COMPLETED') {
     <div
-      class="inline-flex items-center gap-2 rounded-sm px-2 bg-[#68f8b5] text-app-text-green text-[13px] font-medium"
+      class="
+        inline-flex items-center gap-2 rounded-sm bg-[#68f8b5] px-2 text-[13px]
+        font-medium text-app-text-green
+      "
     >
       <svg lucideCircleCheck [size]="17" />
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
