@@ -1,17 +1,25 @@
-import { Component, input, output, OnInit } from '@angular/core';
+import { Component, input, output, OnInit, afterNextRender, viewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UpdateTaskRequest } from '../../../models/request/update-task-request';
 import { Task, TaskPriority, TaskStatus } from '../../../models/task';
-import { LucideX } from '@lucide/angular';
 import { DateTimePicker } from '../../date-time-picker/date-time-picker';
+import { DialogHeader } from '../shared/dialog-header/dialog-header';
+import { DialogFooter } from '../shared/dialog-footer/dialog-footer';
 
 @Component({
   selector: 'app-edit-task-dialog',
-  imports: [ReactiveFormsModule, LucideX, DateTimePicker],
+  imports: [ReactiveFormsModule, DateTimePicker, DialogHeader, DialogFooter],
   templateUrl: './edit-task-dialog.html',
   styles: ``,
 })
 export class EditTaskDialog implements OnInit {
+  private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dialogRef');
+  constructor() {
+    afterNextRender(() => {
+      this.dialogRef().nativeElement.showModal();
+    });
+  }
+
   ngOnInit() {
     const task = this.task();
     this.taskForm.patchValue({
@@ -30,7 +38,7 @@ export class EditTaskDialog implements OnInit {
   submitted = output<{ taskId: number; req: UpdateTaskRequest }>();
   cancelled = output<void>();
 
-  taskForm = new FormGroup({
+  protected taskForm = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     description: new FormControl('', { nonNullable: true }),
     priority: new FormControl<TaskPriority>('LOW', { nonNullable: true }),
@@ -38,7 +46,7 @@ export class EditTaskDialog implements OnInit {
     dueDate: new FormControl<string | null>(null, { validators: [Validators.required] }),
   });
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
       return;

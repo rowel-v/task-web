@@ -1,7 +1,6 @@
 @import url('https://googleapis.com');
 @import 'tailwindcss';
 @import 'vanilla-calendar-pro/styles/index.css';
-@import './styles/dialog-styles.css';
 
 @plugin 'daisyui';
 
