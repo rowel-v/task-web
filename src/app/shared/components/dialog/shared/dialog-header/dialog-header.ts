@@ -3,7 +3,7 @@ import { Button } from '../../../button/button';
 
 @Component({
   selector: 'app-dialog-header',
-  imports: [Button],
+  imports: [Button, LucideX],
   styles: ``,
   templateUrl: './dialog-header.html',
 })
