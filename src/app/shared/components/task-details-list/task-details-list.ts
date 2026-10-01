@@ -1,4 +1,5 @@
 import { Component, input, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Task } from '../../models/task';
 import {
   LucideGhost,
@@ -37,6 +38,7 @@ type LucidIconSelection =
     LucideCircleEllipsis,
     LucideBadgeCheck,
     LucideCalendarCheck,
+    RouterLink
   ],
   templateUrl: './task-details-list.html',
   styles: ``,

@@ -1,4 +1,13 @@
-import { Component, computed, inject, OnInit, Signal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  OnInit,
+  Signal,
+  signal,
+  untracked,
+} from '@angular/core';
 import { TaskService } from '../../core/services/task-service/task-service';
 import { Task } from '../../shared/models/task';
 import { CommonModule } from '@angular/common';
@@ -11,7 +20,7 @@ import { SearchService } from '../../core/services/search-service/search-service
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
 import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
-import { finalize } from 'rxjs';
+import { finalize, map } from 'rxjs';
 import {
   LucideClipboardList,
   LucideClock5,
@@ -23,6 +32,8 @@ import {
 } from '@lucide/angular';
 import { UpdateTaskRequest } from '../../shared/models/request/update-task-request';
 import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
@@ -53,6 +64,26 @@ export class Tasks implements OnInit {
   ngOnInit(): void {
     this.taskService.getAllTask().subscribe();
   }
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly taskId = toSignal(
+    this.route.queryParamMap.pipe(map((p) => Number(p.get('taskId')) || null)),
+  );
+
+  constructor() {
+    // Opens the details dialog when arriving with a taskId in the URL.
+    effect(() => {
+      const id = this.taskId();
+      const task = this.tasks().find((t) => t.id === id);
+      if (!id || !task) return;
+
+      untracked(() => {
+        this.selectedTask.set(task);
+        this.selectedModal.set('task-details-dialog');
+      });
+    });
+  }
+
   private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
   protected readonly selectedTab = signal<TabSelection>('all');
@@ -97,6 +128,15 @@ export class Tasks implements OnInit {
     this.updateTaskError.set(null);
     this.deleteTaskError.set(null);
     this.createTaskError.set(null);
+
+    // Clear the taskId param when the dialog closes.
+    if (this.taskId()) {
+      void this.router.navigate([], {
+        queryParams: { taskId: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
 
     this.closedModal.set(true);
 

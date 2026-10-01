@@ -93,7 +93,7 @@
       </button>
       <a
         routerLink="/tasks"
-        tabindex="0"
+        [queryParams]="{ taskId: selectedTask()?.id }"
         class="
           btn gap-1.5 border-0 shadow-sm btn-accent btn-sm
           hover:bg-app-background-hover
