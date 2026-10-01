@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -39,6 +39,10 @@ interface NavItem {
     LucideSearch,
     FormsModule,
   ],
+  host: {
+    '(document:click)': 'onDocumentClick($event)',
+    '(document:keydown.escape)': 'closeProfile()',
+  },
   templateUrl: './main-layout.html',
   styles: ``,
 })
@@ -109,5 +113,12 @@ export class MainLayout {
       this.openedProfile.set(false);
       this.closingProfile.set(false);
     }, 200);
+  }
+
+  private readonly profileRef = viewChild<ElementRef<HTMLElement>>('profileRef');
+
+  // Closes the profile dropdown when clicking outside of it.
+  protected onDocumentClick(event: MouseEvent) {
+    if (!this.profileRef()?.nativeElement.contains(event.target as Node)) this.closeProfile();
   }
 }

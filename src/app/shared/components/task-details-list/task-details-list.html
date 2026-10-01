@@ -1,7 +1,13 @@
 @if (!selectedTask()) {
   @for (task of tasks(); track task.id) {
-    <div
-      class="flex items-center gap-3 p-2.5 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
+    <button
+      type="button"
+      class="
+        flex w-full cursor-pointer items-center gap-3 rounded-lg p-2.5 text-left
+        transition-colors duration-200
+        hover:bg-app-background-hover
+        focus-visible:bg-app-background-hover focus-visible:outline-0
+      "
       [class.slide-in-right]="isEnteringDetail()"
       (click)="selectedTask.set(task)"
     >
@@ -35,10 +41,12 @@
         }
       }
       <p class="truncate text-sm font-medium">{{ task.name }}</p>
-    </div>
+    </button>
   } @empty {
     <div
-      class="flex h-full flex-col items-center justify-center gap-2 text-center"
+      class="
+        flex h-full flex-col items-center justify-center gap-2 text-center
+      "
       [class.slide-in-right]="isEnteringDetail()"
     >
       <svg lucideGhost />
@@ -53,25 +61,45 @@
     class="relative flex h-50 min-h-50 flex-col bg-app-background-white p-4"
     [class.slide-in-right]="isEnteringDetail()"
   >
-    <div class="min-h-0 flex-1 text-app-text-green overflow-y-auto overflow-x-hidden pr-2">
-      <h3 class="text-base font-bold leading-tight">
+    <div class="
+      min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-2 text-app-text-green
+    ">
+      <h3 class="text-base/tight font-bold">
         {{ selectedTask()?.name }}
       </h3>
 
       @if (selectedTask()?.description) {
-        <p class="mt-2 wrap-break-word text-sm leading-relaxed italic text-base-content/65">
+        <p class="
+          mt-2 text-sm/relaxed wrap-break-word text-base-content/65 italic
+        ">
           {{ selectedTask()?.description }}
         </p>
       } @else {
-        <p class="mt-2 text-sm italic text-base-content/40">No description provided.</p>
+        <p class="mt-2 text-sm text-base-content/40 italic">No description provided.</p>
       }
     </div>
 
-    <div class="flex gap-2 absolute bottom-2 right-4">
-      <button type="button" class="btn btn-ghost btn-sm gap-1.5 hover:bg-app-background-hover" (click)="selectedTask.set(null)">
+    <div class="absolute right-4 bottom-2 flex gap-2">
+      <button
+        type="button"
+        class="
+          btn gap-1.5 btn-ghost btn-sm
+          hover:bg-app-background-hover
+          focus-visible:bg-app-background-hover focus-visible:outline-0
+        "
+        (click)="selectedTask.set(null)"
+      >
         <span>Back</span>
       </button>
-      <a routerLink="/tasks" class="btn btn-sm btn-accent hover:bg-app-background-hover gap-1.5 shadow-sm">
+      <a
+        routerLink="/tasks"
+        tabindex="0"
+        class="
+          btn gap-1.5 border-0 shadow-sm btn-accent btn-sm
+          hover:bg-app-background-hover
+          focus-visible:bg-app-background-hover focus-visible:outline-0
+        "
+      >
         <span>Go to Tasks</span>
       </a>
     </div>

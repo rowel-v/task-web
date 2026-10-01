@@ -1,4 +1,14 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  HostListener,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { TaskDetailsList } from '../../../shared/components/task-details-list/task-details-list';
 import { Task } from '../../../shared/models/task';
 import {
@@ -28,19 +38,30 @@ type TaskCategory =
   styles: ``,
 })
 export class CompletedTasksDetailsModal {
+  private readonly backDrop = viewChild<ElementRef<HTMLElement>>('backDrop'); // control backdrop closing
+  private readonly backBtn = viewChild<ElementRef<HTMLButtonElement>>('backBtn');
+  constructor() {
+    // Focus the back button whenever it appears.
+    effect(() => {
+      this.backBtn()?.nativeElement.focus();
+    });
+  }
+
   tasks = input.required<Task[]>(); // Input tasks from the parent component.
-  protected completedTasks = computed(() => this.tasks().filter((t) => t.status === 'COMPLETED'));
+  protected readonly completedTasks = computed(() =>
+    this.tasks().filter((t) => t.status === 'COMPLETED'),
+  );
   // Gets completed tasks with high priority.
-  protected completedHighPriority = computed(() =>
+  protected readonly completedHighPriority = computed(() =>
     this.completedTasks().filter((t) => t.priority === 'HIGH'),
   );
   // Gets tasks completed today.
-  protected completedToday = computed(() => {
+  protected readonly completedToday = computed(() => {
     const today = new Date().toDateString();
     return this.completedTasks().filter((t) => new Date(t.completedAt).toDateString() === today);
   });
   // Gets completed tasks from this week.
-  protected completedThisWeek = computed(() => {
+  protected readonly completedThisWeek = computed(() => {
     const now = new Date();
     const startOfWeek = new Date(now);
 
@@ -54,10 +75,20 @@ export class CompletedTasksDetailsModal {
       (t) => t.completedAt && new Date(t.completedAt) >= startOfWeek,
     );
   });
+
+  // Category rows displayed in the task breakdown.
+  // prettier-ignore
+  protected categories = computed(() => [
+    { key: 'completed', label: 'Completed', count: this.completedTasks().length },
+    { key: 'high_priority', label: 'High Priority', count: this.completedHighPriority().length },
+    { key: 'completed_today', label: 'Completed Today', count: this.completedToday().length },
+    { key: 'completed_this_week', label: 'Completed This Week', count: this.completedThisWeek().length },
+  ] as const);
+
   closed = output<void>(); // used to notify the parent when the modal is closed.
-  protected isClosing = signal(false); // Controls the modal closing animation.
-  protected isReturning = signal(false); // for animation when returning to the task breakdown.
-  protected selectedCategory = signal<TaskCategory>(null); // Stores the currently selected task category.
+  protected readonly isClosing = signal(false); // Controls the modal closing animation.
+  protected readonly isReturning = signal(false); // for animation when returning to the task breakdown.
+  protected readonly selectedCategory = signal<TaskCategory>(null); // Stores the currently selected task category.
   // Updates the selected category and determines the navigation animation.
   protected selectCategory(taskCategory: TaskCategory) {
     // Animate from left when returning to the task breakdown.
@@ -75,5 +106,15 @@ export class CompletedTasksDetailsModal {
       this.closed.emit();
       this.isClosing.set(false);
     }, 200);
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent) {
+    if (event.target === this.backDrop()?.nativeElement) this.closeModal();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape() {
+    this.closeModal();
   }
 }

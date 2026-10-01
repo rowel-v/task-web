@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { Task } from '../../../shared/models/task';
 import { TasksStatusBadge } from '../../../shared/components/tasks-status-badge/tasks-status-badge';
 
@@ -10,6 +10,6 @@ import { TasksStatusBadge } from '../../../shared/components/tasks-status-badge/
 })
 export class TaskItem {
   task = input.required<Task>();
-  
+  pressed = output<void>();
   protected readonly isCompleted = computed(() => this.task().status === 'COMPLETED');
 }

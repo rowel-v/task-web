@@ -17,10 +17,7 @@
       title="Total Tasks"
       [value]="totalTasks()"
       [description]="'All your tasks'"
-      (click)="openModalTasksDetailsFlag('total')"
-      role="button"
-      tabindex="0"
-      (keydown.enter)="openModalTasksDetailsFlag('total')"
+      (pressed)="openModalTasksDetailsFlag('total')"
     >
       @if (tasksDetailsFlag() === 'total') {
         <app-total-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -33,10 +30,7 @@
       title="Pending"
       [value]="totalPendingTasks()"
       [description]="'Tasks waiting to start'"
-      (click)="openModalTasksDetailsFlag('pending')"
-      role="button"
-      tabindex="0"
-      (keydown.enter)="openModalTasksDetailsFlag('pending')"
+      (pressed)="openModalTasksDetailsFlag('pending')"
     >
       @if (tasksDetailsFlag() === 'pending') {
         <app-pending-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -49,10 +43,7 @@
       title="In Progress"
       [value]="totalInProgressTasks()"
       [description]="'Currently working on'"
-      (click)="openModalTasksDetailsFlag('in_progress')"
-      role="button"
-      tabindex="0"
-      (keydown.enter)="openModalTasksDetailsFlag('in_progress')"
+      (pressed)="openModalTasksDetailsFlag('in_progress')"
     >
       @if (tasksDetailsFlag() === 'in_progress') {
         <app-inprogress-tasks-details-modal
@@ -68,10 +59,7 @@
       title="Completed"
       [value]="totalCompletedTasks()"
       [description]="completionRate() + '% completion rate'"
-      (click)="openModalTasksDetailsFlag('completed')"
-      role="button"
-      tabindex="0"
-      (keydown.enter)="openModalTasksDetailsFlag('completed')"
+      (pressed)="openModalTasksDetailsFlag('completed')"
     >
       @if (tasksDetailsFlag() === 'completed') {
         <app-completed-tasks-details-modal
@@ -105,6 +93,7 @@
               <button
                 class="
                   btn border-none bg-app-button-purple shadow-none btn-sm
+                  focus-within:bg-app-button-hover-gray focus-within:outline-0
                   hover:bg-app-button-hover-gray
                 "
                 (click)="openModal.set('create-task-dialog')"
@@ -123,10 +112,7 @@
             @for (task of displayedTodaysTasks(); track task.id) {
               <app-task-item
                 [task]="task"
-                (click)="openModal.set('task-details-dialog'); selectedTask.set(task)"
-                role="button"
-                tabindex="0"
-                (keydown.enter)="openModal.set('task-details-dialog'); selectedTask.set(task)"
+                (pressed)="openModal.set('task-details-dialog'); selectedTask.set(task)"
               />
             } @empty {
               <app-task-empty-state (pressedAddTaskBtn)="openModal.set('create-task-dialog')" />
@@ -139,6 +125,7 @@
               routerLink="/tasks"
               class="
                 flex items-center gap-1 rounded-sm px-2
+                focus-within:bg-app-button-hover-gray focus-within:outline-0
                 hover:bg-app-button-hover-gray
               "
             >

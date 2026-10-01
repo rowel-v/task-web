@@ -1,26 +1,29 @@
-<!--using daisy ui 'stat' component-->
-<div
-  class="
-    relative stat cursor-pointer rounded-sm border border-base-200
-    bg-app-background-white transition
-    hover:bg-app-background-hover
-  "
->
-  <div class="stat-figure text-app-text-green">
-    @if (icon() === 'total') {
-      <svg lucideClipboardList></svg>
-    } @else if (icon() === 'pending') { 
-      <svg lucideClock5></svg>
-    } @else if (icon() === 'in_progress') {
-      <svg lucideCircleEllipsis></svg>
-    } @else if (icon() === 'completed') {
-      <svg lucideCircleCheck></svg>
-    }
-  </div>
+<div class="relative">
+  <button
+    class="
+      stat w-full cursor-pointer rounded-sm border border-base-200
+      bg-app-background-white text-left transition
+      hover:bg-app-background-hover
+      focus-visible:bg-app-background-hover focus-visible:outline-0
+    "
+    (click)="pressed.emit()"
+  >
+    <span class="stat-figure text-app-text-green">
+      @if (icon() === 'total') {
+        <svg lucideClipboardList></svg>
+      } @else if (icon() === 'pending') {
+        <svg lucideClock5></svg>
+      } @else if (icon() === 'in_progress') {
+        <svg lucideCircleEllipsis></svg>
+      } @else if (icon() === 'completed') {
+        <svg lucideCircleCheck></svg>
+      }
+    </span>
+    <span class="stat-title text-app-text-green">{{ title() }}</span>
+    <span class="stat-value py-2 text-app-text-green">{{ value() }}</span>
+    <span class="stat-desc text-app-text-green">{{ description() }}</span>
+  </button>
 
-  <div class="stat-title text-app-text-green">{{ title() }}</div>
-  <div class="stat-value py-2 text-app-text-green">{{ value() }}</div>
-  <div class="stat-desc text-app-text-green">{{ description() }}</div>
-
+  <!-- Modal is projected here, positioned relative to the wrapper. -->
   <ng-content />
 </div>

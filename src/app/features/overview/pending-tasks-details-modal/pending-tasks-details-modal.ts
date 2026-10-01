@@ -1,4 +1,14 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  HostListener,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { Task } from '../../../shared/models/task';
 import { TaskDetailsList } from '../../../shared/components/task-details-list/task-details-list';
 import {
@@ -27,6 +37,15 @@ type TaskCategory = 'pending' | 'high_priority' | 'due_today' | 'overdue' | null
   styles: ``,
 })
 export class PendingTasksDetailsModal {
+  private readonly backDrop = viewChild<ElementRef<HTMLElement>>('backDrop'); // control backdrop closing
+  private readonly backBtn = viewChild<ElementRef<HTMLButtonElement>>('backBtn');
+  constructor() {
+    // Focus the back button whenever it appears.
+    effect(() => {
+      this.backBtn()?.nativeElement.focus();
+    });
+  }
+
   tasks = input.required<Task[]>(); // Input tasks from the parent component.
   protected pendingTasks = computed(() => this.tasks().filter((t) => t.status === 'PENDING'));
   // Gets pending tasks with high priority.
@@ -48,6 +67,16 @@ export class PendingTasksDetailsModal {
       .filter((t) => t.status !== 'COMPLETED')
       .filter((t) => new Date(t.dueDate) < startOfDay);
   });
+
+  // Category rows displayed in the task breakdown.
+  // prettier-ignore
+  protected categories = computed(() => [
+    { key: 'pending', label: 'Pending', count: this.pendingTasks().length },
+    { key: 'high_priority', label: 'High Priority', count: this.pendingHighPriority().length },
+    { key: 'due_today', label: 'Due Today', count: this.pendingDueToday().length },
+    { key: 'overdue', label: 'Overdue', count: this.overdueTasks().length },
+  ] as const);
+
   closed = output<void>(); // used to notify the parent when the modal is closed.
   protected isClosing = signal(false); // Controls the modal closing animation.
   protected isReturning = signal(false); // for animation when returning to the task breakdown.
@@ -69,5 +98,15 @@ export class PendingTasksDetailsModal {
       this.closed.emit();
       this.isClosing.set(false);
     }, 200);
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent) {
+    if (event.target === this.backDrop()?.nativeElement) this.closeModal();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape() {
+    this.closeModal();
   }
 }

@@ -1,15 +1,18 @@
 <!-- Invisible backdrop, covers the entire viewport and catches clicks outside the modal. -->
-<div class="fixed inset-0 z-9998 cursor-default" (click)="closeModal()"></div>
+<div #backDrop class="fixed inset-0 z-9998 cursor-default"></div>
 
 <!-- Modal container, positioned beside the Pending Tasks stat. -->
 <div
-  class="absolute left-full top-0 z-9999 ml-2 cursor-default"
+  class="absolute top-0 left-full z-9999 ml-2 cursor-default"
   [class.scale-in-tl]="!isClosing()"
   [class.scale-out-tl]="isClosing()"
 >
   <!-- Modal content -->
   <div
-    class="flex flex-col w-80 h-72 bg-app-background-white text-app-background-green rounded-xl p-5 shadow-xl"
+    class="
+      flex h-72 w-80 flex-col rounded-xl bg-app-background-white p-5
+      text-app-background-green shadow-xl
+    "
   >
     <!-- Header -->
     <div class="mb-4 flex justify-between">
@@ -17,7 +20,11 @@
       <!-- Close button -->
       @if (selectedCategory() === null) {
         <button
-          class="cursor-pointer rounded hover:bg-gray-300"
+          class="
+            cursor-pointer rounded-sm
+            hover:bg-app-background-hover
+            focus-visible:bg-app-background-hover focus-visible:outline-0
+          "
           [class.rotate-in-center]="true"
           (click)="closeModal()"
         >
@@ -25,7 +32,12 @@
         </button>
       } @else {
         <button
-          class="cursor-pointer rounded hover:bg-gray-300"
+          #backBtn
+          class="
+            cursor-pointer rounded-sm
+            hover:bg-app-background-hover
+            focus-visible:bg-app-background-hover focus-visible:outline-0
+          "
           [class.rotate-in-center]="true"
           (click)="selectCategory(null)"
         >
@@ -35,7 +47,7 @@
     </div>
 
     <!-- Content -->
-    <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+    <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
       @switch (selectedCategory()) {
         @case ('pending') {
           <app-task-details-list
@@ -79,52 +91,42 @@
         }
         @default {
           <!-- Task breakdown -->
-          <div class="space-y-3" [class.slide-in-left]="isReturning()">
-            <!-- Total pending tasks -->
-            <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
-              (click)="selectCategory('pending')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideClock5 />
-                <span>Pending</span>
-              </div>
-              <span class="font-semibold">{{ pendingTasks().length }} </span>
-            </div>
-            <!-- High-priority pending tasks -->
-            <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
-              (click)="selectCategory('high_priority')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideFlagTriangleRight />
-                <span>High Priority</span>
-              </div>
-              <span class="font-semibold">{{ pendingHighPriority().length }}</span>
-            </div>
-            <!-- Pending tasks due today -->
-            <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
-              (click)="selectCategory('due_today')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideAlarmClock />
-                <span>Due Today</span>
-              </div>
-              <span class="font-semibold">{{ pendingDueToday().length }}</span>
-            </div>
-            <!-- Overdue pending tasks -->
-            <div
-              class="flex items-center justify-between p-2 hover:bg-app-background-hover cursor-pointer rounded-lg transition-colors duration-200"
-              (click)="selectCategory('overdue')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideTriangleAlert />
-                <span>Overdue</span>
-              </div>
-              <span class="font-semibold">{{ overdueTasks().length }}</span>
-            </div>
-          </div>
+          <ul class="space-y-3" [class.slide-in-left]="isReturning()">
+            @for (c of categories(); track c.key) {
+              <li>
+                <button
+                  type="button"
+                  class="
+                    flex w-full cursor-pointer items-center justify-between
+                    rounded-lg p-2 text-left transition-colors duration-200
+                    hover:bg-app-background-hover
+                    focus-visible:bg-app-background-hover
+                    focus-visible:outline-0
+                  "
+                  (click)="selectCategory(c.key)"
+                >
+                  <span class="flex items-center gap-2">
+                    @switch (c.key) {
+                      @case ('pending') {
+                        <svg lucideClock5 />
+                      }
+                      @case ('high_priority') {
+                        <svg lucideFlagTriangleRight />
+                      }
+                      @case ('due_today') {
+                        <svg lucideAlarmClock />
+                      }
+                      @case ('overdue') {
+                        <svg lucideTriangleAlert />
+                      }
+                    }
+                    <span>{{ c.label }}</span>
+                  </span>
+                  <span class="font-semibold">{{ c.count }}</span>
+                </button>
+              </li>
+            }
+          </ul>
         }
       }
     </div>

@@ -1,5 +1,5 @@
 <!-- Invisible backdrop, covers the entire viewport and catches clicks outside the modal. -->
-<div class="fixed inset-0 z-9998 cursor-default" (click)="closeModal()"></div>
+<div #backDrop class="fixed inset-0 z-9998 cursor-default"></div>
 
 <!-- Modal container, positioned beside the Pending Tasks stat. -->
 <div
@@ -23,7 +23,8 @@
           animate.enter="rotate-in-center"
           class="
             cursor-pointer rounded-sm
-            hover:bg-gray-300
+            hover:bg-app-background-hover
+            focus-visible:bg-app-background-hover focus-visible:outline-0
           "
           (click)="closeModal()"
         >
@@ -31,10 +32,12 @@
         </button>
       } @else {
         <button
+          #backBtn
           animate.enter="rotate-in-center"
           class="
             cursor-pointer rounded-sm
-            hover:bg-gray-300
+            hover:bg-app-background-hover
+            focus-visible:bg-app-background-hover focus-visible:outline-0
           "
           (click)="selectCategory(null)"
         >
@@ -88,68 +91,42 @@
         }
         @default {
           <!-- Task breakdown -->
-          <div class="space-y-3" [class.slide-in-left]="isReturning()">
-            <!-- Total completed tasks -->
-            <div
-              class="
-                flex cursor-pointer items-center justify-between rounded-lg p-2
-                transition-colors duration-200
-                hover:bg-app-background-hover
-              "
-              (click)="selectCategory('completed')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideCircleCheck />
-                <span>Completed</span>
-              </div>
-              <span class="font-semibold">{{ completedTasks().length }} </span>
-            </div>
-            <!-- High-priority completed tasks -->
-            <div
-              class="
-                flex cursor-pointer items-center justify-between rounded-lg p-2
-                transition-colors duration-200
-                hover:bg-app-background-hover
-              "
-              (click)="selectCategory('high_priority')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideFlagTriangleRight />
-                <span>High Priority</span>
-              </div>
-              <span class="font-semibold">{{ completedHighPriority().length }}</span>
-            </div>
-            <!-- tasks completed today -->
-            <div
-              class="
-                flex cursor-pointer items-center justify-between rounded-lg p-2
-                transition-colors duration-200
-                hover:bg-app-background-hover
-              "
-              (click)="selectCategory('completed_today')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideBadgeCheck />
-                <span>Completed Today</span>
-              </div>
-              <span class="font-semibold">{{ completedToday().length }}</span>
-            </div>
-            <!-- tasks completed this week -->
-            <div
-              class="
-                flex cursor-pointer items-center justify-between rounded-lg p-2
-                transition-colors duration-200
-                hover:bg-app-background-hover
-              "
-              (click)="selectCategory('completed_this_week')"
-            >
-              <div class="flex items-center gap-2">
-                <svg lucideCalendarCheck />
-                <span>Completed This Week</span>
-              </div>
-              <span class="font-semibold">{{ completedThisWeek().length }}</span>
-            </div>
-          </div>
+          <ul class="space-y-3" [class.slide-in-left]="isReturning()">
+            @for (c of categories(); track c.key) {
+              <li>
+                <button
+                  type="button"
+                  class="
+                    flex w-full cursor-pointer items-center justify-between
+                    rounded-lg p-2 text-left transition-colors duration-200
+                    hover:bg-app-background-hover
+                    focus-visible:bg-app-background-hover
+                    focus-visible:outline-0
+                  "
+                  (click)="selectCategory(c.key)"
+                >
+                  <span class="flex items-center gap-2">
+                    @switch (c.key) {
+                      @case ('completed') {
+                        <svg lucideCircleCheck />
+                      }
+                      @case ('high_priority') {
+                        <svg lucideFlagTriangleRight />
+                      }
+                      @case ('completed_today') {
+                        <svg lucideBadgeCheck />
+                      }
+                      @case ('completed_this_week') {
+                        <svg lucideCalendarCheck />
+                      }
+                    }
+                    <span>{{ c.label }}</span>
+                  </span>
+                  <span class="font-semibold">{{ c.count }}</span>
+                </button>
+              </li>
+            }
+          </ul>
         }
       }
     </div>
