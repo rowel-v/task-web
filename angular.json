@@ -75,7 +75,13 @@
               "buildTarget": "my-third-angular:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "allowedHosts": [
+              "crtjgtnw-4200.asse.devtunnels.ms"
+            ]
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

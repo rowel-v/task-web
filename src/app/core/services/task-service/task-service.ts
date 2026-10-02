@@ -11,6 +11,7 @@ import { TaskStatusAction } from '../../../shared/components/dialog/task-details
   providedIn: 'root',
 })
 export class TaskService {
+  private readonly baseUrl = '/api/tasks';
   private readonly http = inject(HttpClient);
   private readonly tasksState = signal<Task[]>([]);
   tasks = this.tasksState.asReadonly();
@@ -53,10 +54,10 @@ export class TaskService {
     return this.tasksState()
       .filter((task) => task.dueDate && new Date(task.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
-  }); 
+  });
 
   getAllTask(): Observable<Task[]> {
-    return this.http.get<ApiResponse<Task[]>>('http://localhost:8080/tasks').pipe(
+    return this.http.get<ApiResponse<Task[]>>(this.baseUrl).pipe(
       tap((result) => this.tasksState.set(result.data)),
       map((result) => result.data),
     );
@@ -64,19 +65,19 @@ export class TaskService {
 
   getTask(taskId: number): Observable<Task> {
     return this.http
-      .get<ApiResponse<Task>>(`http://localhost:8080/tasks/${taskId}`)
+      .get<ApiResponse<Task>>(`${this.baseUrl}/${taskId}`)
       .pipe(map((result) => result.data));
   }
 
   createTask(req: CreateTaskRequest): Observable<Task> {
-    return this.http.post<ApiResponse<Task>>(`http://localhost:8080/tasks`, req).pipe(
+    return this.http.post<ApiResponse<Task>>(`${this.baseUrl}`, req).pipe(
       tap((result) => this.tasksState.update((tasks) => [...tasks, result.data])),
       map((result) => result.data),
     );
   }
 
   updateTask(taskId: number, req: UpdateTaskRequest): Observable<Task> {
-    return this.http.patch<ApiResponse<Task>>(`http://localhost:8080/tasks/${taskId}`, req).pipe(
+    return this.http.patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}`, req).pipe(
       tap((result) =>
         this.tasksState.update((tasks) =>
           tasks.map((task) => (task.id === result.data.id ? result.data : task)),
@@ -88,13 +89,13 @@ export class TaskService {
 
   deleteTask(taskId: number): Observable<void> {
     return this.http
-      .delete<void>(`http://localhost:8080/tasks/${taskId}`)
+      .delete<void>(`${this.baseUrl}/${taskId}`)
       .pipe(tap(() => this.tasksState.update((tasks) => tasks.filter((t) => t.id !== taskId))));
   }
 
   updateTaskStatus(taskId: number, taskStatusAction: TaskStatusAction): Observable<Task> {
     return this.http
-      .patch<ApiResponse<Task>>(`http://localhost:8080/tasks/${taskId}/${taskStatusAction}`, null)
+      .patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}/${taskStatusAction}`, null)
       .pipe(
         tap((result) =>
           this.tasksState.update((task) =>
