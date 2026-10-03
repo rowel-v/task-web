@@ -18,7 +18,9 @@ import { DatePipe } from '@angular/common';
 import { TaskItem } from './task-item/task-item';
 import { TaskEmptyState } from './task-empty-state/task-empty-state';
 import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
-import { finalize } from 'rxjs';
+import { finalize, map } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
 type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
@@ -45,6 +47,11 @@ type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
   styles: ``,
 })
 export class Overview {
+  private readonly bp = inject(BreakpointObserver);
+  protected readonly isMobile = toSignal(
+    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
+    { initialValue: false },
+  );
   private readonly taskService = inject(TaskService);
   protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
   protected selectedTask = signal<Task | null>(null);

@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, linkedSignal, signal, viewChild } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -14,6 +14,7 @@ import {
   LucideLogOut,
   LucideSearch,
 } from '@lucide/angular';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 
@@ -47,9 +48,15 @@ interface NavItem {
   styles: ``,
 })
 export class MainLayout {
+  private readonly bp = inject(BreakpointObserver);
+  protected readonly isMobile = toSignal(
+    this.bp.observe(Breakpoints.Handset).pipe(map(r => r.matches)),
+    { initialValue: false }
+  );
+
   private readonly router = inject(Router);
   protected readonly searchService = inject(SearchService);
-  protected readonly openSideNav = signal<boolean>(true);
+  protected readonly openSideNav = linkedSignal(() => !this.isMobile());
   protected readonly navItems: NavItem[] = [
     { key: 'home', label: 'Home', route: '/overview' },
     { key: 'tasks', label: 'Tasks', route: '/tasks' },
@@ -89,9 +96,9 @@ export class MainLayout {
   protected readonly description = computed(() => {
     switch (this.currentSideNav()) {
       case 'home':
-        return "Here's your task overview for today.";
+        return "Overview";
       case 'tasks':
-        return 'Manage your tasks and stay organized.';
+        return 'Stay organized.';
       case 'settings':
         return 'Settings Description later.';
     }

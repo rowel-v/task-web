@@ -3,20 +3,22 @@
 @let updatedAt = t.updatedAt | date: 'short';
 @let completedAt = t.completedAt | date: 'short';
 
-<div class="flex flex-col gap-4 px-6 pb-5 overflow-y-auto text-[17px] max-h-[50vh]">
+<div class="
+  flex max-h-[50vh] flex-col gap-4 overflow-y-auto px-6 pb-5 text-[17px]
+">
   @if (t.description) {
-    <p class="opacity-80 leading-relaxed italic">{{ t.description }}</p>
+    <p class="leading-relaxed italic opacity-80">{{ t.description }}</p>
   }
 
   <div class="flex flex-col gap-3 py-3">
     <div class="flex items-center gap-3">
-      <svg lucideFlag class="w-4 h-4 shrink-0" />
+      <svg lucideFlag class="size-4 shrink-0" />
       <span class="w-16">Priority</span>
       <span [class]="priorityClasses()" class="font-medium">{{ t.priority | titlecase }}</span>
     </div>
 
     <div class="flex items-center gap-3">
-      <svg lucideCalendar class="w-4 h-4 shrink-0" />
+      <svg lucideCalendar class="size-4 shrink-0" />
       <span class="w-16">Due</span>
       <span [class.text-red-500]="isOverdue()" class="font-medium">
         {{ t.dueDate | date: 'MMM d, y, h:mm a' }}

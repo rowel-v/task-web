@@ -1,7 +1,18 @@
 import { Calendar } from 'vanilla-calendar-pro';
-import { AfterViewInit, Component, ElementRef, output, signal, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { LucideCalendarDays, LucideX } from '@lucide/angular';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-date-time-picker',
@@ -10,6 +21,12 @@ import { LucideCalendarDays, LucideX } from '@lucide/angular';
   templateUrl: './date-time-picker.html',
 })
 export class DateTimePicker implements AfterViewInit {
+  private readonly bp = inject(BreakpointObserver);
+  protected readonly isMobile = toSignal(
+    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
+    { initialValue: false },
+  );
+
   private readonly calendarEl = viewChild.required<ElementRef>('calendarRef');
   dateSelected = output<string>(); // emits the chosen date as string format
   protected readonly selectedDate = signal<string>(''); // for display in its template
@@ -50,7 +67,7 @@ export class DateTimePicker implements AfterViewInit {
         if (popup && dialogEl) {
           popup.style.position = 'absolute';
           popup.style.top = '50%';
-          popup.style.left = '70%';
+          popup.style.left = this.isMobile() ? '65%' : '70%';
           popup.style.transform = 'translate(-50%, -50%)';
           popup.style.zIndex = '9999';
 

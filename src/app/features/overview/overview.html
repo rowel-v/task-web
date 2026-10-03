@@ -1,13 +1,15 @@
 <div
   class="
-    flex h-full flex-col gap-2 bg-app-background-green text-app-background-white
+    flex h-full flex-col gap-2 overflow-y-auto bg-app-background-green
+    text-app-background-white
+    md:overflow-hidden md:overflow-y-hidden
   "
   data-theme="light"
 >
   <!-- Statistics -->
   <div
     class="
-      stats w-full shrink-0 stats-vertical gap-2 overflow-visible shadow-sm
+      stats mx-2 shrink-0 stats-vertical gap-2 overflow-visible shadow-sm
       md:stats-horizontal
     "
   >
@@ -71,7 +73,10 @@
   </div>
 
   <!-- Main Dashboard -->
-  <div class="flex flex-col overflow-y-auto">
+  <div class="
+    flex flex-col
+    md:overflow-y-auto
+  ">
     <div class="
       grid items-start gap-2
       lg:grid-cols-3
@@ -95,6 +100,7 @@
                   btn border-none bg-app-button-purple shadow-none btn-sm
                   focus-within:bg-app-button-hover-gray focus-within:outline-0
                   hover:bg-app-button-hover-gray
+                  active:bg-app-button-hover-gray
                 "
                 (click)="openModal.set('create-task-dialog')"
               >
@@ -127,6 +133,7 @@
                 flex items-center gap-1 rounded-sm px-2
                 focus-within:bg-app-button-hover-gray focus-within:outline-0
                 hover:bg-app-button-hover-gray
+                active:bg-app-button-hover-gray
               "
             >
               View all tasks
@@ -180,7 +187,7 @@
           </div>
         </div>
         <!-- Progress footer -->
-        <div class="mt-2 flex flex-col">
+        <div class="mx-6 mt-2 flex flex-col">
           <div class="flex items-center justify-between text-sm">
             <span class=""> Overall progress </span>
             <span class="font-medium"> {{ completionRate() }}% </span>
@@ -199,7 +206,7 @@
     <div class="card">
       <div class="card-body">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div class="mt-3 flex items-center justify-between">
           <div>
             <h2 class="card-title">Upcoming Tasks</h2>
 

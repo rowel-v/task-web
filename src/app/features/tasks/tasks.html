@@ -1,28 +1,28 @@
 <div class="mx-auto flex size-full flex-col text-app-text-white">
   <!--Tab list-->
-  <div class="tabs tabs-border mb-3 gap-1">
+  <div class="tabs tabs-border mb-3 shrink-0 flex-nowrap gap-1 overflow-x-auto">
     <!--All-->
-    <label class="tab gap-1 text-[15px]">
+    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
       <input type="radio" name="my_tabs_4" checked="checked" (change)="selectedTab.set('all')" />
-      <svg lucideClipboardList />
+      <svg lucideClipboardList class="size-5" />
       All
     </label>
     <!--Pending-->
-    <label class="tab gap-1 text-[15px]">
+    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
       <input type="radio" name="my_tabs_4" (change)="selectedTab.set('pending')" />
-      <svg lucideClock5 />
+      <svg lucideClock5 class="size-5" />
       Pending
     </label>
     <!--In progress-->
-    <label class="tab gap-1 text-[15px]">
+    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
       <input type="radio" name="my_tabs_4" (change)="selectedTab.set('in_progress')" />
-      <svg lucideCircleEllipsis />
+      <svg lucideCircleEllipsis class="size-5" />
       In Progress
     </label>
     <!--Completed-->
-    <label class="tab gap-1 text-[15px]">
+    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
       <input type="radio" name="my_tabs_4" (change)="selectedTab.set('completed')" />
-      <svg lucideCircleCheck />
+      <svg lucideCircleCheck class="size-5" />
       Completed
     </label>
   </div>
@@ -35,6 +35,7 @@
           group relative flex items-center justify-between rounded-md
           focus-within:bg-app-button-hover-gray
           hover:bg-app-button-hover-gray
+          active:bg-app-button-hover-gray
         "
       >
         <!--Clickable task info-->
@@ -47,18 +48,27 @@
           (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
         >
           <div class="flex flex-col">
-            <p class="text-[18px] font-medium">{{ task.name | titlecase }}</p>
-            <p class="mt-2 italic">{{ task.description }}</p>
-            <div class="mt-3 flex gap-3">
+            <p class="
+              font- line-clamp-2 font-sora text-[15px] font-medium
+              text-app-text-white
+            ">
+              {{ task.name | titlecase }}
+            </p>
+            <div class="mt-3 flex items-center gap-3">
               <app-tasks-status-badge [status]="task.status" />
-              <p class="font-extralight">Due: {{ task.dueDate | date: 'medium' }}</p>
+              <p class="
+                text-xs font-light
+                md:text-[14px] md:font-medium
+              " [class.text-[#fca5a5]]="isOverdue(task)">
+                Due: {{ task.dueDate | date: 'medium' }}
+              </p>
             </div>
           </div>
         </button>
 
         <div
           class="
-            flex gap-3 pr-4 opacity-0
+            absolute right-0 flex gap-3 pr-4 opacity-0
             group-focus-within:opacity-100
             group-hover:opacity-100
           "
@@ -105,7 +115,7 @@
     }
 
     <!-- Floating "Add Task" button, fixed to bottom-right corner of the viewport -->
-    <div class="fixed right-0 bottom-0 mr-12 mb-12">
+    <div class="fixed right-0 bottom-0 mr-9 mb-12">
       <button
         class="
           btn border-none bg-app-button-purple text-app-text-green btn-md

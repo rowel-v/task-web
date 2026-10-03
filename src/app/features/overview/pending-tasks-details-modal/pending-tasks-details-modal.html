@@ -1,17 +1,23 @@
 <!-- Invisible backdrop, covers the entire viewport and catches clicks outside the modal. -->
 <div #backDrop class="fixed inset-0 z-9998 cursor-default"></div>
 
-<!-- Modal container, positioned beside the Pending Tasks stat. -->
+<!-- Modal container, positioned beside the Pending Tasks stat (centered on mobile). -->
 <div
-  class="absolute top-0 left-full z-9999 ml-2 cursor-default"
-  [class.scale-in-tl]="!isClosing()"
-  [class.scale-out-tl]="isClosing()"
+  class="
+    absolute top-0 left-full z-9999 ml-2 cursor-default
+    max-md:fixed max-md:inset-0 max-md:m-auto max-md:size-fit
+  "
+  [class.scale-in-tl]="!isClosing() && !isMobile()"
+  [class.scale-out-tl]="isClosing() && !isMobile()"
+  [class.scale-in-center]="!isClosing() && isMobile()"
+  [class.scale-out-center]="isClosing() && isMobile()"
 >
   <!-- Modal content -->
   <div
     class="
       flex h-72 w-80 flex-col rounded-xl bg-app-background-white p-5
       text-app-background-green shadow-xl
+      max-md:max-w-[90vw]
     "
   >
     <!-- Header -->
@@ -24,6 +30,7 @@
             cursor-pointer rounded-sm
             hover:bg-app-background-hover
             focus-visible:bg-app-background-hover focus-visible:outline-0
+            active:bg-app-background-hover
           "
           [class.rotate-in-center]="true"
           (click)="closeModal()"
@@ -37,6 +44,7 @@
             cursor-pointer rounded-sm
             hover:bg-app-background-hover
             focus-visible:bg-app-background-hover focus-visible:outline-0
+            active:bg-app-background-hover
           "
           [class.rotate-in-center]="true"
           (click)="selectCategory(null)"
@@ -102,6 +110,7 @@
                     hover:bg-app-background-hover
                     focus-visible:bg-app-background-hover
                     focus-visible:outline-0
+                    active:bg-app-background-hover
                   "
                   (click)="selectCategory(c.key)"
                 >

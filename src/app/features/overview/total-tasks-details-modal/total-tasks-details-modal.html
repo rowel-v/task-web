@@ -1,134 +1,149 @@
 <!-- Invisible backdrop, covers the entire viewport and catches clicks outside the modal. -->
 <div #backDrop class="fixed inset-0 z-9998 cursor-default"></div>
 
-<!-- Modal container, positioned beside the Total Tasks stat. -->
+<!-- Positioning wrapper: centered on mobile, beside the Total Tasks stat on desktop. -->
 <div
-  class="absolute top-0 left-full z-9999 ml-2 cursor-default"
-  [class.scale-in-tl]="!isClosing()"
-  [class.scale-out-tl]="isClosing()"
+  class="
+    pointer-events-none z-9999 cursor-default
+    max-md:fixed max-md:inset-0 max-md:flex max-md:items-center
+    max-md:justify-center
+    md:absolute md:top-0 md:left-full md:ml-2
+  "
 >
-  <!-- Modal content -->
+  <!-- Animated wrapper -->
   <div
-    class="
-      flex h-72 w-80 flex-col rounded-xl bg-app-background-white p-5
-      text-app-background-green shadow-xl
-    "
+    class="pointer-events-auto"
+    [class.scale-in-tl]="!isClosing() && !isMobile()"
+    [class.scale-out-tl]="isClosing() && !isMobile()"
+    [class.scale-in-center]="!isClosing() && isMobile()"
+    [class.scale-out-center]="isClosing() && isMobile()"
   >
-    <!-- Header -->
-    <div class="mb-4 flex justify-between">
-      <h2 class="text-lg font-bold">Total Tasks</h2>
-      <!-- Close button -->
-      @if (selectedCategory() === null) {
-        <button
-          class="
-            cursor-pointer rounded-sm
-            hover:bg-app-background-hover
-            focus-visible:bg-app-background-hover focus-visible:outline-0
-          "
-          [class.rotate-in-center]="true"
-          (click)="closeModal()"
-        >
-          <svg lucideX />
-        </button>
-      } @else {
-        <button
-          #backBtn
-          class="
-            cursor-pointer rounded-sm
-            hover:bg-app-background-hover
-            focus-visible:bg-app-background-hover focus-visible:outline-0
-          "
-          [class.rotate-in-center]="true"
-          (click)="selectCategory(null)"
-        >
-          <svg lucideArrowLeft />
-        </button>
-      }
-    </div>
+    <!-- Modal content -->
+    <div
+      class="
+        flex h-72 w-80 max-w-[90vw] flex-col rounded-xl bg-app-background-white
+        p-5 text-app-background-green shadow-xl
+      "
+    >
+      <!-- Header -->
+      <div class="mb-4 flex justify-between">
+        <h2 class="text-lg font-bold">Total Tasks</h2>
+        <!-- Close button -->
+        @if (selectedCategory() === null) {
+          <button
+            class="
+              cursor-pointer rounded-sm
+              hover:bg-app-background-hover
+              focus-visible:bg-app-background-hover focus-visible:outline-0
+              active:bg-app-background-hover
+            "
+            [class.rotate-in-center]="true"
+            (click)="closeModal()"
+          >
+            <svg lucideX />
+          </button>
+        } @else {
+          <button
+            #backBtn
+            class="
+              cursor-pointer rounded-sm
+              hover:bg-app-background-hover
+              focus-visible:bg-app-background-hover focus-visible:outline-0
+              active:bg-app-background-hover
+            "
+            [class.rotate-in-center]="true"
+            (click)="selectCategory(null)"
+          >
+            <svg lucideArrowLeft />
+          </button>
+        }
+      </div>
 
-    <!-- Content -->
-    <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
-      @switch (selectedCategory()) {
-        @case ('completed') {
-          <app-task-details-list
-            [isEnteringDetail]="true"
-            [tasks]="completedTasks()"
-            icon="completed"
-            iconWhenEmpty="check_circle"
-            titleWhenEmpty="No completed tasks"
-            descriptionWhenEmpty="You haven't completed any tasks yet."
-          />
-        }
-        @case ('pending') {
-          <app-task-details-list
-            [isEnteringDetail]="true"
-            [tasks]="pendingTasks()"
-            icon="pending"
-            iconWhenEmpty="check_circle"
-            titleWhenEmpty="No pending tasks"
-            descriptionWhenEmpty="All your tasks are completed."
-          />
-        }
-        @case ('overdue') {
-          <app-task-details-list
-            [isEnteringDetail]="true"
-            [tasks]="overdueTasks()"
-            icon="overdue"
-            iconWhenEmpty="check_circle"
-            titleWhenEmpty="No overdue tasks"
-            descriptionWhenEmpty="You're all caught up with your tasks."
-          />
-        }
-        @case ('upcoming') {
-          <app-task-details-list
-            [isEnteringDetail]="true"
-            [tasks]="upcomingTasks()"
-            icon="upcoming"
-            iconWhenEmpty="check_circle"
-            titleWhenEmpty="No upcoming tasks"
-            descriptionWhenEmpty="You have no tasks scheduled for the future."
-          />
-        }
-        @default {
-          <!-- Task breakdown -->
-          <ul class="space-y-3" [class.slide-in-left]="isReturning()">
-            @for (c of categories(); track c.key) {
-              <li>
-                <button
-                  type="button"
-                  class="
-                    flex w-full cursor-pointer items-center justify-between
-                    rounded-lg p-2 text-left transition-colors duration-200
-                    hover:bg-app-background-hover
-                    focus-visible:bg-app-background-hover
-                    focus-visible:outline-0
-                  "
-                  (click)="selectCategory(c.key)"
-                >
-                  <span class="flex items-center gap-2">
-                    @switch (c.key) {
-                      @case ('completed') {
-                        <svg lucideCircleCheck />
+      <!-- Content -->
+      <div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+        @switch (selectedCategory()) {
+          @case ('completed') {
+            <app-task-details-list
+              [isEnteringDetail]="true"
+              [tasks]="completedTasks()"
+              icon="completed"
+              iconWhenEmpty="check_circle"
+              titleWhenEmpty="No completed tasks"
+              descriptionWhenEmpty="You haven't completed any tasks yet."
+            />
+          }
+          @case ('pending') {
+            <app-task-details-list
+              [isEnteringDetail]="true"
+              [tasks]="pendingTasks()"
+              icon="pending"
+              iconWhenEmpty="check_circle"
+              titleWhenEmpty="No pending tasks"
+              descriptionWhenEmpty="All your tasks are completed."
+            />
+          }
+          @case ('overdue') {
+            <app-task-details-list
+              [isEnteringDetail]="true"
+              [tasks]="overdueTasks()"
+              icon="overdue"
+              iconWhenEmpty="check_circle"
+              titleWhenEmpty="No overdue tasks"
+              descriptionWhenEmpty="You're all caught up with your tasks."
+            />
+          }
+          @case ('upcoming') {
+            <app-task-details-list
+              [isEnteringDetail]="true"
+              [tasks]="upcomingTasks()"
+              icon="upcoming"
+              iconWhenEmpty="check_circle"
+              titleWhenEmpty="No upcoming tasks"
+              descriptionWhenEmpty="You have no tasks scheduled for the future."
+            />
+          }
+          @default {
+            <!-- Task breakdown -->
+            <ul class="space-y-3" [class.slide-in-left]="isReturning()">
+              @for (c of categories(); track c.key) {
+                <li>
+                  <button
+                    type="button"
+                    class="
+                      flex w-full cursor-pointer items-center justify-between
+                      rounded-lg p-2 text-left transition-colors duration-200
+                      hover:bg-app-background-hover
+                      focus-visible:bg-app-background-hover
+                      focus-visible:outline-0
+                      active:bg-app-background-hover
+                    "
+                    (click)="selectCategory(c.key)"
+                  >
+                    <span class="flex items-center gap-2">
+                      @switch (c.key) {
+                        @case ('completed') {
+                          <svg lucideCircleCheck />
+                        }
+                        @case ('pending') {
+                          <svg lucideClock5 />
+                        }
+                        @case ('overdue') {
+                          <svg lucideTriangleAlert />
+                        }
+                        @case ('upcoming') {
+                          <svg lucideCalendarClock />
+                        }
                       }
-                      @case ('pending') {
-                        <svg lucideClock5 />
-                      }
-                      @case ('overdue') {
-                        <svg lucideTriangleAlert />
-                      }
-                      @case ('upcoming') {
-                        <svg lucideCalendarClock />
-                      }
-                    }
-                    <span>{{ c.label }}</span>
-                  </span>
-                  <span class="font-semibold">{{ c.count }}</span>
-                </button>
-              </li>
-            }
-          </ul>
+                      <span>{{ c.label }}</span>
+                    </span>
+                    <span class="font-semibold">{{ c.count }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
         }
-      }
+      </div>
     </div>
   </div>
 </div>

@@ -4,6 +4,7 @@ import {
   effect,
   ElementRef,
   HostListener,
+  inject,
   input,
   output,
   signal,
@@ -19,6 +20,9 @@ import {
   LucideAlarmClock,
   LucideTriangleAlert,
 } from '@lucide/angular';
+import { map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 type TaskCategory = 'in_progress' | 'high_priority' | 'due_today' | 'overdue' | null;
 
@@ -37,6 +41,12 @@ type TaskCategory = 'in_progress' | 'high_priority' | 'due_today' | 'overdue' | 
   styles: ``,
 })
 export class InprogressTasksDetailsModal {
+  private readonly bp = inject(BreakpointObserver);
+  protected readonly isMobile = toSignal(
+    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
+
+    { initialValue: false },
+  );
   private readonly backDrop = viewChild<ElementRef<HTMLElement>>('backDrop'); // control backdrop closing
   private readonly backBtn = viewChild<ElementRef<HTMLButtonElement>>('backBtn');
   constructor() {

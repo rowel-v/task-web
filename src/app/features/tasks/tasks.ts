@@ -187,6 +187,11 @@ export class Tasks implements OnInit {
     }
   });
 
+  // helper function
+   protected readonly isOverdue = (task: Task) => {
+    return task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date();
+  };
+
   protected readonly isCreatingTask = signal<boolean>(false);
   protected readonly createTaskError = signal<string | null>(null);
   protected onTaskCreated(req: CreateTaskRequest): void {
