@@ -1,3 +1,21 @@
+import { TaskService } from '../../core/services/task-service/task-service';
+import { Task } from '../../shared/models/task';
+import { CommonModule } from '@angular/common';
+import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
+import { SearchService } from '../../core/services/search-service/search-service';
+import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
+import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
+import { finalize, map } from 'rxjs';
+import { UpdateTaskRequest } from '../../shared/models/request/update-task-request';
+import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import {
+  TaskDetailsDialog,
+  TaskStatusAction,
+} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import {
   Component,
   computed,
@@ -8,19 +26,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { TaskService } from '../../core/services/task-service/task-service';
-import { Task } from '../../shared/models/task';
-import { CommonModule } from '@angular/common';
-import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
-import {
-  TaskDetailsDialog,
-  TaskStatusAction,
-} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
-import { SearchService } from '../../core/services/search-service/search-service';
-import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
-import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
-import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
-import { finalize, map } from 'rxjs';
 import {
   LucideClipboardList,
   LucideClock5,
@@ -28,12 +33,9 @@ import {
   LucideCircleCheck,
   LucidePlus,
   LucideTrash,
-  LucideSquarePen,
+  LucidePencil,
 } from '@lucide/angular';
-import { UpdateTaskRequest } from '../../shared/models/request/update-task-request';
-import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
@@ -48,7 +50,7 @@ type ModalSelection =
     LucideCircleCheck,
     LucidePlus,
     LucideTrash,
-    LucideSquarePen,
+    LucidePencil,
     CommonModule,
 
     TasksStatusBadge,
@@ -64,6 +66,7 @@ export class Tasks implements OnInit {
   ngOnInit(): void {
     this.taskService.getAllTask().subscribe();
   }
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly taskId = toSignal(
@@ -89,7 +92,7 @@ export class Tasks implements OnInit {
   protected readonly selectedTab = signal<TabSelection>('all');
   protected readonly selectedTask = signal<Task | null>(null); // use for manage task
   protected readonly selectedModal = signal<ModalSelection>(null);
-  private readonly tasks: Signal<Task[]> = this.taskService.tasks;
+  protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
   protected readonly tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
 
@@ -188,9 +191,66 @@ export class Tasks implements OnInit {
   });
 
   // helper function
-   protected readonly isOverdue = (task: Task) => {
+  protected readonly isOverdue = (task: Task) => {
     return task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date();
   };
+
+  // Watches the screen size (CDK). Handset = phones only.
+  private readonly bp = inject(BreakpointObserver);
+  protected readonly isMobile = toSignal(
+    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
+    { initialValue: false },
+  );
+
+  // true while the "Select" checkbox is on
+  protected readonly selectMode = signal(false);
+  protected onSelectToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.selectMode.set(checked);
+    // unchecking clears all selected tasks
+    if (!checked) this.selectedTaskIds.set(new Set());
+  }
+
+  // ids of the tasks the user picked while selectMode is true
+  protected readonly selectedTaskIds = signal<Set<number>>(new Set());
+
+  // first selected task, used for Edit.
+  protected readonly firstSelectedTask = computed<Task>(() => {
+    const task = this.tasks().find((t) => this.selectedTaskIds().has(t.id));
+    if (!task) throw new Error('No task is selected');
+    return task;
+  });
+
+  // all selected tasks, used for bulk delete.
+  protected readonly tasksToDelete: Signal<Task[]> = computed(() =>
+    this.tasks().filter((t) => this.selectedTaskIds().has(t.id)),
+  );
+
+  // runs when a task row is clicked
+  protected onTaskClick(modal: ModalSelection, task: Task) {
+    // in select mode, clicking a row toggles its selection
+    if (this.selectMode()) {
+      this.selectedTaskIds.update((ids) => {
+        // copy the Set so the signal sees a new value
+        const next = new Set(ids);
+        if (next.has(task.id)) {
+          next.delete(task.id); // already selected, so unselect
+        } else {
+          next.add(task.id); // not selected, so select
+        }
+        return next;
+      });
+      return; // don't open the task-details-kdialog while selectMode is true
+    }
+
+    this.selectedModal.set(modal);
+    this.selectedTask.set(task);
+  }
+
+  // used by the template to highlight selected rows
+  protected isSelected(task: Task): boolean {
+    return this.selectedTaskIds().has(task.id);
+  }
 
   protected readonly isCreatingTask = signal<boolean>(false);
   protected readonly createTaskError = signal<string | null>(null);
@@ -214,24 +274,20 @@ export class Tasks implements OnInit {
 
   protected readonly isDeletingTask = signal<boolean>(false);
   protected readonly deleteTaskError = signal<string | null>(null);
-  protected onTaskDeleted(task: Task): void {
+  protected onTaskDeleted(tasks: Task[]): void {
     this.deleteTaskError.set(null);
     this.isDeletingTask.set(true);
 
     this.taskService
-      .deleteTask(task.id)
-      .pipe(
-        finalize(() =>
-          setTimeout(() => {
-            this.isDeletingTask.set(false);
-          }, 5000),
-        ),
-      )
+      .deleteTask(tasks)
+      .pipe(finalize(() => this.isDeletingTask.set(false)))
       .subscribe({
-        next: () => setTimeout(() => this.closeModal(), 5000),
-        error: (err) => {
-          console.error('Failed to delete task', err);
-          this.deleteTaskError.set('Failed to delete task. Please try again.');
+        next: () => {
+          this.closeModal();
+          this.selectMode.set(false);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.deleteTaskError.set(err.error?.message ?? 'Something went wrong. Please try again.');
         },
       });
   }

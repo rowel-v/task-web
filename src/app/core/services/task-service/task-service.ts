@@ -87,10 +87,13 @@ export class TaskService {
     );
   }
 
-  deleteTask(taskId: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.baseUrl}/${taskId}`)
-      .pipe(tap(() => this.tasksState.update((tasks) => tasks.filter((t) => t.id !== taskId))));
+  deleteTask(task: Task[]): Observable<void> {
+    const taskIds = task.map((t) => t.id);
+    const ids = new Set(taskIds);
+
+    return this.http.delete<void>(`${this.baseUrl}`, { body: { taskIds } }).pipe(
+      tap(() => this.tasksState.update((current) => current.filter((t) => !ids.has(t.id)))),
+    );
   }
 
   updateTaskStatus(taskId: number, taskStatusAction: TaskStatusAction): Observable<Task> {
@@ -105,40 +108,4 @@ export class TaskService {
         map((result) => result.data),
       );
   }
-
-  // addTodo(todo: Todo) {
-  //   this.todosState.update((todos) => [
-  //     ...todos,
-  //     {
-  //       ...todo,
-  //       id: this.defaultId++,
-  //     },
-  //   ]);
-  // }
-
-  // updateStatus(todo: Todo, status: TodoStatus) {
-  //   this.todosState.update((todos) => todos.map((t) => (t.id === todo.id ? { ...t, status } : t)));
-  // }
-
-  // deleteTodo(todo: Todo) {
-  //   this.todosState.update((todos) => todos.filter((t) => t.id !== todo.id));
-  // }
-
-  // updateTodo(todo: Todo) {
-  //   this.todosState.update((todos) =>
-  //     todos.map((t) =>
-  //       t.id === todo.id
-  //         ? {
-  //             ...t,
-  //             name: todo.name,
-  //             description: todo.description,
-  //             priority: todo.priority,
-  //             status: todo.status,
-  //             duedate: todo.duedate,
-  //             updatedAt: new Date(),
-  //           }
-  //         : t,
-  //     ),
-  //   );
-  // }
 }

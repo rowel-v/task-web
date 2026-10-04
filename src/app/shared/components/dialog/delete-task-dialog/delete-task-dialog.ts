@@ -1,4 +1,12 @@
-import { afterNextRender, Component, ElementRef, input, output, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  ElementRef,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
 import { Task } from '../../../models/task';
 import { LucideTriangleAlert } from '@lucide/angular';
 import { Button } from '../../button/button';
@@ -17,11 +25,16 @@ export class DeleteTaskDialog {
       this.dialogRef().nativeElement.showModal();
     });
   }
-  task = input.required<Task>();
+  tasks = input.required<Task[]>();
   isClosing = input<boolean>(false);
   isDeleting = input<boolean>(false);
   errorMessage = input<string | null>(null);
 
   cancelled = output<void>();
-  confirmed = output<Task>();
+  confirmed = output<Task[]>();
+
+  protected readonly label = computed(() => {
+    const list = this.tasks();
+    return list.length === 1 ? list[0].name : `${list.length} tasks`;
+  });
 }

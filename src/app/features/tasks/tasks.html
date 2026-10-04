@@ -25,17 +25,36 @@
       <svg lucideCircleCheck class="size-5" />
       Completed
     </label>
+
+    @if (!isMobile()) {
+      <label class="ms-5 flex cursor-pointer items-center gap-2">
+        <input
+          type="checkbox"
+          class="checkbox checkbox-sm"
+          [checked]="selectMode()"
+          (change)="onSelectToggle($event)"
+        />
+        Select
+      </label>
+    }
   </div>
 
   <div class="flex flex-col overflow-y-auto">
     <!--list of Task-->
     @for (task of tasksToDisplay(); track task.id) {
       <div
-        class="
-          group relative flex items-center justify-between rounded-md
-          focus-within:bg-app-button-hover-gray
-          hover:bg-app-button-hover-gray
-          active:bg-app-button-hover-gray
+        class="group relative flex items-center justify-between rounded-md"
+        [class]="
+          isSelected(task)
+            ? '
+              border-b border-be-app-background-green bg-app-button-hover-gray
+              hover:bg-app-button-hover-gray
+            '
+            : '
+              hover:bg-[#1f585c]
+              active:bg-app-button-hover-gray
+              has-focus-visible:bg-app-button-hover-gray
+            '
         "
       >
         <!--Clickable task info-->
@@ -45,7 +64,7 @@
             flex flex-1 items-center justify-between rounded-md p-4 text-left
             focus:outline-none
           "
-          (click)="selectedModal.set('task-details-dialog'); selectedTask.set(task)"
+          (click)="onTaskClick('task-details-dialog', task)"
         >
           <div class="flex flex-col">
             <p class="
@@ -56,47 +75,18 @@
             </p>
             <div class="mt-3 flex items-center gap-3">
               <app-tasks-status-badge [status]="task.status" />
-              <p class="
-                text-xs font-light
-                md:text-[14px] md:font-medium
-              " [class.text-[#fca5a5]]="isOverdue(task)">
+              <p
+                class="
+                  text-xs font-light
+                  md:text-[14px] md:font-medium
+                "
+                [class.text-[#fca5a5]]="isOverdue(task)"
+              >
                 Due: {{ task.dueDate | date: 'medium' }}
               </p>
             </div>
           </div>
         </button>
-
-        <div
-          class="
-            absolute right-0 flex gap-3 pr-4 opacity-0
-            group-focus-within:opacity-100
-            group-hover:opacity-100
-          "
-        >
-          <!--Edit Button-->
-          <button
-            type="button"
-            class="
-              btn btn-circle border-0 bg-[#00D3BB] text-app-text-green btn-sm
-              hover:bg-[#15c2ae]
-            "
-            (click)="selectedModal.set('edit-task-dialog'); selectedTask.set(task)"
-          >
-            <svg lucideSquarePen class="size-4" />
-          </button>
-
-          <!--Delete Button-->
-          <button
-            type="button"
-            class="
-              btn btn-circle border-0 bg-red-500/90 text-app-text-white btn-sm
-              hover:bg-red-500/75
-            "
-            (click)="selectedModal.set('delete-task-dialog'); selectedTask.set(task)"
-          >
-            <svg lucideTrash2 class="size-4" />
-          </button>
-        </div>
       </div>
     } @empty {
       <div class="
@@ -114,20 +104,59 @@
       </div>
     }
 
-    <!-- Floating "Add Task" button, fixed to bottom-right corner of the viewport -->
-    <div class="fixed right-0 bottom-0 mr-9 mb-12">
+    <!-- Floating "Add, Editm Delete" button, fixed to bottom-right corner of the viewport -->
+    <div class="fixed right-0 bottom-0 mr-9 mb-12 flex flex-col gap-3">
+      <!--Delete Button-->
+      @if (selectedTaskIds().size > 0) {
+        <button
+          animate.enter="fade-in-bottom"
+          animate.leave="scale-out-bottom"
+          class="
+            tooltip btn tooltip-left justify-center border-none bg-red-500
+            text-app-text-green btn-md
+            hover:bg-red-500/75
+          "
+          [attr.data-tip]="tasksToDelete().length === 1 ? 'Delete Task' : 'Delete Tasks'"
+          aria-label="Delete Button"
+          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+          (click)="selectedModal.set('delete-task-dialog')"
+        >
+          <svg lucideTrash />
+        </button>
+      }
+
+      <!--Edit Button-->
+      @if (selectedTaskIds().size === 1) {
+        <button
+          animate.enter="fade-in-bottom"
+          animate.leave="scale-out-bottom"
+          class="
+            tooltip btn tooltip-left justify-center border-none bg-[#00D3BB]
+            py-3 text-app-text-green btn-md
+            hover:bg-[#15c2ae]
+          "
+          data-tip="Edit Task"
+          aria-label="Edit Button"
+          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+          (click)="selectedModal.set('edit-task-dialog'); selectedTask.set(firstSelectedTask())"
+        >
+          <svg lucidePencil />
+        </button>
+      }
+
+      <!--Add Button-->
       <button
         class="
-          btn border-none bg-app-button-purple text-app-text-green btn-md
+          tooltip btn tooltip-left justify-center border-none
+          bg-app-button-purple text-app-text-green btn-md
           hover:bg-app-button-hover-gray
         "
+        data-tip="Add Task"
+        aria-label="Add Button"
+        style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
         (click)="selectedModal.set('create-task-dialog')"
       >
         <svg lucidePlus />
-        <span class="
-          hidden
-          sm:inline
-        ">Add Task</span>
       </button>
     </div>
   </div>
@@ -157,9 +186,9 @@
 }
 
 <!--Delete task confirmation dialog-->
-@if (selectedModal() === 'delete-task-dialog' && selectedTask(); as task) {
+@if (selectedModal() === 'delete-task-dialog' && tasksToDelete().length > 0) {
   <app-delete-task-dialog
-    [task]="task"
+    [tasks]="tasksToDelete()"
     [isClosing]="closedModal()"
     [isDeleting]="isDeletingTask()"
     [errorMessage]="deleteTaskError()"

@@ -23,7 +23,7 @@
 
   <p class="mt-4">
     Are you sure you want to delete
-    <span class="font-semibold">{{ task().name }}</span
+    <span class="font-semibold">{{ label() }}</span
     >? This action cannot be undone.
   </p>
 
@@ -33,6 +33,6 @@
 
   <div class="mt-6 flex justify-end gap-3">
     <app-button variant="cancel" [unclickable]="isDeleting()" (pressed)="cancelled.emit()" />
-    <app-button variant="delete" [unclickable]="isDeleting()" (pressed)="confirmed.emit(task())" />
+    <app-button variant="delete" [unclickable]="isDeleting()" (pressed)="confirmed.emit(tasks())" />
   </div>
 </dialog>
