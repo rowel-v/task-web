@@ -16,15 +16,7 @@ import {
   TaskDetailsDialog,
   TaskStatusAction,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  Signal,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, computed, effect, inject, Signal, signal, untracked } from '@angular/core';
 import {
   LucideClipboardList,
   LucideClock5,
@@ -35,6 +27,7 @@ import {
   LucidePencil,
 } from '@lucide/angular';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LongPress } from './directives/long-press';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
@@ -51,6 +44,7 @@ type ModalSelection =
     LucideTrash,
     LucidePencil,
     CommonModule,
+    LongPress,
 
     TasksStatusBadge,
     TaskDetailsDialog,
@@ -199,6 +193,10 @@ export class Tasks {
 
   // true while the "Select" checkbox is on
   protected readonly selectMode = signal(false);
+  protected exitSelectMode() {
+    this.selectMode.set(false);
+    this.selectedTaskIds.set(new Set());
+  }
   protected onSelectToggle(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
     this.selectMode.set(checked);
@@ -235,6 +233,11 @@ export class Tasks {
         }
         return next;
       });
+
+      if (this.selectedTaskIds().size === 0) {
+        this.exitSelectMode();
+      }
+
       return; // don't open the task-details-kdialog while selectMode is true
     }
 
@@ -245,6 +248,15 @@ export class Tasks {
   // used by the template to highlight selected rows
   protected isSelected(task: Task): boolean {
     return this.selectedTaskIds().has(task.id);
+  }
+
+  protected onTaskLongPress(task: Task) {
+    if (this.selectMode()) {
+      return;
+    }
+
+    this.selectMode.set(true);
+    this.onTaskClick(null, task);
   }
 
   protected readonly isCreatingTask = signal<boolean>(false);
@@ -279,7 +291,7 @@ export class Tasks {
       .subscribe({
         next: () => {
           this.closeModal();
-          this.selectMode.set(false);
+          this.exitSelectMode();
         },
         error: (err: HttpErrorResponse) => {
           this.deleteTaskError.set(err.error?.message ?? 'Something went wrong. Please try again.');

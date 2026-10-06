@@ -3,10 +3,10 @@
     <div
       class="
         inline-flex items-center gap-2 rounded-sm bg-[#f4ff9d] px-2 text-[13px]
-        font-medium text-app-text-green
+        font-medium whitespace-nowrap text-app-text-green
       "
     >
-      <svg lucideClock5 [size]="17" />
+      <svg lucideClock5 [size]="17" class="shrink-0" />
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }
@@ -14,10 +14,10 @@
     <div
       class="
         inline-flex items-center gap-2 rounded-sm bg-[#c5c8fc] px-2 text-[13px]
-        font-medium text-app-text-green
+        font-medium whitespace-nowrap text-app-text-green
       "
     >
-      <svg lucideCircleEllipsis [size]="17" />
+      <svg lucideCircleEllipsis [size]="17" class="shrink-0" />
 
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
@@ -26,10 +26,10 @@
     <div
       class="
         inline-flex items-center gap-2 rounded-sm bg-[#68f8b5] px-2 text-[13px]
-        font-medium text-app-text-green
+        font-medium whitespace-nowrap text-app-text-green
       "
     >
-      <svg lucideCircleCheck [size]="17" />
+      <svg lucideCircleCheck [size]="17" class="shrink-0" />
       <p>{{ (status() | titlecase).replace('_', ' ') }}</p>
     </div>
   }

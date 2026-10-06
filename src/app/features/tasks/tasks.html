@@ -59,12 +59,14 @@
       >
         <!--Clickable task info-->
         <button
+          appLongPress
+          (longPressed)="onTaskLongPress(task)"
           type="button"
+          (click)="onTaskClick('task-details-dialog', task)"
           class="
             flex flex-1 items-center justify-between rounded-md p-4 text-left
             focus:outline-none
           "
-          (click)="onTaskClick('task-details-dialog', task)"
         >
           <div class="flex flex-col">
             <p class="
@@ -107,7 +109,7 @@
     <!-- Floating "Add, Editm Delete" button, fixed to bottom-right corner of the viewport -->
     <div class="fixed right-0 bottom-0 mr-9 mb-12 flex flex-col gap-3">
       <!--Delete Button-->
-      @if (selectedTaskIds().size > 0) {
+      @if (selectMode() && selectedTaskIds().size > 0) {
         <button
           animate.enter="fade-in-bottom"
           animate.leave="scale-out-bottom"
@@ -126,7 +128,7 @@
       }
 
       <!--Edit Button-->
-      @if (selectedTaskIds().size === 1) {
+      @if (selectMode() && selectedTaskIds().size === 1) {
         <button
           animate.enter="fade-in-bottom"
           animate.leave="scale-out-bottom"

@@ -97,11 +97,15 @@
             @if (todaysTasks().length !== 0) {
               <button
                 class="
-                  btn border-none bg-app-button-purple shadow-none btn-sm
+                  tooltip btn tooltip-left border-none bg-app-button-purple
+                  shadow-none btn-sm
                   focus-within:bg-app-button-hover-gray focus-within:outline-0
                   hover:bg-app-button-hover-gray
                   active:bg-app-button-hover-gray
                 "
+                data-tip="Add Task"
+                aria-label="Add Button"
+                style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
                 (click)="openModal.set('create-task-dialog')"
               >
                 <svg lucidePlus />
@@ -231,6 +235,7 @@
                   class="
                     group cursor-pointer transition
                     hover:rounded-2xl hover:bg-app-button-hover-gray
+                    active:bg-app-button-hover-gray
                   "
                   (click)="openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)"
                   tabindex="0"
