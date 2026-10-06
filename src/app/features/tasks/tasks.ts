@@ -21,7 +21,6 @@ import {
   computed,
   effect,
   inject,
-  OnInit,
   Signal,
   signal,
   untracked,
@@ -62,11 +61,7 @@ type ModalSelection =
   templateUrl: './tasks.html',
   styles: ``,
 })
-export class Tasks implements OnInit {
-  ngOnInit(): void {
-    this.taskService.getAllTask().subscribe();
-  }
-
+export class Tasks {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly taskId = toSignal(

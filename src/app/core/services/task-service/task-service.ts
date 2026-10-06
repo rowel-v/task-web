@@ -6,6 +6,7 @@ import { ApiResponse } from '../../../shared/models/response/api-response';
 import { CreateTaskRequest } from '../../../shared/models/request/create-task-request';
 import { UpdateTaskRequest } from '../../../shared/models/request/update-task-request';
 import { TaskStatusAction } from '../../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { NotificationService } from '../notification-service/notification-service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ import { TaskStatusAction } from '../../../shared/components/dialog/task-details
 export class TaskService {
   private readonly baseUrl = '/api/tasks';
   private readonly http = inject(HttpClient);
+  private readonly appNotification = inject(NotificationService);
   private readonly tasksState = signal<Task[]>([]);
   tasks = this.tasksState.asReadonly();
   totalTasks = computed(() => this.tasksState().length);
@@ -58,31 +60,32 @@ export class TaskService {
 
   getAllTask(): Observable<Task[]> {
     return this.http.get<ApiResponse<Task[]>>(this.baseUrl).pipe(
-      tap((result) => this.tasksState.set(result.data)),
+      tap((result) => {
+        this.tasksState.set(result.data);
+        this.appNotification.success(result.message);
+      }),
       map((result) => result.data),
     );
   }
 
-  getTask(taskId: number): Observable<Task> {
-    return this.http
-      .get<ApiResponse<Task>>(`${this.baseUrl}/${taskId}`)
-      .pipe(map((result) => result.data));
-  }
-
   createTask(req: CreateTaskRequest): Observable<Task> {
     return this.http.post<ApiResponse<Task>>(`${this.baseUrl}`, req).pipe(
-      tap((result) => this.tasksState.update((tasks) => [...tasks, result.data])),
+      tap((result) => {
+        this.tasksState.update((tasks) => [...tasks, result.data]);
+        this.appNotification.success(result.message);
+      }),
       map((result) => result.data),
     );
   }
 
   updateTask(taskId: number, req: UpdateTaskRequest): Observable<Task> {
     return this.http.patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}`, req).pipe(
-      tap((result) =>
+      tap((result) => {
         this.tasksState.update((tasks) =>
           tasks.map((task) => (task.id === result.data.id ? result.data : task)),
-        ),
-      ),
+        );
+        this.appNotification.success(result.message);
+      }),
       map((result) => result.data),
     );
   }
@@ -91,8 +94,12 @@ export class TaskService {
     const taskIds = task.map((t) => t.id);
     const ids = new Set(taskIds);
 
-    return this.http.delete<void>(`${this.baseUrl}`, { body: { taskIds } }).pipe(
-      tap(() => this.tasksState.update((current) => current.filter((t) => !ids.has(t.id)))),
+    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}`, { body: { taskIds } }).pipe(
+      tap((result) => {
+        this.tasksState.update((current) => current.filter((t) => !ids.has(t.id)));
+        this.appNotification.success(result.message);
+      }),
+      map(() => undefined),
     );
   }
 
@@ -100,11 +107,12 @@ export class TaskService {
     return this.http
       .patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}/${taskStatusAction}`, null)
       .pipe(
-        tap((result) =>
+        tap((result) => {
           this.tasksState.update((task) =>
             task.map((t) => (t.id === result.data.id ? result.data : t)),
-          ),
-        ),
+          );
+          this.appNotification.success(result.message);
+        }),
         map((result) => result.data),
       );
   }

@@ -1,0 +1,13 @@
+/*used in animation in notification*/
+@keyframes toast-enter {
+  from { opacity: 0; scale: 0.9; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@keyframes toast-leave {
+  from { grid-template-rows: 1fr; opacity: 1; }
+  to   { grid-template-rows: 0fr; opacity: 0; }
+}
+
+.toast-enter { animation: toast-enter 0.25s ease-out; }
+.toast-leave { animation: toast-leave 0.3s ease-in forwards; }

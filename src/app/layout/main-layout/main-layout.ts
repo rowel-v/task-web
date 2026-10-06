@@ -1,4 +1,12 @@
-import { Component, computed, ElementRef, inject, linkedSignal, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -15,6 +23,7 @@ import {
   LucideSearch,
 } from '@lucide/angular';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { NotificationService } from '../../core/services/notification-service/notification-service';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 
@@ -45,17 +54,18 @@ interface NavItem {
     '(document:keydown.escape)': 'closeProfile()',
   },
   templateUrl: './main-layout.html',
-  styles: ``,
+  styleUrl: './main-layout.css',
 })
 export class MainLayout {
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
-    this.bp.observe(Breakpoints.Handset).pipe(map(r => r.matches)),
-    { initialValue: false }
+    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
+    { initialValue: false },
   );
 
   private readonly router = inject(Router);
   protected readonly searchService = inject(SearchService);
+  protected readonly notificationService = inject(NotificationService);
   protected readonly openSideNav = linkedSignal(() => !this.isMobile());
   protected readonly navItems: NavItem[] = [
     { key: 'home', label: 'Home', route: '/overview' },
@@ -96,7 +106,7 @@ export class MainLayout {
   protected readonly description = computed(() => {
     switch (this.currentSideNav()) {
       case 'home':
-        return "Overview";
+        return 'Overview';
       case 'tasks':
         return 'Stay organized.';
       case 'settings':
