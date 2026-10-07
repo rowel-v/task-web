@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { TaskService } from './task-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { Task } from '../../../shared/models/task';
-import { CreateTaskRequest } from '../../../shared/models/request/create-task-request';
+import { Task } from '../../models/task';
+import { CreateTaskRequest } from '../../models/request/create-task-request';
 
 describe('TaskService', () => {
   let service: TaskService;

@@ -1,26 +1,26 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { TaskService } from '../../core/services/task-service/task-service';
 import { RouterLink } from '@angular/router';
-import { Task } from '../../shared/models/task';
-import { TotalTasksDetailsModal } from './total-tasks-details-modal/total-tasks-details-modal';
+import { Task } from '../../core/models/task';
 import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
-import { PendingTasksDetailsModal } from './pending-tasks-details-modal/pending-tasks-details-modal';
-import { InprogressTasksDetailsModal } from './inprogress-tasks-details-modal/inprogress-tasks-details-modal';
-import { CompletedTasksDetailsModal } from './completed-tasks-details-modal/completed-tasks-details-modal';
 import { LucideArrowRight, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { DatePipe } from '@angular/common';
+import { TaskItem } from './task-item/task-item';
+import { TaskEmptyState } from './task-empty-state/task-empty-state';
+import { CreateTaskRequest } from '../../core/models/request/create-task-request';
+import { finalize, map } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TotalTasksDetailsModal } from './dialog/total-tasks-details-modal/total-tasks-details-modal';
+import { PendingTasksDetailsModal } from './dialog/pending-tasks-details-modal/pending-tasks-details-modal';
+import { InprogressTasksDetailsModal } from './dialog/inprogress-tasks-details-modal/inprogress-tasks-details-modal';
+import { CompletedTasksDetailsModal } from './dialog/completed-tasks-details-modal/completed-tasks-details-modal';
 import {
   TaskDetailsDialog,
   TaskStatusAction,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
-import { DatePipe } from '@angular/common';
-import { TaskItem } from './task-item/task-item';
-import { TaskEmptyState } from './task-empty-state/task-empty-state';
-import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
-import { finalize, map } from 'rxjs';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
 type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;

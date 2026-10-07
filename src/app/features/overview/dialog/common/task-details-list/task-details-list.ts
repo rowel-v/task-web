@@ -1,6 +1,5 @@
 import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Task } from '../../models/task';
 import {
   LucideGhost,
   LucideCircleCheck,
@@ -13,6 +12,7 @@ import {
   LucideBadgeCheck,
   LucideCalendarCheck,
 } from '@lucide/angular';
+import { Task } from '../../../../../core/models/task'
 
 type LucidIconSelection =
   | 'completed'

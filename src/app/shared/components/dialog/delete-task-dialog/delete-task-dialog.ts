@@ -7,7 +7,7 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { Task } from '../../../models/task';
+import { Task } from '../../../../core/models/task';
 import { LucideTriangleAlert } from '@lucide/angular';
 import { Button } from '../../button/button';
 

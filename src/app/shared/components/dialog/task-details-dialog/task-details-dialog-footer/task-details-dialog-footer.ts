@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { Task } from '../../../../models/task';
+import { Task } from '../../../../../core/models/task';
 import { LucideCheck, LucidePlay } from '@lucide/angular';
 import {
   TaskStatusAction,

@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { LucideClock5, LucideCircleEllipsis, LucideCircleCheck } from '@lucide/angular';
-import { TaskStatus } from '../../models/task';
+import { TaskStatus } from '../../../core/models/task'
 import { TitleCasePipe } from '@angular/common';
 
 @Component({

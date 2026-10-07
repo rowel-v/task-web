@@ -12,6 +12,7 @@ describe('TaskDetailsDialogHeader', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TaskDetailsDialogHeader);
+    fixture.componentRef.setInput('title', 'Test title');
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

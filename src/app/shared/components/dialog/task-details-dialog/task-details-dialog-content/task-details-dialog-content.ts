@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
-import { Task } from '../../../../models/task';
 import { DatePipe, TitleCasePipe } from '@angular/common';
+import { Task } from '../../../../../core/models/task';
 
 @Component({
   selector: 'app-task-details-dialog-content',

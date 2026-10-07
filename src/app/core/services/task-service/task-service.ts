@@ -1,12 +1,12 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Task } from '../../../shared/models/task';
+import { Task } from '../../models/task';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { ApiResponse } from '../../../shared/models/response/api-response';
-import { CreateTaskRequest } from '../../../shared/models/request/create-task-request';
-import { UpdateTaskRequest } from '../../../shared/models/request/update-task-request';
-import { TaskStatusAction } from '../../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { ApiResponse } from '../../models/response/api-response';
 import { NotificationService } from '../notification-service/notification-service';
+import { TaskStatusAction } from '../../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { UpdateTaskRequest } from '../../models/request/update-task-request';
+import { CreateTaskRequest } from '../../models/request/create-task-request';
 
 @Injectable({
   providedIn: 'root',

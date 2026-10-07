@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { TasksStatusBadge } from '../../../tasks-status-badge/tasks-status-badge';
-import { TaskStatus } from '../../../../models/task';
+import { TaskStatus } from '../../../../../core/models/task';
 import { Button } from '../../../button/button';
 
 @Component({

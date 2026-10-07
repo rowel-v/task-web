@@ -1,10 +1,18 @@
-import { Component, input, output, OnInit, afterNextRender, viewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  OnInit,
+  afterNextRender,
+  viewChild,
+  ElementRef,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UpdateTaskRequest } from '../../../models/request/update-task-request';
-import { Task, TaskPriority, TaskStatus } from '../../../models/task';
-import { DateTimePicker } from '../../date-time-picker/date-time-picker';
-import { DialogHeader } from '../shared/dialog-header/dialog-header';
-import { DialogFooter } from '../shared/dialog-footer/dialog-footer';
+import { DialogFooter } from '../common/dialog-footer/dialog-footer';
+import { DialogHeader } from '../common/dialog-header/dialog-header';
+import { DateTimePicker } from '../common/date-time-picker/date-time-picker';
+import { Task, TaskStatus, TaskPriority } from '../../../../core/models/task';
+import { UpdateTaskRequest } from '../../../../core/models/request/update-task-request';
 
 @Component({
   selector: 'app-edit-task-dialog',
@@ -42,6 +50,7 @@ export class EditTaskDialog implements OnInit {
     description: new FormControl('', { nonNullable: true }),
     priority: new FormControl<TaskPriority>('LOW', { nonNullable: true }),
     status: new FormControl<TaskStatus>('PENDING', { nonNullable: true }),
+
     dueDate: new FormControl<string | null>(null, { validators: [Validators.required] }),
   });
 

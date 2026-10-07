@@ -10,8 +10,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { TaskDetailsList } from '../../../shared/components/task-details-list/task-details-list';
-import { Task } from '../../../shared/models/task';
 import {
   LucideX,
   LucideArrowLeft,
@@ -23,6 +21,8 @@ import {
 import { map } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TaskDetailsList } from '../common/task-details-list/task-details-list';
+import { Task } from '../../../../core/models/task';
 
 type TaskCategory =
   'completed' | 'high_priority' | 'completed_today' | 'completed_this_week' | null;

@@ -1,14 +1,12 @@
 import { TaskService } from '../../core/services/task-service/task-service';
-import { Task } from '../../shared/models/task';
+import { Task } from '../../core/models/task';
 import { CommonModule } from '@angular/common';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { SearchService } from '../../core/services/search-service/search-service';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
-import { CreateTaskRequest } from '../../shared/models/request/create-task-request';
-import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
+import { CreateTaskRequest } from '../../core/models/request/create-task-request';
 import { finalize, map } from 'rxjs';
-import { UpdateTaskRequest } from '../../shared/models/request/update-task-request';
-import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
+import { UpdateTaskRequest } from '../../core/models/request/update-task-request';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -27,6 +25,8 @@ import {
   LucidePencil,
 } from '@lucide/angular';
 import { LongPress } from './directives/long-press';
+import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
+import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =

@@ -1,5 +1,5 @@
 import { afterNextRender, Component, ElementRef, input, output, viewChild } from '@angular/core';
-import { Task } from '../../../models/task';
+import { Task } from '../../../../core/models/task';
 import { TaskDetailsDialogFooter } from './task-details-dialog-footer/task-details-dialog-footer';
 import { TaskDetailsDialogContent } from './task-details-dialog-content/task-details-dialog-content';
 import { TaskDetailsDialogHeader } from './task-details-dialog-header/task-details-dialog-header';

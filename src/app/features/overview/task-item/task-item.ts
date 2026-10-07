@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { Task } from '../../../shared/models/task';
+import { Task } from '../../../core/models/task';
 import { TasksStatusBadge } from '../../../shared/components/tasks-status-badge/tasks-status-badge';
 
 @Component({
