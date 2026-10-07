@@ -27,10 +27,6 @@
     >? This action cannot be undone.
   </p>
 
-  @if (errorMessage()) {
-    <p class="mt-2 text-sm text-red-500">{{ errorMessage() }}</p>
-  }
-
   <div class="mt-6 flex justify-end gap-3">
     <app-button variant="cancel" [unclickable]="isDeleting()" (pressed)="cancelled.emit()" />
     <app-button variant="delete" [unclickable]="isDeleting()" (pressed)="confirmed.emit(tasks())" />

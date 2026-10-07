@@ -26,7 +26,6 @@ import {
   LucideTrash,
   LucidePencil,
 } from '@lucide/angular';
-import { HttpErrorResponse } from '@angular/common/http';
 import { LongPress } from './directives/long-press';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
@@ -115,11 +114,6 @@ export class Tasks {
     if (this.closedModal()) {
       return;
     }
-
-    this.updateTaskStatusError.set(null);
-    this.updateTaskError.set(null);
-    this.deleteTaskError.set(null);
-    this.createTaskError.set(null);
 
     // Clear the taskId param when the dialog closes.
     if (this.taskId()) {
@@ -260,29 +254,19 @@ export class Tasks {
   }
 
   protected readonly isCreatingTask = signal<boolean>(false);
-  protected readonly createTaskError = signal<string | null>(null);
   protected onTaskCreated(req: CreateTaskRequest): void {
-    this.createTaskError.set(null); // clear previous error
     this.isCreatingTask.set(true);
 
-    setTimeout(() => {
-      this.taskService
-        .createTask(req)
-        .pipe(finalize(() => this.isCreatingTask.set(false)))
-        .subscribe({
-          next: () => this.closeModal(),
-          error: (err) => {
-            console.error('Failed to create task', err);
-            this.createTaskError.set('Failed to create task. Please try again.');
-          },
-        });
-    }, 5000);
+    this.taskService
+      .createTask(req)
+      .pipe(finalize(() => this.isCreatingTask.set(false)))
+      .subscribe({
+        next: () => this.closeModal(),
+      });
   }
 
   protected readonly isDeletingTask = signal<boolean>(false);
-  protected readonly deleteTaskError = signal<string | null>(null);
   protected onTaskDeleted(tasks: Task[]): void {
-    this.deleteTaskError.set(null);
     this.isDeletingTask.set(true);
 
     this.taskService
@@ -293,47 +277,30 @@ export class Tasks {
           this.closeModal();
           this.exitSelectMode();
         },
-        error: (err: HttpErrorResponse) => {
-          this.deleteTaskError.set(err.error?.message ?? 'Something went wrong. Please try again.');
-        },
       });
   }
 
   protected readonly isUpdatingTask = signal<boolean>(false);
-  protected readonly updateTaskError = signal<string | null>(null);
   protected onTaskUpdated(taskId: number, req: UpdateTaskRequest): void {
-    this.updateTaskError.set(null);
     this.isUpdatingTask.set(true);
-
-    console.log('Emitted Value: ', req);
 
     this.taskService
       .updateTask(taskId, req)
       .pipe(finalize(() => this.isUpdatingTask.set(false)))
       .subscribe({
         next: () => this.closeModal(),
-        error: (err) => {
-          console.error('Failed to delete task', err);
-          this.updateTaskError.set('Failed to delete task. Please try again.');
-        },
       });
   }
 
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
-  protected readonly updateTaskStatusError = signal<string | null>(null);
   protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
-    this.updateTaskStatusError.set(null);
     this.isUpdatingTaskStatus.set(true);
 
     this.taskService
       .updateTaskStatus(targetTask.id, taskStatusAction)
-      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)))
+      .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
       .subscribe({
-        next: () => setTimeout(() => this.closeModal(), 5000),
-        error: (err) => {
-          console.error('Failed to update task status', err);
-          this.updateTaskStatusError.set('Failed to update task status. Please try again.');
-        },
+        next: () => this.closeModal(),
       });
   }
 }

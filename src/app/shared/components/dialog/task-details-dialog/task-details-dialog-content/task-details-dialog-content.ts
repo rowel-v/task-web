@@ -10,7 +10,6 @@ import { DatePipe, TitleCasePipe } from '@angular/common';
 })
 export class TaskDetailsDialogContent {
   task = input.required<Task>();
-  errorMessage = input.required<string | null>();
 
   protected readonly priorityClasses = computed(() => {
     const map = {

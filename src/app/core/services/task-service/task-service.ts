@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Task } from '../../../shared/models/task';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../../../shared/models/response/api-response';
 import { CreateTaskRequest } from '../../../shared/models/request/create-task-request';
 import { UpdateTaskRequest } from '../../../shared/models/request/update-task-request';
@@ -64,6 +64,7 @@ export class TaskService {
         this.tasksState.set(result.data);
         this.appNotification.success(result.message);
       }),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
       map((result) => result.data),
     );
   }
@@ -74,6 +75,7 @@ export class TaskService {
         this.tasksState.update((tasks) => [...tasks, result.data]);
         this.appNotification.success(result.message);
       }),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
       map((result) => result.data),
     );
   }
@@ -86,6 +88,7 @@ export class TaskService {
         );
         this.appNotification.success(result.message);
       }),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
       map((result) => result.data),
     );
   }
@@ -99,6 +102,7 @@ export class TaskService {
         this.tasksState.update((current) => current.filter((t) => !ids.has(t.id)));
         this.appNotification.success(result.message);
       }),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
       map(() => undefined),
     );
   }
@@ -113,7 +117,15 @@ export class TaskService {
           );
           this.appNotification.success(result.message);
         }),
+        catchError((err: HttpErrorResponse) => this.handleError(err)),
         map((result) => result.data),
       );
   }
+
+  private readonly handleError = (err: HttpErrorResponse) => {
+    const errorResponse = err.error as ApiResponse<null> | null;
+    const errorMessage = errorResponse?.message ?? 'Something went wrong. Please try again.';
+    this.appNotification.error(errorMessage);
+    return throwError(() => err);
+  };
 }

@@ -27,7 +27,6 @@ export class TaskDetailsDialog {
   task = input.required<Task>();
   isClosing = input(false);
   isLoading = input(false);
-  errorMessage = input<string | null>(null);
   closed = output<void>();
   statusChangeRequested = output<TaskStatusChangeRequest>();
 

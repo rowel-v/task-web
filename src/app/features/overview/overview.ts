@@ -118,40 +118,26 @@ export class Overview {
   }
 
   protected readonly isCreatingTask = signal<boolean>(false);
-  protected readonly createTaskError = signal<string | null>(null);
   protected onTaskCreated(req: CreateTaskRequest): void {
-    this.createTaskError.set(null); // clear previous error
     this.isCreatingTask.set(true);
 
-    setTimeout(() => {
-      this.taskService
-        .createTask(req)
-        .pipe(finalize(() => this.isCreatingTask.set(false)))
-        .subscribe({
-          next: () => this.closeModal(),
-          error: (err) => {
-            console.error('Failed to create task', err);
-            this.createTaskError.set('Failed to create task. Please try again.');
-          },
-        });
-    }, 5000);
+    this.taskService
+      .createTask(req)
+      .pipe(finalize(() => this.isCreatingTask.set(false)))
+      .subscribe({
+        next: () => this.closeModal(),
+      });
   }
 
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
-  protected readonly updateTaskStatusError = signal<string | null>(null);
   protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
-    this.updateTaskStatusError.set(null);
     this.isUpdatingTaskStatus.set(true);
 
     this.taskService
       .updateTaskStatus(targetTask.id, taskStatusAction)
-      .pipe(finalize(() => setTimeout(() => this.isUpdatingTaskStatus.set(false), 5000)))
+      .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
       .subscribe({
-        next: () => setTimeout(() => this.closeModal(), 5000),
-        error: (err) => {
-          console.error('Failed to update task status', err);
-          this.updateTaskStatusError.set('Failed to update task status. Please try again.');
-        },
+        next: () => this.closeModal(),
       });
   }
 }

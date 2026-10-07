@@ -280,7 +280,6 @@
     <app-create-task-dialog
       [isClosing]="isClosing()"
       [isLoading]="isCreatingTask()"
-      [errorMessage]="createTaskError()"
       (closed)="closeModal()"
       (submitted)="onTaskCreated($event)"
     />
@@ -292,7 +291,6 @@
         [task]="task"
         [isClosing]="isClosing()"
         [isLoading]="isUpdatingTaskStatus()"
-        [errorMessage]="updateTaskStatusError()"
         (closed)="closeModal()"
         (statusChangeRequested)="onTaskUpdatedStatus($event.targetTask, $event.action)"
       />

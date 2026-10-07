@@ -28,7 +28,6 @@ export class DeleteTaskDialog {
   tasks = input.required<Task[]>();
   isClosing = input<boolean>(false);
   isDeleting = input<boolean>(false);
-  errorMessage = input<string | null>(null);
 
   cancelled = output<void>();
   confirmed = output<Task[]>();

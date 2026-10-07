@@ -33,7 +33,6 @@ export class CreateTaskDialog {
   submitted = output<CreateTaskRequest>();
   isClosing = input.required<boolean>();
   isLoading = input.required<boolean>();
-  errorMessage = input<string | null>(null);
   protected readonly taskForm = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,

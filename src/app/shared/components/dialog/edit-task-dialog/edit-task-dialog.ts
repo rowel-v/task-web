@@ -33,7 +33,6 @@ export class EditTaskDialog implements OnInit {
   task = input.required<Task>();
   isClosing = input<boolean>(false);
   isUpdating = input<boolean>(false);
-  errorMessage = input<string | null>(null);
 
   submitted = output<{ taskId: number; req: UpdateTaskRequest }>();
   cancelled = output<void>();
