@@ -1,5 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import {
   LucideClipboardList,
   LucideClock5,
@@ -11,13 +10,7 @@ type StatusCardIcon = 'total' | 'pending' | 'in_progress' | 'completed';
 
 @Component({
   selector: 'app-tasks-status-card',
-  imports: [
-    MatIconModule,
-    LucideClipboardList,
-    LucideClock5,
-    LucideCircleEllipsis,
-    LucideCircleCheck,
-  ],
+  imports: [LucideClipboardList, LucideClock5, LucideCircleEllipsis, LucideCircleCheck],
   templateUrl: './tasks-status-card.html',
   styles: ``,
 })

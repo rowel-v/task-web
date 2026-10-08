@@ -1,13 +1,14 @@
 import {
   ApplicationConfig,
   inject,
+  PLATFORM_ID,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { isPlatformBrowser } from '@angular/common';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { TaskService } from './core/services/task-service/task-service';
@@ -17,8 +18,12 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideNativeDateAdapter(),
     provideHttpClient(withFetch()),
-    provideAppInitializer(() => firstValueFrom(inject(TaskService).getAllTask())),
+    // Only fetch tasks in the browser — skip during SSR/build-time route extraction
+    // so ng build doesn't hang waiting for the backend API.
+    provideAppInitializer(() => {
+      if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
+      return firstValueFrom(inject(TaskService).getAllTask());
+    }),
   ],
 };

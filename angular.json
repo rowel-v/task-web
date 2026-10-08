@@ -28,7 +28,6 @@
               }
             ],
             "styles": [
-              "src/material-theme.scss",
               "src/styles.css",
               "node_modules/vanilla-calendar-pro/styles/index.css"
             ],

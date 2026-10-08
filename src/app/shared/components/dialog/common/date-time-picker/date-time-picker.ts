@@ -1,6 +1,11 @@
 import { Calendar } from 'vanilla-calendar-pro';
+import { DatePipe } from '@angular/common';
+import { LucideCalendarDays, LucideX } from '@lucide/angular';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import {
-  AfterViewInit,
+  afterNextRender,
   Component,
   ElementRef,
   inject,
@@ -8,11 +13,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { LucideCalendarDays, LucideX } from '@lucide/angular';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'app-date-time-picker',
@@ -20,7 +20,7 @@ import { map } from 'rxjs';
   imports: [DatePipe, LucideX, LucideCalendarDays],
   templateUrl: './date-time-picker.html',
 })
-export class DateTimePicker implements AfterViewInit {
+export class DateTimePicker {
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
@@ -34,18 +34,19 @@ export class DateTimePicker implements AfterViewInit {
 
   private readonly calendarEl = viewChild.required<ElementRef>('calendarRef');
 
-  ngAfterViewInit(): void {
-    this.calendar = new Calendar(this.calendarEl().nativeElement, {
-      inputMode: true, // renders as a closed input, opens on click
+  constructor() {
+    afterNextRender(() => {
+      this.calendar = new Calendar(this.calendarEl().nativeElement, {
+        inputMode: true, // renders as a closed input, opens on click
 
-      disableDatesPast: true,
+        disableDatesPast: true,
 
-      positionToInput: 'auto',
+        positionToInput: 'auto',
 
-      selectionTimeMode: 12,
+        selectionTimeMode: 12,
 
-      layouts: {
-        default: `
+        layouts: {
+          default: `
           <div class="vc-header" data-vc="header" role="group" aria-label="Calendar Navigation">
             <#ArrowPrev [month] />
             <div class="vc-header__content" data-vc-header="content">
@@ -64,62 +65,63 @@ export class DateTimePicker implements AfterViewInit {
           <#ControlTime />
           <button type="button" data-vc-save class="btn btn-accent btn-sm w-full mt-1">Confirm</button>
         `,
-      },
+        },
 
-      selectedDates: this.getCurrentDate(), // default selected date
+        selectedDates: this.getCurrentDate(), // default selected date
 
-      selectedTime: this.getCurrentTimeFormatted(), // default selected time
+        selectedTime: this.getCurrentTimeFormatted(), // default selected time
 
-      onShow: (self) => {
-        const popup = self.context.mainElement as HTMLElement;
-        const dialogEl = this.calendarEl().nativeElement.closest('dialog');
+        onShow: (self) => {
+          const popup = self.context.mainElement as HTMLElement;
+          const dialogEl = this.calendarEl().nativeElement.closest('dialog');
 
-        if (popup && dialogEl) {
-          popup.style.position = 'absolute';
-          popup.style.top = '50%';
-          popup.style.left = this.isMobile() ? '65%' : '70%';
-          popup.style.transform = 'translate(-50%, -50%)';
-          popup.style.zIndex = '9999';
+          if (popup && dialogEl) {
+            popup.style.position = 'absolute';
+            popup.style.top = '50%';
+            popup.style.left = this.isMobile() ? '65%' : '70%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.zIndex = '9999';
 
-          dialogEl.appendChild(popup);
-          dialogEl.classList.remove('overflow-hidden');
-          dialogEl.classList.add('overflow-visible');
-        }
+            dialogEl.appendChild(popup);
+            dialogEl.classList.remove('overflow-hidden');
+            dialogEl.classList.add('overflow-visible');
+          }
 
-        const backdrop = document.createElement('div');
-        backdrop.dataset['vcBackdrop'] = '';
-        backdrop.style.position = 'absolute';
-        backdrop.style.inset = '0';
-        backdrop.style.zIndex = '9998';
-        backdrop.style.background = 'rgba(0,0,0,0.2)';
-        backdrop.onclick = () => this.calendar.hide();
+          const backdrop = document.createElement('div');
+          backdrop.dataset['vcBackdrop'] = '';
+          backdrop.style.position = 'absolute';
+          backdrop.style.inset = '0';
+          backdrop.style.zIndex = '9998';
+          backdrop.style.background = 'rgba(0,0,0,0.2)';
+          backdrop.onclick = () => this.calendar.hide();
 
-        dialogEl?.appendChild(backdrop);
+          dialogEl?.appendChild(backdrop);
 
-        this.bindSave(self);
-      },
+          this.bindSave(self);
+        },
 
-      onClickDate: (self) => {
-        const date = self.context.selectedDates[0];
-        if (!date) return;
+        onClickDate: (self) => {
+          const date = self.context.selectedDates[0];
+          if (!date) return;
 
-        // today keeps the current time, any other day defaults to 9:00 AM
-        const isToday = date === this.getCurrentDate()[0];
-        const time = isToday ? this.getCurrentTimeFormatted() : '09:00 AM';
+          // today keeps the current time, any other day defaults to 9:00 AM
+          const isToday = date === this.getCurrentDate()[0];
+          const time = isToday ? this.getCurrentTimeFormatted() : '09:00 AM';
 
-        self.set({ selectedDates: [date], selectedTime: time });
-        this.bindSave(self); // set() re-renders the popup, so bind Confirm again
-      },
+          self.set({ selectedDates: [date], selectedTime: time });
+          this.bindSave(self); // set() re-renders the popup, so bind Confirm again
+        },
 
-      onHide: () => {
-        const dialogEl = this.calendarEl().nativeElement.closest('dialog');
-        dialogEl?.classList.remove('overflow-visible');
-        dialogEl?.classList.add('overflow-hidden');
-        document.querySelector('[data-vc-backdrop]')?.remove();
-      },
+        onHide: () => {
+          const dialogEl = this.calendarEl().nativeElement.closest('dialog');
+          dialogEl?.classList.remove('overflow-visible');
+          dialogEl?.classList.add('overflow-hidden');
+          document.querySelector('[data-vc-backdrop]')?.remove();
+        },
+      });
+
+      this.calendar.init();
     });
-
-    this.calendar.init();
   }
 
   /**
