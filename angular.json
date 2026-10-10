@@ -9,7 +9,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "my-third-angular": {
+    "my-task": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -68,10 +68,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "my-third-angular:build:production"
+              "buildTarget": "my-task:build:production"
             },
             "development": {
-              "buildTarget": "my-third-angular:build:development"
+              "buildTarget": "my-task:build:development"
             }
           },
           "defaultConfiguration": "development",
