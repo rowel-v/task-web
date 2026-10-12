@@ -68,7 +68,9 @@ export class CompletedTasksDetailsModal {
   // Gets tasks completed today.
   protected readonly completedToday = computed(() => {
     const today = new Date().toDateString();
-    return this.completedTasks().filter((t) => new Date(t.completedAt).toDateString() === today);
+    return this.completedTasks().filter(
+      (t) => t.completedAt && new Date(t.completedAt).toDateString() === today,
+    );
   });
   // Gets completed tasks from this week.
   protected readonly completedThisWeek = computed(() => {

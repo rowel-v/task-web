@@ -4,9 +4,10 @@ import { TaskDetailsDialogFooter } from './task-details-dialog-footer/task-detai
 import { TaskDetailsDialogContent } from './task-details-dialog-content/task-details-dialog-content';
 import { TaskDetailsDialogHeader } from './task-details-dialog-header/task-details-dialog-header';
 
-export type TaskStatusAction = 'START' | 'COMPLETE' | 'REOPEN';
+export type TaskStatusAction = 'START' | 'COMPLETE';
 export interface TaskStatusChangeRequest {
   action: TaskStatusAction;
+  reopen?: boolean;
   targetTask: Task;
 }
 

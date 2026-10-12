@@ -5,14 +5,20 @@ import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../../models/response/api-response';
 import { NotificationService } from '../notification-service/notification-service';
 import { TaskStatusAction } from '../../../shared/components/dialog/task-details-dialog/task-details-dialog';
-import { UpdateTaskRequest } from '../../models/request/update-task-request';
-import { CreateTaskRequest } from '../../models/request/create-task-request';
+import {
+  CreateTaskRequest,
+  TaskControllerService,
+  TaskResponse,
+  UpdateTaskRequest,
+} from '../../../api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
+  private readonly api = inject(TaskControllerService);
   private readonly baseUrl = '/api/tasks';
+
   private readonly http = inject(HttpClient);
   private readonly appNotification = inject(NotificationService);
   private readonly tasksState = signal<Task[]>([]);
@@ -57,50 +63,42 @@ export class TaskService {
       .filter((task) => task.dueDate && new Date(task.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
   });
-
   getAllTask(): Observable<Task[]> {
-    return this.http.get<ApiResponse<Task[]>>(this.baseUrl).pipe(
-      tap((result) => {
-        this.tasksState.set(result.data);
-        this.appNotification.success(result.message);
-      }),
+    return this.api.getTasks().pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => result.data?.map(this.toTask) ?? []),
+      tap((tasks) => this.tasksState.set(tasks)),
       catchError((err: HttpErrorResponse) => this.handleError(err)),
-      map((result) => result.data),
     );
   }
 
   createTask(req: CreateTaskRequest): Observable<Task> {
-    return this.http.post<ApiResponse<Task>>(`${this.baseUrl}`, req).pipe(
-      tap((result) => {
-        this.tasksState.update((tasks) => [...tasks, result.data]);
-        this.appNotification.success(result.message);
-      }),
+    return this.api.createTask(req).pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => this.toTask(result.data!)),
+      tap((task) => this.tasksState.update((tasks) => [...tasks, task])),
       catchError((err: HttpErrorResponse) => this.handleError(err)),
-      map((result) => result.data),
     );
   }
 
   updateTask(taskId: number, req: UpdateTaskRequest): Observable<Task> {
-    return this.http.patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}`, req).pipe(
-      tap((result) => {
-        this.tasksState.update((tasks) =>
-          tasks.map((task) => (task.id === result.data.id ? result.data : task)),
-        );
-        this.appNotification.success(result.message);
+    return this.api.updateTask(taskId, req).pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => this.toTask(result.data!)),
+      tap((task) => {
+        this.tasksState.update((tasks) => tasks.map((t) => (t.id === task.id ? task : t)));
       }),
       catchError((err: HttpErrorResponse) => this.handleError(err)),
-      map((result) => result.data),
     );
   }
 
-  deleteTask(task: Task[]): Observable<void> {
-    const taskIds = task.map((t) => t.id);
-    const ids = new Set(taskIds);
+  deleteTask(tasks: Task[]): Observable<void> {
+    const taskIds: number[] = tasks.map((t) => t.id);
 
-    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}`, { body: { taskIds } }).pipe(
+    return this.api.deleteTask(taskIds).pipe(
       tap((result) => {
-        this.tasksState.update((current) => current.filter((t) => !ids.has(t.id)));
         this.appNotification.success(result.message);
+        this.tasksState.update((current) => current.filter((t) => !taskIds.includes(t.id)));
       }),
       catchError((err: HttpErrorResponse) => this.handleError(err)),
       map(() => undefined),
@@ -108,18 +106,14 @@ export class TaskService {
   }
 
   updateTaskStatus(taskId: number, taskStatusAction: TaskStatusAction): Observable<Task> {
-    return this.http
-      .patch<ApiResponse<Task>>(`${this.baseUrl}/${taskId}/${taskStatusAction}`, null)
-      .pipe(
-        tap((result) => {
-          this.tasksState.update((task) =>
-            task.map((t) => (t.id === result.data.id ? result.data : t)),
-          );
-          this.appNotification.success(result.message);
-        }),
-        catchError((err: HttpErrorResponse) => this.handleError(err)),
-        map((result) => result.data),
-      );
+    return this.api.updateTaskStatus(taskId, taskStatusAction).pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => this.toTask(result.data!)),
+      tap((task) => {
+        this.tasksState.update((tasks) => tasks.map((t) => (t.id === task.id ? task : t)));
+      }),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
+    );
   }
 
   private readonly handleError = (err: HttpErrorResponse) => {
@@ -128,4 +122,16 @@ export class TaskService {
     this.appNotification.error(errorMessage);
     return throwError(() => err);
   };
+
+  private readonly toTask = (taskResponse: TaskResponse): Task => ({
+    id: taskResponse.id,
+    name: taskResponse.name,
+    description: taskResponse.description ?? null,
+    status: taskResponse.status,
+    priority: taskResponse.priority,
+    createdAt: taskResponse.createdAt,
+    updatedAt: taskResponse.updatedAt,
+    dueDate: taskResponse.dueDate,
+    completedAt: taskResponse.completedAt ?? null,
+  });
 }

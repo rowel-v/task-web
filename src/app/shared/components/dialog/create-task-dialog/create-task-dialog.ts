@@ -9,11 +9,11 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskPriority } from '../../../../core/models/task';
-import { CreateTaskRequest } from '../../../../core/models/request/create-task-request';
 import { DateTimePicker } from '../common/date-time-picker/date-time-picker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DialogHeader } from '../common/dialog-header/dialog-header';
 import { DialogFooter } from '../common/dialog-footer/dialog-footer';
+import { CreateTaskRequest } from '../../../../api';
 
 @Component({
   selector: 'app-create-task-dialog',

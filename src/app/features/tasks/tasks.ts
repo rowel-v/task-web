@@ -4,15 +4,13 @@ import { CommonModule } from '@angular/common';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { SearchService } from '../../core/services/search-service/search-service';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
-import { CreateTaskRequest } from '../../core/models/request/create-task-request';
 import { finalize, map } from 'rxjs';
-import { UpdateTaskRequest } from '../../core/models/request/update-task-request';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   TaskDetailsDialog,
-  TaskStatusAction,
+  TaskStatusChangeRequest,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import { Component, computed, effect, inject, Signal, signal, untracked } from '@angular/core';
 import {
@@ -27,6 +25,7 @@ import {
 import { LongPress } from './directives/long-press';
 import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
 import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
+import { CreateTaskRequest, UpdateTaskRequest } from '../../api';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
@@ -293,11 +292,18 @@ export class Tasks {
   }
 
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
-  protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
+  protected onTaskUpdatedStatus(taskStatusChangeReq: TaskStatusChangeRequest): void {
+    const req = taskStatusChangeReq;
+
+    if (req.reopen) {
+      this.selectedModal.set('edit-task-dialog');
+      this.selectedTask.set(req.targetTask);
+    }
+
     this.isUpdatingTaskStatus.set(true);
 
     this.taskService
-      .updateTaskStatus(targetTask.id, taskStatusAction)
+      .updateTaskStatus(req.targetTask.id, req.action)
       .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
       .subscribe({
         next: () => this.closeModal(),

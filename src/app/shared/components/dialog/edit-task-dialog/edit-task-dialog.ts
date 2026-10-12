@@ -12,7 +12,7 @@ import { DialogFooter } from '../common/dialog-footer/dialog-footer';
 import { DialogHeader } from '../common/dialog-header/dialog-header';
 import { DateTimePicker } from '../common/date-time-picker/date-time-picker';
 import { Task, TaskStatus, TaskPriority } from '../../../../core/models/task';
-import { UpdateTaskRequest } from '../../../../core/models/request/update-task-request';
+import { UpdateTaskRequest } from '../../../../api';
 
 @Component({
   selector: 'app-edit-task-dialog',

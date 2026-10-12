@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { RequestOptions, ApiResponseListTaskResponse, CreateTaskRequest, ApiResponseTaskResponse, DeleteTaskRequest, ApiResponseVoid, UpdateTaskRequest } from "../models";
+import { RequestOptions, ApiResponseListTaskResponse, CreateTaskRequest, ApiResponseTaskResponse, ApiResponseVoid, UpdateTaskRequest } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class TaskControllerService {
@@ -25,9 +25,9 @@ export class TaskControllerService {
         return context.set(this.clientContextToken, 'default');
     }
 
-    getTasks(observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseListTaskResponse>;
-    getTasks(observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseListTaskResponse>>;
-    getTasks(observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseListTaskResponse>>;
+    getTasks(observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseListTaskResponse>;
+    getTasks(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseListTaskResponse>>;
+    getTasks(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseListTaskResponse>>;
     getTasks(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks`;
 
@@ -39,22 +39,21 @@ export class TaskControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
 
         return this.httpClient.request('get', url, {
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
         });
     }
 
-    createTask(createTaskRequest: CreateTaskRequest, observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseTaskResponse>;
-    createTask(createTaskRequest: CreateTaskRequest, observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
-    createTask(createTaskRequest: CreateTaskRequest, observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
+    createTask(createTaskRequest: CreateTaskRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseTaskResponse>;
+    createTask(createTaskRequest: CreateTaskRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
+    createTask(createTaskRequest: CreateTaskRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
     createTask(createTaskRequest: CreateTaskRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks`;
 
@@ -66,7 +65,7 @@ export class TaskControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
         // Set Content-Type for JSON requests if not already set
         if (!headers.has('Content-Type')) {
@@ -77,18 +76,22 @@ export class TaskControllerService {
             body: createTaskRequest,
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
         });
     }
 
-    deleteTask(deleteTaskRequest: DeleteTaskRequest, observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseVoid>;
-    deleteTask(deleteTaskRequest: DeleteTaskRequest, observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseVoid>>;
-    deleteTask(deleteTaskRequest: DeleteTaskRequest, observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseVoid>>;
-    deleteTask(deleteTaskRequest: DeleteTaskRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+    deleteTask(ids: Array<number>, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseVoid>;
+    deleteTask(ids: Array<number>, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseVoid>>;
+    deleteTask(ids: Array<number>, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseVoid>>;
+    deleteTask(ids: Array<number>, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks`;
+
+        let params = new HttpParams();
+        if (ids != null) {
+            params = HttpParamsBuilder.addToHttpParams(params, ids, 'ids');
+        }
 
         let headers: HttpHeaders;
         if (options?.headers instanceof HttpHeaders) {
@@ -98,26 +101,22 @@ export class TaskControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
-        }
-        // Set Content-Type for JSON requests if not already set
-        if (!headers.has('Content-Type')) {
-            headers = headers.set('Content-Type', 'application/json');
+            headers = headers.set('Accept', 'application/json');
         }
 
         return this.httpClient.request('delete', url, {
             observe,
             headers,
-            responseType: 'blob',
+            params,
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
         });
     }
 
-    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseTaskResponse>;
-    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
-    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
+    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseTaskResponse>;
+    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
+    updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
     updateTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks/${id}`;
 
@@ -129,7 +128,7 @@ export class TaskControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
         // Set Content-Type for JSON requests if not already set
         if (!headers.has('Content-Type')) {
@@ -140,16 +139,15 @@ export class TaskControllerService {
             body: updateTaskRequest,
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
         });
     }
 
-    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseTaskResponse>;
-    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
-    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
+    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseTaskResponse>;
+    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
+    updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
     updateTaskStatus(id: number, taskStatusAction: 'START' | 'COMPLETE', observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks/${id}/${taskStatusAction}`;
 
@@ -161,14 +159,13 @@ export class TaskControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
 
         return this.httpClient.request('patch', url, {
             body: null,
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)

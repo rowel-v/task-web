@@ -9,7 +9,6 @@ import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dia
 import { DatePipe } from '@angular/common';
 import { TaskItem } from './task-item/task-item';
 import { TaskEmptyState } from './task-empty-state/task-empty-state';
-import { CreateTaskRequest } from '../../core/models/request/create-task-request';
 import { finalize, map } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -21,6 +20,7 @@ import {
   TaskDetailsDialog,
   TaskStatusAction,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+import { CreateTaskRequest } from '../../api';
 
 type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
 type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;

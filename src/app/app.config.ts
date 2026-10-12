@@ -12,6 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { TaskService } from './core/services/task-service/task-service';
+import { provideDefaultClient } from './api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,5 +26,6 @@ export const appConfig: ApplicationConfig = {
       if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
       return firstValueFrom(inject(TaskService).getAllTask());
     }),
+    provideDefaultClient({ basePath: 'http://localhost:8080' }),
   ],
 };

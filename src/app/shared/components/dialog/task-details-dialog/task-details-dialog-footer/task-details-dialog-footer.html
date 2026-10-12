@@ -9,7 +9,7 @@
     <app-button
       variant="green"
       [unclickable]="isLoading()"
-      (pressed)="onStatusChangeRequested('START')"
+      (pressed)="onStatusChangeRequested({ action: 'START' })"
     >
       <svg lucidePlay size="16" />
       Start
@@ -18,7 +18,7 @@
     <app-button
       variant="green"
       [unclickable]="isLoading()"
-      (pressed)="onStatusChangeRequested('COMPLETE')"
+      (pressed)="onStatusChangeRequested({ action: 'COMPLETE' })"
     >
       <svg lucideCheck size="16" />
       Complete
@@ -27,7 +27,7 @@
     <app-button
       variant="green"
       [unclickable]="isLoading()"
-      (pressed)="onStatusChangeRequested('REOPEN')"
+      (pressed)="onStatusChangeRequested({ reopen: true })"
     >
       <svg lucideCheck size="16" />
       Reopen

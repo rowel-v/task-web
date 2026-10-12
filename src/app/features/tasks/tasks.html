@@ -171,7 +171,7 @@
     [isClosing]="closedModal()"
     [isLoading]="isUpdatingTaskStatus()"
     (closed)="closeModal()"
-    (statusChangeRequested)="onTaskUpdatedStatus($event.targetTask, $event.action)"
+    (statusChangeRequested)="onTaskUpdatedStatus($event)"
   />
 }
 
@@ -196,6 +196,7 @@
   />
 }
 
+<!--Edit task dialog-->
 @if (selectedModal() === 'edit-task-dialog' && selectedTask(); as task) {
   <app-edit-task-dialog
     [task]="task"
