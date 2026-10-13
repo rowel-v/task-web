@@ -171,4 +171,35 @@ export class TaskControllerService {
             context: this.createContextWithClientId(options?.context)
         });
     }
+
+    reopenTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseTaskResponse>;
+    reopenTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseTaskResponse>>;
+    reopenTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseTaskResponse>>;
+    reopenTask(id: number, updateTaskRequest: UpdateTaskRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/api/tasks/${id}/reopen`;
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+        // Set Content-Type for JSON requests if not already set
+        if (!headers.has('Content-Type')) {
+            headers = headers.set('Content-Type', 'application/json');
+        }
+
+        return this.httpClient.request('patch', url, {
+            body: updateTaskRequest,
+            observe,
+            headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
 }

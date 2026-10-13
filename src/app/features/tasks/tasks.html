@@ -185,6 +185,17 @@
   />
 }
 
+<!--Edit task dialog-->
+@if (selectedModal() === 'edit-task-dialog' && selectedTask(); as task) {
+  <app-edit-task-dialog
+    [task]="task"
+    [isClosing]="closedModal()"
+    [isUpdating]="isUpdatingTask()"
+    (cancelled)="closeModal()"
+    (submitted)="onTaskUpdated($event.taskId, $event.req)"
+  />
+}
+
 <!--Delete task confirmation dialog-->
 @if (selectedModal() === 'delete-task-dialog' && tasksToDelete().length > 0) {
   <app-delete-task-dialog
@@ -196,13 +207,13 @@
   />
 }
 
-<!--Edit task dialog-->
-@if (selectedModal() === 'edit-task-dialog' && selectedTask(); as task) {
-  <app-edit-task-dialog
+<!--Reopen task dialog-->
+@if (selectedModal() === 'reopen-task-dialog' && selectedTask(); as task) {
+  <app-reopen-task-dialog
     [task]="task"
     [isClosing]="closedModal()"
     [isUpdating]="isUpdatingTask()"
     (cancelled)="closeModal()"
-    (submitted)="onTaskUpdated($event.taskId, $event.req)"
+    (submitted)="onTaskReopen($event)"
   />
 }

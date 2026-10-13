@@ -116,6 +116,17 @@ export class TaskService {
     );
   }
 
+  reopenTask(taskId: number, changes: UpdateTaskRequest): Observable<Task> {
+    return this.api.reopenTask(taskId, changes).pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => this.toTask(result.data!)),
+      tap((task) =>
+        this.tasksState.update((tasks) => tasks.map((t) => (t.id === task.id ? task : t))),
+      ),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
+    );
+  }
+
   private readonly handleError = (err: HttpErrorResponse) => {
     const errorResponse = err.error as ApiResponse<null> | null;
     const errorMessage = errorResponse?.message ?? 'Something went wrong. Please try again.';

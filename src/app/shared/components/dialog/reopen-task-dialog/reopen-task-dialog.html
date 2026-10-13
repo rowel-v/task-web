@@ -1,0 +1,114 @@
+<dialog
+  #dialogRef
+  class="
+    fixed inset-0 m-auto flex w-full max-w-md flex-col overflow-hidden
+    rounded-md bg-app-background-white p-6 text-app-text-green
+  "
+  [class.scale-in-center]="!isClosing()"
+  [class.scale-out-center]="isClosing()"
+  (cancel)="$event.preventDefault(); !isUpdating() && cancelled.emit()"
+>
+  <app-dialog-header
+    title="Reopen Task"
+    subTitle="Move this completed task back to your active list."
+    [disableCloseButton]="isUpdating()"
+    (closed)="cancelled.emit()"
+  />
+
+  <!--Content-->
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="
+    mt-5 flex flex-1 flex-col gap-6
+  ">
+    <!--Task name-->
+    <div class="flex items-start gap-3 text-lg">
+      <label for="task-name" class="shrink-0"> Task name: </label>
+
+      <div class="flex flex-1 flex-col gap-1 text-lg">
+        <input
+          id="task-name"
+          type="text"
+          formControlName="name"
+          placeholder="Enter task name"
+          class="h-7 flex-1 border-b outline-none"
+        />
+        @if (taskForm.controls.name.invalid && taskForm.controls.name.touched) {
+          <!--Error label-->
+          <span class="text-sm text-red-500">Task name is required.</span>
+        }
+      </div>
+    </div>
+
+    <!--Task Description-->
+    <div class="flex items-start gap-2">
+      <label for="task-desc" class="shrink-0 text-lg"> Description: </label>
+
+      <div class="flex flex-1">
+        <input
+          id="task-desc"
+          type="text"
+          formControlName="description"
+          placeholder="(optional)"
+          class="h-7 flex-1 border-b text-lg outline-none"
+        />
+      </div>
+    </div>
+
+    <!--Task Priority-->
+    <div class="flex items-center justify-start gap-3 text-[17px]">
+      <span>Priority:</span>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="priority" value="LOW" />
+        Low
+      </label>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="priority" value="MEDIUM" />
+        Medium
+      </label>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="priority" value="HIGH" />
+        High
+      </label>
+    </div>
+
+    <!--Task Status-->
+    <div class="flex items-center justify-start gap-3 text-[17px]">
+      <span>Status:</span>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="status" value="PENDING" />
+        Pending
+      </label>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="status" value="IN_PROGRESS" />
+        In Progress
+      </label>
+
+      <label class="flex items-center gap-1 text-sm">
+        <input type="radio" formControlName="status" value="COMPLETED" />
+        Completed
+      </label>
+    </div>
+
+    <!--Task Due date-->
+    <div class="flex flex-col gap-1">
+      <app-date-time-picker [defaultDate]="task().dueDate" (dateSelected)="taskForm.patchValue({ dueDate: $event })" />
+
+      @if (taskForm.controls.dueDate.invalid && taskForm.controls.dueDate.touched) {
+        <!--Error label-->
+        <span class="text-sm text-red-500">Due date is required.</span>
+      }
+    </div>
+
+    <app-dialog-footer
+      type="submit"
+      label="Save"
+      labelWhenLoading="Saving..."
+      [isLoading]="isUpdating()"
+      (closed)="cancelled.emit()"
+    />
+  </form>
+</dialog>

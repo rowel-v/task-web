@@ -7,10 +7,12 @@ import { map } from 'rxjs';
 import {
   afterNextRender,
   Component,
+  computed,
   ElementRef,
   inject,
+  input,
+  linkedSignal,
   output,
-  signal,
   viewChild,
 } from '@angular/core';
 
@@ -27,17 +29,43 @@ export class DateTimePicker {
     { initialValue: false },
   );
 
-  protected readonly selectedDate = signal<string>(''); // for display in its template
+  defaultDate = input<string>();
+  // parsed default, or null when there's no valid value
+  private readonly initial = computed(() => {
+    const raw = this.defaultDate();
+    if (!raw) return null;
+
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) return null;
+
+    const date = d.toLocaleDateString('en-CA');
+    const time = d.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return { date, time, value: `${date}T${this.to24Hour(time)}` };
+  });
+
+  // follows the default, but the user's pick or Clear can overwrite it
+  // for display in its template
+  protected readonly selectedDate = linkedSignal(() => this.initial()?.value ?? '');
+
   dateSelected = output<string>(); // emits the chosen date as string format
 
   private calendar!: Calendar;
-
   private readonly calendarEl = viewChild.required<ElementRef>('calendarRef');
 
   constructor() {
     afterNextRender(() => {
+      const initial = this.initial(); // read once
+
       this.calendar = new Calendar(this.calendarEl().nativeElement, {
         inputMode: true, // renders as a closed input, opens on click
+
+        selectedDates: initial ? [initial.date] : this.getCurrentDate(),
+        selectedTime: initial?.time ?? this.getCurrentTimeFormatted(),
 
         disableDatesPast: true,
 
@@ -66,10 +94,6 @@ export class DateTimePicker {
           <button type="button" data-vc-save class="btn btn-accent btn-sm w-full mt-1">Confirm</button>
         `,
         },
-
-        selectedDates: this.getCurrentDate(), // default selected date
-
-        selectedTime: this.getCurrentTimeFormatted(), // default selected time
 
         onShow: (self) => {
           const popup = self.context.mainElement as HTMLElement;

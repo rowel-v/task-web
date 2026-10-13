@@ -26,10 +26,19 @@ import { LongPress } from './directives/long-press';
 import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
 import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
 import { CreateTaskRequest, UpdateTaskRequest } from '../../api';
+import {
+  ReopenTaskDialog,
+  ReopenTaskEvent,
+} from '../../shared/components/dialog/reopen-task-dialog/reopen-task-dialog';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
 type ModalSelection =
-  'task-details-dialog' | 'create-task-dialog' | 'edit-task-dialog' | 'delete-task-dialog' | null;
+  | 'task-details-dialog'
+  | 'create-task-dialog'
+  | 'edit-task-dialog'
+  | 'delete-task-dialog'
+  | 'reopen-task-dialog'
+  | null;
 
 @Component({
   selector: 'app-tasks',
@@ -49,6 +58,7 @@ type ModalSelection =
     CreateTaskDialog,
     DeleteTaskDialog,
     EditTaskDialog,
+    ReopenTaskDialog,
   ],
   templateUrl: './tasks.html',
   styles: ``,
@@ -295,9 +305,11 @@ export class Tasks {
   protected onTaskUpdatedStatus(taskStatusChangeReq: TaskStatusChangeRequest): void {
     const req = taskStatusChangeReq;
 
+    // if request is REOPEN not START nor COMPLETE, transfer the request in reopen-task-dialog
     if (req.reopen) {
-      this.selectedModal.set('edit-task-dialog');
+      this.selectedModal.set('reopen-task-dialog');
       this.selectedTask.set(req.targetTask);
+      return;
     }
 
     this.isUpdatingTaskStatus.set(true);
@@ -308,5 +320,15 @@ export class Tasks {
       .subscribe({
         next: () => this.closeModal(),
       });
+  }
+
+  protected readonly isReopeningTask = signal<boolean>(false);
+  protected onTaskReopen(event: ReopenTaskEvent): void {
+    this.isReopeningTask.set(true);
+
+    this.taskService
+      .reopenTask(event.id, event.changes)
+      .pipe(finalize(() => this.isReopeningTask.set(false)))
+      .subscribe({ next: () => this.closeModal() });
   }
 }
