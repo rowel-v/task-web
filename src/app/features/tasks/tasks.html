@@ -37,6 +37,27 @@
         Select
       </label>
     }
+
+    <label class="ms-5 flex shrink-0 items-center gap-2 text-[16px]">
+      <span class="whitespace-nowrap">Sort by:</span>
+
+      <select
+        class="
+          select w-auto shrink-0 cursor-pointer border-white/20 bg-transparent
+          text-[15px] text-app-text-white scheme-dark select-sm outline-none
+          focus:border-0
+          [&>option]:border-0 [&>option]:bg-[#1b484b]
+          [&>option]:text-app-text-white
+          [&>option]:hover:bg-app-button-hover-gray
+        "
+        (change)="sortBy.set($any($event.target).value)"
+      >
+        <option value="due-asc">Due date: soonest</option>
+        <option value="due-desc">Due date: latest</option>
+        <option value="name">Name: A to Z</option>
+        <option value="created">Newest created</option>
+      </select>
+    </label>
   </div>
 
   <div class="flex flex-col overflow-y-auto">
@@ -64,7 +85,8 @@
           type="button"
           (click)="onTaskClick('task-details-dialog', task)"
           class="
-            flex flex-1 items-center justify-between rounded-md p-4 text-left
+            flex flex-1 cursor-pointer items-center justify-between rounded-md
+            p-4 text-left
             focus:outline-none
           "
         >

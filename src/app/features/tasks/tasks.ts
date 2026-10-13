@@ -32,6 +32,8 @@ import {
 } from '../../shared/components/dialog/reopen-task-dialog/reopen-task-dialog';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
+type SortSelection = 'due-asc' | 'due-desc' | 'name' | 'created';
+
 type ModalSelection =
   | 'task-details-dialog'
   | 'create-task-dialog'
@@ -90,6 +92,7 @@ export class Tasks {
   protected readonly selectedTask = signal<Task | null>(null); // use for manage task
   protected readonly selectedModal = signal<ModalSelection>(null);
   protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
+  protected readonly sortBy = signal<SortSelection>('due-asc');
   protected readonly tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
 
@@ -109,14 +112,31 @@ export class Tasks {
         break;
     }
 
-    if (!term) {
-      return filtered;
-    }
+    const result = term
+      ? filtered.filter(
+          (t) => t.name.toLowerCase().includes(term) || t.description?.toLowerCase().includes(term),
+        )
+      : filtered;
 
-    return filtered.filter(
-      (t) => t.name.toLowerCase().includes(term) || t.description?.toLowerCase().includes(term),
-    );
+    return this.sortTasks(result);
   });
+
+  private sortTasks(list: Task[]): Task[] {
+    const due = (t: Task) => (t.dueDate ? new Date(t.dueDate).getTime() : Infinity);
+
+    return [...list].sort((a, b) => {
+      switch (this.sortBy()) {
+        case 'due-asc':
+          return due(a) - due(b);
+        case 'due-desc':
+          return due(b) - due(a);
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
+  }
 
   protected closedModal = signal<boolean>(false); // for rendering animation
   protected closeModal() {
