@@ -172,9 +172,33 @@
 
       <div class="
         flex items-center gap-1
-        md:gap-3
+        md:gap-5
       ">
         @if (currentSideNav() === 'tasks') {
+          <!--Select mode toggle (desktop only)-->
+          @if (!isMobile()) {
+            <label
+              class="
+                flex cursor-pointer items-center rounded-md border
+                border-white/20 px-3 py-1 text-[15px] transition-colors
+                select-none
+                hover:bg-white/10
+                has-checked:border-app-button-hover-gray
+                has-checked:bg-app-button-hover-gray
+                has-checked:text-app-text-white
+                has-focus-visible:ring-2 has-focus-visible:ring-[#00D3BB]
+              "
+            >
+              <input
+                type="checkbox"
+                class="sr-only"
+                [checked]="selectModeService.enabled()"
+                (change)="onSelectToggle($event)"
+              />
+              Select Mode
+            </label>
+          }
+
           <label
             class="
               input mx-2 max-w-35 min-w-0 flex-1 bg-app-background-green

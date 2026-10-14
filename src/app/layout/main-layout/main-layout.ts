@@ -24,6 +24,7 @@ import {
 } from '@lucide/angular';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
+import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 
@@ -66,6 +67,7 @@ export class MainLayout {
   private readonly router = inject(Router);
   protected readonly searchService = inject(SearchService);
   protected readonly notificationService = inject(NotificationService);
+  protected readonly selectModeService = inject(SelectModeService);
   protected readonly openSideNav = linkedSignal(() => !this.isMobile());
   protected readonly navItems: NavItem[] = [
     { key: 'home', label: 'Home', route: '/overview' },
@@ -137,5 +139,11 @@ export class MainLayout {
   // Closes the profile dropdown when clicking outside of it.
   protected onDocumentClick(event: MouseEvent) {
     if (!this.profileRef()?.nativeElement.contains(event.target as Node)) this.closeProfile();
+  }
+
+  protected onSelectToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) this.selectModeService.toggleOn();
+    else this.selectModeService.toggleOff();
   }
 }

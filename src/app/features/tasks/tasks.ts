@@ -12,7 +12,16 @@ import {
   TaskDetailsDialog,
   TaskStatusChangeRequest,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
-import { Component, computed, effect, inject, Signal, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  Signal,
+  signal,
+  untracked,
+} from '@angular/core';
 import {
   LucideClipboardList,
   LucideClock5,
@@ -21,6 +30,9 @@ import {
   LucidePlus,
   LucideTrash,
   LucidePencil,
+  LucideArrowDownWideNarrow,
+  LucideCalendarX,
+  LucideSun,
 } from '@lucide/angular';
 import { LongPress } from './directives/long-press';
 import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
@@ -30,9 +42,11 @@ import {
   ReopenTaskDialog,
   ReopenTaskEvent,
 } from '../../shared/components/dialog/reopen-task-dialog/reopen-task-dialog';
+import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
 
-type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed';
-type SortSelection = 'due-asc' | 'due-desc' | 'name' | 'created';
+type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today';
+type SortSelection =
+  'due-asc' | 'due-desc' | 'priority-high' | 'name-asc' | 'name-desc' | 'created';
 
 type ModalSelection =
   | 'task-details-dialog'
@@ -52,6 +66,9 @@ type ModalSelection =
     LucidePlus,
     LucideTrash,
     LucidePencil,
+    LucideArrowDownWideNarrow,
+    LucideCalendarX,
+    LucideSun,
     CommonModule,
     LongPress,
 
@@ -84,10 +101,21 @@ export class Tasks {
         this.selectedModal.set('task-details-dialog');
       });
     });
+
+    // clear picked tasks whenever select mode is turned off by selectModeService
+    effect(() => {
+      if (!this.selectMode()) {
+        this.selectedTaskIds.set(new Set());
+      }
+    });
+
+    // turn select mode off when leaving the Tasks page
+    inject(DestroyRef).onDestroy(() => this.selectModeService.toggleOff());
   }
 
   private readonly taskService = inject(TaskService);
   private readonly searchService = inject(SearchService);
+  private readonly selectModeService = inject(SelectModeService);
   protected readonly selectedTab = signal<TabSelection>('all');
   protected readonly selectedTask = signal<Task | null>(null); // use for manage task
   protected readonly selectedModal = signal<ModalSelection>(null);
@@ -110,6 +138,20 @@ export class Tasks {
       case 'completed':
         filtered = this.tasks().filter((t) => t.status === 'COMPLETED');
         break;
+      case 'overdue':
+        filtered = this.tasks().filter((t) => this.isOverdue(t));
+        break;
+      case 'today': {
+        const now = new Date();
+
+        filtered = this.tasks().filter(
+          (t) =>
+            t.status !== 'COMPLETED' &&
+            t.dueDate &&
+            new Date(t.dueDate).toDateString() === now.toDateString(),
+        );
+        break;
+      }
     }
 
     const result = term
@@ -123,6 +165,7 @@ export class Tasks {
 
   private sortTasks(list: Task[]): Task[] {
     const due = (t: Task) => (t.dueDate ? new Date(t.dueDate).getTime() : Infinity);
+    const priorityRank = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
     return [...list].sort((a, b) => {
       switch (this.sortBy()) {
@@ -130,8 +173,12 @@ export class Tasks {
           return due(a) - due(b);
         case 'due-desc':
           return due(b) - due(a);
-        case 'name':
+        case 'priority-high':
+          return priorityRank[a.priority] - priorityRank[b.priority] || due(a) - due(b);
+        case 'name-asc':
           return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
         case 'created':
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
@@ -199,6 +246,18 @@ export class Tasks {
           image: 'images/stick-man-empty-completed-tasks.png',
           imageWidth: 'w-35',
         };
+      case 'overdue':
+        return {
+          message: 'No overdue tasks.',
+          image: 'images/stick-man-empty-overdue-tasks.png',
+          imageWidth: 'w-30',
+        };
+      case 'today':
+        return {
+          message: 'No tasks due today.',
+          image: 'images/stick-man-empty-today-tasks.png',
+          imageWidth: 'w-40',
+        };
     }
   });
 
@@ -214,17 +273,11 @@ export class Tasks {
     { initialValue: false },
   );
 
-  // true while the "Select" checkbox is on
-  protected readonly selectMode = signal(false);
+  // mirrors the header's "Select Mode" toggle (shared through SelectModeService
+  protected readonly selectMode = this.selectModeService.enabled;
   protected exitSelectMode() {
-    this.selectMode.set(false);
+    this.selectModeService.toggleOff(); // the effect clears selectedTaskIds
     this.selectedTaskIds.set(new Set());
-  }
-  protected onSelectToggle(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.selectMode.set(checked);
-    // unchecking clears all selected tasks
-    if (!checked) this.selectedTaskIds.set(new Set());
   }
 
   // ids of the tasks the user picked while selectMode is true
@@ -278,7 +331,7 @@ export class Tasks {
       return;
     }
 
-    this.selectMode.set(true);
+    this.selectModeService.toggleOn();
     this.onTaskClick(null, task);
   }
 
