@@ -83,14 +83,16 @@ type ModalSelection =
   styles: ``,
 })
 export class Tasks {
-  private readonly route = inject(ActivatedRoute);
+  
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  // reads 'taskId' from the URL query params from overview page
   private readonly taskId = toSignal(
     this.route.queryParamMap.pipe(map((p) => Number(p.get('taskId')) || null)),
   );
 
   constructor() {
-    // Opens the details dialog when arriving with a taskId in the URL.
+    // Opens the details dialog when arriving with a taskId in the URL. trigger in overview page
     effect(() => {
       const id = this.taskId();
       const task = this.tasks().find((t) => t.id === id);
@@ -113,14 +115,25 @@ export class Tasks {
     inject(DestroyRef).onDestroy(() => this.selectModeService.toggleOff());
   }
 
+  // loads and updates tasks through the API
   private readonly taskService = inject(TaskService);
+  // shared search term typed in the header's search box
   private readonly searchService = inject(SearchService);
+  // shared select mode state, toggled from the header
   private readonly selectModeService = inject(SelectModeService);
-  protected readonly selectedTab = signal<TabSelection>('all');
-  protected readonly selectedTask = signal<Task | null>(null); // use for manage task
-  protected readonly selectedModal = signal<ModalSelection>(null);
+
+  // all tasks from the service (read-only)
   protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
+  // active tab
+  protected readonly selectedTab = signal<TabSelection>('all');
+  // task being viewed, edited or reopened in a dialog
+  protected readonly selectedTask = signal<Task | null>(null);
+  // active dialog open, or null when none
+  protected readonly selectedModal = signal<ModalSelection>(null);
+  // current order chosen in the sort dropdown
   protected readonly sortBy = signal<SortSelection>('due-asc');
+
+  // tasks shown in the list: filtered by tab, then by search term, then sorted
   protected readonly tasksToDisplay = computed(() => {
     const term = this.searchService.searchTerm().toLowerCase().trim();
 
@@ -185,34 +198,12 @@ export class Tasks {
     });
   }
 
-  protected closedModal = signal<boolean>(false); // for rendering animation
-  protected closeModal() {
-    if (this.closedModal()) {
-      return;
-    }
-
-    // Clear the taskId param when the dialog closes.
-    if (this.taskId()) {
-      void this.router.navigate([], {
-        queryParams: { taskId: null },
-        queryParamsHandling: 'merge',
-        replaceUrl: true,
-      });
-    }
-
-    this.closedModal.set(true);
-
-    setTimeout(() => {
-      this.selectedModal.set(null);
-      this.selectedTask.set(null);
-      this.closedModal.set(false);
-    }, 200);
-  }
-
+  // message and image shown when the tasks list is empty, based on the search term or active tab
   protected readonly emptyState = computed(() => {
     const term = this.searchService.searchTerm().trim();
     const hasResults = this.tasksToDisplay().length > 0;
 
+    // a search with no matches gets its own message
     if (term && !hasResults) {
       return {
         message: `No task found for "${term}".`,
@@ -221,6 +212,7 @@ export class Tasks {
       };
     }
 
+    // otherwise the message depends on the active tab
     switch (this.selectedTab()) {
       case 'all':
         return {
@@ -261,6 +253,30 @@ export class Tasks {
     }
   });
 
+  protected closedModal = signal<boolean>(false); // for rendering animation
+  protected closeModal() {
+    if (this.closedModal()) {
+      return;
+    }
+
+    // Clear the taskId param when the dialog closes.
+    if (this.taskId()) {
+      void this.router.navigate([], {
+        queryParams: { taskId: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+
+    this.closedModal.set(true);
+
+    setTimeout(() => {
+      this.selectedModal.set(null);
+      this.selectedTask.set(null);
+      this.closedModal.set(false);
+    }, 200);
+  }
+
   // helper function
   protected readonly isOverdue = (task: Task) => {
     return task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date();
@@ -280,7 +296,7 @@ export class Tasks {
     this.selectedTaskIds.set(new Set());
   }
 
-  // ids of the tasks the user picked while selectMode is true
+  // ids of the tasks picked while selectMode is true
   protected readonly selectedTaskIds = signal<Set<number>>(new Set());
 
   // first selected task, used for Edit.
@@ -326,7 +342,9 @@ export class Tasks {
     return this.selectedTaskIds().has(task.id);
   }
 
+  // long press (mobile) turns on select mode and selects the pressed task
   protected onTaskLongPress(task: Task) {
+    // the press is handled as a normal click if already in select mode
     if (this.selectMode()) {
       return;
     }
@@ -335,7 +353,9 @@ export class Tasks {
     this.onTaskClick(null, task);
   }
 
+  // disables the Create Task Dialog's [Create] button while the request runs
   protected readonly isCreatingTask = signal<boolean>(false);
+  // saves the new task
   protected onTaskCreated(req: CreateTaskRequest): void {
     this.isCreatingTask.set(true);
 
@@ -347,7 +367,9 @@ export class Tasks {
       });
   }
 
+  // disables the Delete Task Dialog's [Delete] button while the request runs
   protected readonly isDeletingTask = signal<boolean>(false);
+  // deletes the tasks, then closes the dialog and exits select mode
   protected onTaskDeleted(tasks: Task[]): void {
     this.isDeletingTask.set(true);
 
@@ -362,7 +384,9 @@ export class Tasks {
       });
   }
 
+  // disables the Edit Task Dialog's [Save] button while the request runs
   protected readonly isUpdatingTask = signal<boolean>(false);
+  // saves the edited task
   protected onTaskUpdated(taskId: number, req: UpdateTaskRequest): void {
     this.isUpdatingTask.set(true);
 
@@ -374,7 +398,9 @@ export class Tasks {
       });
   }
 
+  // disables the Task Details Dialog's primary button while the request runs
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
+  // saves the edited task status
   protected onTaskUpdatedStatus(taskStatusChangeReq: TaskStatusChangeRequest): void {
     const req = taskStatusChangeReq;
 
@@ -395,7 +421,9 @@ export class Tasks {
       });
   }
 
+  // disables the Reopen Task dialog's [Save] button while the request runs
   protected readonly isReopeningTask = signal<boolean>(false);
+  // saves the reopen task request
   protected onTaskReopen(event: ReopenTaskEvent): void {
     this.isReopeningTask.set(true);
 

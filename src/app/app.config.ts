@@ -26,6 +26,6 @@ export const appConfig: ApplicationConfig = {
       if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
       return firstValueFrom(inject(TaskService).getAllTask());
     }),
-    provideDefaultClient({ basePath: 'http://localhost:8080' }),
+    provideDefaultClient({ basePath: '' }),
   ],
 };
