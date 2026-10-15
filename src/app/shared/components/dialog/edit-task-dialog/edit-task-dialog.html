@@ -95,7 +95,7 @@
 
     <!--Task Due date-->
     <div class="flex flex-col gap-1">
-      <app-date-time-picker (dateSelected)="taskForm.patchValue({ dueDate: $event })" />
+      <app-date-time-picker [defaultDate]="task().dueDate" (dateSelected)="taskForm.patchValue({ dueDate: $event })" />
 
       @if (taskForm.controls.dueDate.invalid && taskForm.controls.dueDate.touched) {
         <!--Error label-->

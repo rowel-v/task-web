@@ -83,7 +83,6 @@ type ModalSelection =
   styles: ``,
 })
 export class Tasks {
-  
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   // reads 'taskId' from the URL query params.(set when opening a task from the overview page)
@@ -394,7 +393,12 @@ export class Tasks {
       .updateTask(taskId, req)
       .pipe(finalize(() => this.isUpdatingTask.set(false)))
       .subscribe({
-        next: () => this.closeModal(),
+        next: (updatedTask) => {
+          this.selectModeService.toggleOff();
+          // show the updated task in the details dialog (replaces the edit dialog)
+          this.selectedTask.set(updatedTask);
+          this.selectedModal.set('task-details-dialog');
+        },
       });
   }
 
@@ -430,6 +434,12 @@ export class Tasks {
     this.taskService
       .reopenTask(event.id, event.changes)
       .pipe(finalize(() => this.isReopeningTask.set(false)))
-      .subscribe({ next: () => this.closeModal() });
+      .subscribe({
+        next: (updatedTask) => {
+          // show the updated reopened task in the details dialog (replaces the edit dialog)
+          this.selectedTask.set(updatedTask);
+          this.selectedModal.set('task-details-dialog');
+        },
+      });
   }
 }
