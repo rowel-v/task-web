@@ -86,7 +86,7 @@ export class Tasks {
   
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  // reads 'taskId' from the URL query params from overview page
+  // reads 'taskId' from the URL query params.(set when opening a task from the overview page)
   private readonly taskId = toSignal(
     this.route.queryParamMap.pipe(map((p) => Number(p.get('taskId')) || null)),
   );

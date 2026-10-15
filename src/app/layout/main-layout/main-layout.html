@@ -153,23 +153,6 @@
         </div>
       </div>
 
-      <!-- Notication -->
-      <div class="fixed top-4 left-1/2 z-9999 -translate-x-1/2">
-        @for (n of notificationService.notifications(); track n.id) {
-          <div class="grid grid-rows-[1fr]" animate.enter="toast-enter" animate.leave="toast-leave">
-            <div class="min-h-0 overflow-hidden">
-              <div
-                class="mb-2 alert"
-                [class.alert-success]="n.type === 'success'"
-                [class.alert-error]="n.type === 'error'"
-              >
-                <span>{{ n.message }}</span>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-
       <div class="
         flex items-center gap-1
         md:gap-5

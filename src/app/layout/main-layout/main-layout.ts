@@ -55,7 +55,7 @@ interface NavItem {
     '(document:keydown.escape)': 'closeProfile()',
   },
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css',
+  styles: ``,
 })
 export class MainLayout {
   private readonly bp = inject(BreakpointObserver);
