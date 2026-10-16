@@ -2,38 +2,91 @@
   <!--Tab list-->
   <div class="tabs tabs-border mb-3 shrink-0 flex-nowrap gap-1 overflow-x-auto">
     <!--All-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" checked="checked" (change)="selectedTab.set('all')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'all'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'all'"
+        (change)="selectTab('all')"
+      />
       <svg lucideClipboardList class="size-5" />
       All
     </label>
+
     <!--Pending-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('pending')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'pending'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'pending'"
+        (change)="selectTab('pending')"
+      />
       <svg lucideClock5 class="size-5" />
       Pending
     </label>
+
     <!--In progress-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('in_progress')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'in_progress'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'in_progress'"
+        (change)="selectTab('in_progress')"
+      />
       <svg lucideCircleEllipsis class="size-5" />
       In Progress
     </label>
+
     <!--Completed-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('completed')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'completed'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'completed'"
+        (change)="selectTab('completed')"
+      />
       <svg lucideCircleCheck class="size-5" />
       Completed
     </label>
+
     <!--Overdue-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('overdue')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'overdue'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'overdue'"
+        (change)="selectTab('overdue')"
+      />
       <svg lucideCalendarX class="size-5" />
       Overdue
     </label>
+
     <!--Today-->
-    <label class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap">
-      <input type="radio" name="my_tabs_4" (change)="selectedTab.set('today')" />
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'today'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'today'"
+        (change)="selectTab('today')"
+      />
       <svg lucideSun class="size-5" />
       Today
     </label>

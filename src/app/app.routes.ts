@@ -15,6 +15,11 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
+        pathMatch: 'full',
+        redirectTo: 'tasks/all',
+      },
+      {
+        path: 'tasks/:tab',
         component: Tasks,
       },
       {

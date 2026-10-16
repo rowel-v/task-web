@@ -124,7 +124,29 @@ export class Tasks {
   // all tasks from the service (read-only)
   protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
   // active tab
-  protected readonly selectedTab = signal<TabSelection>('all');
+  protected readonly selectedTab: Signal<TabSelection> = toSignal(
+    this.route.paramMap.pipe(
+      map((p) => (p.get('tab')?.replace('-', '_') ?? '') as TabSelection),
+      map((tab) => {
+        const validTabs: TabSelection[] = [
+          'all',
+          'pending',
+          'in_progress',
+          'completed',
+          'overdue',
+          'today',
+        ];
+        return validTabs.includes(tab) ? tab : 'all';
+      }),
+    ),
+    { initialValue: 'all' },
+  );
+
+  // switches tab by changing the URL, and selectedTab updates from it ('completed' -> /tasks/completed)
+  protected selectTab(tab: TabSelection): void {
+    void this.router.navigate(['tasks', tab.replace('_', '-')]);
+  }
+
   // task being viewed, edited or reopened in a dialog
   protected readonly selectedTask = signal<Task | null>(null);
   // active dialog open, or null when none

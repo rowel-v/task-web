@@ -4,6 +4,7 @@ import {
   ElementRef,
   inject,
   linkedSignal,
+  Signal,
   signal,
   viewChild,
 } from '@angular/core';
@@ -94,25 +95,14 @@ export class MainLayout {
     return 'home';
   });
 
-  protected readonly title = computed(() => {
+  protected readonly header: Signal<{ title: string; desc: string }> = computed(() => {
     switch (this.currentSideNav()) {
       case 'home':
-        return 'Good morning';
+        return { title: 'Home', desc: 'Overview of your Tasks' };
       case 'tasks':
-        return 'Tasks';
+        return { title: 'Tasks', desc: 'Stay organized' };
       case 'settings':
-        return 'Settings';
-    }
-  });
-
-  protected readonly description = computed(() => {
-    switch (this.currentSideNav()) {
-      case 'home':
-        return 'Overview';
-      case 'tasks':
-        return 'Stay organized.';
-      case 'settings':
-        return 'Settings Description later.';
+        return { title: 'Settings', desc: 'Manage your preferences' };
     }
   });
 

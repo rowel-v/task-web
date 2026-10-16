@@ -22,19 +22,24 @@
     [class.-translate-x-full]="isMobile() && !openSideNav()"
     [attr.inert]="isMobile() && !openSideNav() ? '' : null"
   >
-    <!-- Sidebar Header (desktop only, same as before) -->
-    @if (!isMobile()) {
-      <div class="shrink-0">
-        @if (openSideNav()) {
-          <div class="flex items-center justify-between py-3 ps-6 pe-3">
-            <h1
-              class="
-                animate-wobble-hor-bottom text-[21px] font-medium
-                whitespace-nowrap text-[#FFD580]
-              "
-            >
-              My Tasks
-            </h1>
+
+    <div class="shrink-0">
+      @if (openSideNav()) {
+        <div class="flex items-center justify-between py-3 ps-6 pe-3"
+        [class.-pb-10]="isMobile()"
+        >
+          <h1
+            class="
+              animate-wobble-hor-bottom text-[21px] font-medium
+              whitespace-nowrap text-[#FFD580]
+            "
+          >
+            My Tasks
+          </h1>
+
+
+          <!-- Only show close button of sidebar in desktop-->
+          @if (!isMobile()) {
             <button
               type="button"
               aria-label="Close sidebar"
@@ -48,29 +53,29 @@
             >
               <svg lucideX></svg>
             </button>
-          </div>
-        } @else {
-          <div class="flex justify-center py-3">
-            <button
-              type="button"
-              aria-label="Open sidebar"
-              class="
-                btn btn-square btn-ghost
-                focus-within:border-0 focus-within:bg-gray-600
-                focus-within:outline-0
-                hover:border-0 hover:bg-gray-600 hover:outline-0
-              "
-              (click)="openSideNav.set(true)"
-            >
-              <svg lucideMenu></svg>
-            </button>
-          </div>
-        }
-      </div>
-    }
+          }
+        </div>
+      } @else {
+        <div class="flex justify-center py-3">
+          <button
+            type="button"
+            aria-label="Open sidebar"
+            class="
+              btn btn-square btn-ghost
+              focus-within:border-0 focus-within:bg-gray-600
+              focus-within:outline-0
+              hover:border-0 hover:bg-gray-600 hover:outline-0
+            "
+            (click)="openSideNav.set(true)"
+          >
+            <svg lucideMenu></svg>
+          </button>
+        </div>
+      }
+    </div>
 
     <!-- Navigation -->
-    <nav class="flex flex-col text-[18px]" [class.pt-3]="isMobile()">
+    <nav class="flex flex-col text-[18px]">
       @for (item of navItems; track item.key) {
         <a
           #rla="routerLinkActive"
@@ -139,17 +144,14 @@
         <!-- Header Title-->
         <div class="flex min-w-0 flex-col">
           <h1
-            class="
-              animate-wobble-hor-bottom text-[21px] font-medium
-              whitespace-nowrap text-[#FFD580]
-            "
+            class="text-[21px] font-medium whitespace-nowrap text-[#FFD580]"
           >
-            My Tasks
+            {{ header().title }}
           </h1>
           <p class="
-            pt-1 text-sm
+            text-sm
             sm:text-base
-          ">{{ description() }}</p>
+          ">{{ header().desc }}</p>
         </div>
       </div>
 
