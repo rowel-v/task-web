@@ -2,8 +2,9 @@ import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TaskService } from './core/services/task-service/task-service';
 import { isPlatformBrowser } from '@angular/common';
-import { NotificationService } from './core/services/notification-service/notification-service';
-import { LucideCloudOff } from '@lucide/angular';
+import { LoadingOverlay } from './shared/components/loading-overlay/loading-overlay';
+import { ServerError } from './shared/components/server-error/server-error';
+import { NotificationToast } from './shared/components/notification-toast/notification-toast';
 
 type FetchStatus = 'FETCHING' | 'SUCCESS' | 'FAILED';
 
@@ -11,13 +12,11 @@ type FetchStatus = 'FETCHING' | 'SUCCESS' | 'FAILED';
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
-  imports: [RouterOutlet, LucideCloudOff],
+  imports: [RouterOutlet, LoadingOverlay, ServerError, NotificationToast],
 })
 export class App {
   // fetches the initial task list
   private readonly taskService = inject(TaskService);
-  // shows the toast messages in the template
-  protected readonly appNotification = inject(NotificationService);
 
   // loading state of the first task fetch
   protected readonly fetchStatus = signal<FetchStatus>('FETCHING');
@@ -30,7 +29,7 @@ export class App {
     this.loadTasks();
   }
 
-  protected retry() {
+  protected onRetry() {
     this.loadTasks();
   }
 

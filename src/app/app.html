@@ -1,64 +1,13 @@
 <!-- Current page -->
 <router-outlet />
 
-<!-- Loading overlay: blurs the page while the first task fetch runs -->
 @if (fetchStatus() === 'FETCHING') {
-  <output
-    class="
-      fixed inset-0 z-9999 flex items-center justify-center gap-1 bg-black/20
-      backdrop-blur-xs
-    "
-  >
-    <span class="loading loading-xs loading-ball text-app-button-purple"></span>
-    <span class="loading loading-sm loading-ball text-[#00d3bb]"></span>
-    <span class="loading loading-md loading-ball text-app-button-purple"></span>
-    <span class="loading loading-lg loading-ball text-[#00d3bb]"></span>
-    <span class="loading loading-xl loading-ball text-app-button-purple"></span>
-    <span class="sr-only">Loading tasks</span>
-  </output>
+  <!-- Loading overlay: blurs the page while the first task fetch runs -->
+  <app-loading-overlay />
 } @else if (fetchStatus() === 'FAILED') {
   <!-- Error screen with a retry button -->
-  <div
-    class="
-      fixed inset-0 z-9999 flex flex-col items-center justify-center gap-4
-      bg-[#134548] px-6 text-center text-app-text-white
-    "
-    role="alert"
-  >
-    <svg lucideCloudOff class="size-14 text-[#fca5a5]" />
-
-    <h1 class="font-sora text-xl font-medium">Server unavailable</h1>
-    <p class="max-w-sm text-[15px] font-light">
-      We can’t reach the server right now. Try again in a moment.
-    </p>
-
-    <button
-      type="button"
-      class="
-        btn border-none bg-app-button-purple text-app-text-green shadow-none
-        btn-md
-        hover:bg-app-button-hover-gray
-      "
-      (click)="retry()"
-    >
-      Try again
-    </button>
-  </div>
+  <app-server-error (retried)="onRetry()" />
 }
 
-<!-- Notification toast (z-10000 keeps it above the overlays -->
-<div class="fixed top-4 left-1/2 z-10000 -translate-x-1/2">
-  @for (n of appNotification.notifications(); track n.id) {
-    <div class="grid grid-rows-[1fr]" animate.enter="toast-enter" animate.leave="toast-leave">
-      <div class="min-h-0 overflow-hidden">
-        <div
-          class="mb-2 alert"
-          [class.alert-success]="n.type === 'success'"
-          [class.alert-error]="n.type === 'error'"
-        >
-          <span>{{ n.message }}</span>
-        </div>
-      </div>
-    </div>
-  }
-</div>
+<!--shows the toast messages in the template-->
+<app-notification-toast />

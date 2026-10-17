@@ -1,0 +1,26 @@
+<div
+  class="
+    fixed inset-0 z-9999 flex flex-col items-center justify-center gap-4
+    bg-[#134548] px-6 text-center text-app-text-white
+  "
+  role="alert"
+>
+  <svg lucideCloudOff class="size-14 text-[#fca5a5]" />
+
+  <h1 class="font-sora text-xl font-medium">Server unavailable</h1>
+  <p class="max-w-sm text-[15px] font-light">
+    We can’t reach the server right now. Try again in a moment.
+  </p>
+
+  <button
+    type="button"
+    class="
+      btn border-none bg-app-button-purple text-app-text-green shadow-none
+      btn-md
+      hover:bg-app-button-hover-gray
+    "
+    (click)="retried.emit()"
+  >
+    Try again
+  </button>
+</div>

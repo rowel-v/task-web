@@ -48,10 +48,7 @@
       (pressed)="openModalTasksDetailsFlag('in_progress')"
     >
       @if (tasksDetailsFlag() === 'in_progress') {
-        <app-inprogress-tasks-details-modal
-          [tasks]="tasks()"
-          (closed)="tasksDetailsFlag.set(null)"
-        />
+        <app-inprogress-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
       }
     </app-tasks-status-card>
 
