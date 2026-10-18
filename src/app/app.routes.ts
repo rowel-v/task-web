@@ -1,8 +1,12 @@
-import { Routes } from '@angular/router';
+import { CanMatchFn, Routes } from '@angular/router';
 import { Tasks } from './features/tasks/tasks';
 import { Settings } from './features/settings/settings';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { Overview } from './features/overview/overview';
+
+const VALID_TABS = new Set(['all', 'pending', 'in-progress', 'completed', 'overdue', 'today']);
+// true only when the URL is /tasks/<one of the valid tabs>
+const validTabGuard: CanMatchFn = (_route, segments) => VALID_TABS.has(segments[1]?.path);
 
 export const routes: Routes = [
   {
@@ -14,13 +18,13 @@ export const routes: Routes = [
         component: Overview,
       },
       {
-        path: 'tasks',
-        pathMatch: 'full',
-        redirectTo: 'tasks/all',
+        path: 'tasks/:tab',
+        component: Tasks,
+        canMatch: [validTabGuard],
       },
       {
         path: 'tasks/:tab',
-        component: Tasks,
+        redirectTo: 'tasks/all',
       },
       {
         path: 'settings',

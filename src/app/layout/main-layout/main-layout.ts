@@ -72,7 +72,7 @@ export class MainLayout {
   protected readonly openSideNav = linkedSignal(() => !this.isMobile());
   protected readonly navItems: NavItem[] = [
     { key: 'home', label: 'Home', route: '/overview' },
-    { key: 'tasks', label: 'Tasks', route: '/tasks' },
+    { key: 'tasks', label: 'Tasks', route: '/tasks/all' },
     { key: 'settings', label: 'Settings', route: '/settings' },
   ];
   protected readonly openedProfile = signal<boolean>(false);

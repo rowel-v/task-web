@@ -143,7 +143,7 @@
           appLongPress
           (longPressed)="onTaskLongPress(task)"
           type="button"
-          (click)="onTaskClick('task-details-dialog', task)"
+          (click)="onTaskClick( task)"
           class="
             flex flex-1 cursor-pointer items-center justify-between rounded-md
             p-4 text-left
@@ -203,7 +203,7 @@
           [attr.data-tip]="tasksToDelete().length === 1 ? 'Delete Task' : 'Delete Tasks'"
           aria-label="Delete Button"
           style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-          (click)="selectedModal.set('delete-task-dialog')"
+          (click)="onOpenDeleteTaskDialog()"
         >
           <svg lucideTrash />
         </button>
@@ -225,7 +225,7 @@
           data-tip="Edit Task"
           aria-label="Edit Button"
           style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-          (click)="selectedModal.set('edit-task-dialog'); selectedTask.set(firstSelectedTask())"
+          (click)="onOpenEditTaskDialog(firstSelectedTask())"
         >
           <svg lucidePencil />
         </button>
@@ -241,7 +241,7 @@
         data-tip="Add Task"
         aria-label="Add Button"
         style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-        (click)="selectedModal.set('create-task-dialog')"
+      (click)="onOpenCreateTaskDialog()"
       >
         <svg lucidePlus />
       </button>
@@ -249,12 +249,14 @@
   </div>
 </div>
 
-@let task = selectedTask();
+<!--current open dialog and task selected-->
+@let openDialog = activeDialog().type;
+@let openTask = activeDialog().selectedTask;
 
 <!--Task details dialog-->
-@if (selectedModal() === 'task-details-dialog' && task) {
+@if (openDialog === 'task-details-dialog' && openTask) {
   <app-task-details-dialog
-    [task]="task"
+    [task]="openTask"
     [isClosing]="closedModal()"
     [isLoading]="isUpdatingTaskStatus()"
     (closed)="closeModal()"
@@ -263,7 +265,7 @@
 }
 
 <!--Create task dialog-->
-@if (selectedModal() === 'create-task-dialog') {
+@if (openDialog === 'create-task-dialog') {
   <app-create-task-dialog
     [isClosing]="closedModal()"
     [isLoading]="isCreatingTask()"
@@ -273,9 +275,9 @@
 }
 
 <!--Edit task dialog-->`
-@if (selectedModal() === 'edit-task-dialog' && task) {
+@if (openDialog === 'edit-task-dialog' && openTask) {
   <app-edit-task-dialog
-    [task]="task"
+    [task]="openTask"
     [isClosing]="closedModal()"
     [isUpdating]="isUpdatingTask()"
     (cancelled)="closeModal()"
@@ -284,7 +286,7 @@
 }
 
 <!--Delete task confirmation dialog-->
-@if (selectedModal() === 'delete-task-dialog' && tasksToDelete().length > 0) {
+@if (openDialog === 'delete-task-dialog' && tasksToDelete().length > 0) {
   <app-delete-task-dialog
     [tasks]="tasksToDelete()"
     [isClosing]="closedModal()"
@@ -295,9 +297,9 @@
 }
 
 <!--Reopen task dialog-->
-@if (selectedModal() === 'reopen-task-dialog' && task) {
+@if (openDialog === 'reopen-task-dialog' && openTask) {
   <app-reopen-task-dialog
-    [task]="task"
+    [task]="openTask"
     [isClosing]="closedModal()"
     [isUpdating]="isUpdatingTask()"
     (cancelled)="closeModal()"

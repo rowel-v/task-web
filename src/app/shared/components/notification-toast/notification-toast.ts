@@ -5,7 +5,7 @@ import { NotificationService } from '../../../core/services/notification-service
   selector: 'app-notification-toast',
   imports: [],
   templateUrl: './notification-toast.html',
-  styles: ``,
+  styleUrl: './notification-toast.css',
 })
 export class NotificationToast {
   protected readonly appNotification = inject(NotificationService);

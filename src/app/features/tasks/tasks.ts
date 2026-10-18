@@ -43,11 +43,11 @@ import {
   ReopenTaskEvent,
 } from '../../shared/components/dialog/reopen-task-dialog/reopen-task-dialog';
 import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
+import { NotificationService } from '../../core/services/notification-service/notification-service';
 
 type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today';
 type SortSelection =
   'due-asc' | 'due-desc' | 'priority-high' | 'name-asc' | 'name-desc' | 'created';
-
 type ModalSelection =
   | 'task-details-dialog'
   | 'create-task-dialog'
@@ -85,22 +85,49 @@ type ModalSelection =
 export class Tasks {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  // reads 'taskId' from the URL query params.(set when opening a task from the overview page)
-  private readonly taskId = toSignal(
-    this.route.queryParamMap.pipe(map((p) => Number(p.get('taskId')) || null)),
+
+  // dialog state from the URL (?action=...&taskid=...), updated whenever the query params change
+  private readonly modalQueryParams = toSignal(
+    this.route.queryParamMap.pipe(
+      map((q) => ({
+        action: q.get('action'),
+        taskId: Number(q.get('taskid')) || null,
+      })),
+    ),
+    { initialValue: { action: null, taskId: null } },
   );
 
   constructor() {
-    // Opens the details dialog when arriving with a taskId in the URL. trigger in overview page
+    // opens the dialog from the URL's ?action= and ?taskId=
     effect(() => {
-      const id = this.taskId();
-      const task = this.tasks().find((t) => t.id === id);
-      if (!id || !task) return;
+      const { action, taskId } = this.modalQueryParams();
 
-      untracked(() => {
-        this.selectedTask.set(task);
-        this.selectedModal.set('task-details-dialog');
-      });
+      if (!action) return;
+
+      if (action === 'create') {
+        untracked(() => this.activeDialog.set({ type: 'create-task-dialog' }));
+        return;
+      }
+
+      if (!taskId || this.tasks().length === 0) return; // tasks not loaded yet
+
+      const task = this.tasks().find((t) => t.id === taskId);
+
+      if (!task) {
+        untracked(() => {
+          this.appNotification.error('Task not found');
+          this.clearQueryParams();
+        });
+        return;
+      }
+
+      if (action === 'edit') {
+        untracked(() => this.activeDialog.set({ type: 'edit-task-dialog', selectedTask: task }));
+      } else if (action === 'view') {
+        untracked(() => this.activeDialog.set({ type: 'task-details-dialog', selectedTask: task }));
+      } else if (action === 'reopen') {
+        untracked(() => this.activeDialog.set({ type: 'reopen-task-dialog', selectedTask: task }));
+      }
     });
 
     // clear picked tasks whenever select mode is turned off by selectModeService
@@ -114,10 +141,33 @@ export class Tasks {
     inject(DestroyRef).onDestroy(() => this.selectModeService.toggleOff());
   }
 
+  // sets ?action= and ?taskid= in the URL
+  private setQueryParams(
+    action: 'view' | 'create' | 'edit' | 'delete' | 'reopen',
+    taskId?: number,
+  ) {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { action: action, taskid: taskId },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  // clears ?action= and ?taskid= from the URL
+  private clearQueryParams() {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { action: null, taskid: null },
+      queryParamsHandling: 'merge',
+    });
+  }
+
   // loads and updates tasks through the API
   private readonly taskService = inject(TaskService);
   // shared search term typed in the header's search box
   private readonly searchService = inject(SearchService);
+  // shows success and error toast messages
+  private readonly appNotification = inject(NotificationService);
   // shared select mode state, toggled from the header
   private readonly selectModeService = inject(SelectModeService);
 
@@ -147,10 +197,28 @@ export class Tasks {
     void this.router.navigate(['tasks', tab.replace('_', '-')]);
   }
 
-  // task being viewed, edited or reopened in a dialog
-  protected readonly selectedTask = signal<Task | null>(null);
-  // active dialog open, or null when none
-  protected readonly selectedModal = signal<ModalSelection>(null);
+  // the open dialog and the task it shows (defaults to { type: null, selectedTask: null }, no dialog open)
+  protected readonly activeDialog = signal<{ type: ModalSelection; selectedTask?: Task }>({
+    type: null,
+    selectedTask: undefined,
+  });
+
+  protected onOpenEditTaskDialog(selectedTask: Task) {
+    this.setQueryParams('edit', selectedTask.id);
+    this.activeDialog.set({ type: 'edit-task-dialog', selectedTask: selectedTask });
+  }
+
+  protected onOpenDeleteTaskDialog() {
+    this.setQueryParams('delete');
+    // selectedTask stays null: the tasks to delete come from tasksToDelete (the picked rows), not from a single task
+    this.activeDialog.set({ type: 'delete-task-dialog' });
+  }
+
+  protected onOpenCreateTaskDialog() {
+    this.setQueryParams('create');
+    this.activeDialog.set({ type: 'create-task-dialog' });
+  }
+
   // current order chosen in the sort dropdown
   protected readonly sortBy = signal<SortSelection>('due-asc');
 
@@ -280,20 +348,13 @@ export class Tasks {
       return;
     }
 
-    // Clear the taskId param when the dialog closes.
-    if (this.taskId()) {
-      void this.router.navigate([], {
-        queryParams: { taskId: null },
-        queryParamsHandling: 'merge',
-        replaceUrl: true,
-      });
-    }
+    // Clear the query params when the dialog closes.
+    this.clearQueryParams();
 
     this.closedModal.set(true);
 
     setTimeout(() => {
-      this.selectedModal.set(null);
-      this.selectedTask.set(null);
+      this.activeDialog.set({ type: null });
       this.closedModal.set(false);
     }, 200);
   }
@@ -333,16 +394,16 @@ export class Tasks {
   );
 
   // runs when a task row is clicked
-  protected onTaskClick(modal: ModalSelection, task: Task) {
+  protected onTaskClick(selectedTask: Task) {
     // in select mode, clicking a row toggles its selection
     if (this.selectMode()) {
       this.selectedTaskIds.update((ids) => {
         // copy the Set so the signal sees a new value
         const next = new Set(ids);
-        if (next.has(task.id)) {
-          next.delete(task.id); // already selected, so unselect
+        if (next.has(selectedTask.id)) {
+          next.delete(selectedTask.id); // already selected, so unselect
         } else {
-          next.add(task.id); // not selected, so select
+          next.add(selectedTask.id); // not selected, so select
         }
         return next;
       });
@@ -354,8 +415,8 @@ export class Tasks {
       return; // don't open the task-details-kdialog while selectMode is true
     }
 
-    this.selectedModal.set(modal);
-    this.selectedTask.set(task);
+    this.setQueryParams('view', selectedTask.id);
+    this.activeDialog.set({ type: 'task-details-dialog', selectedTask: selectedTask });
   }
 
   // used by the template to highlight selected rows
@@ -371,7 +432,7 @@ export class Tasks {
     }
 
     this.selectModeService.toggleOn();
-    this.onTaskClick(null, task);
+    this.onTaskClick(task);
   }
 
   // disables the Create Task Dialog's [Create] button while the request runs
@@ -418,8 +479,7 @@ export class Tasks {
         next: (updatedTask) => {
           this.selectModeService.toggleOff();
           // show the updated task in the details dialog (replaces the edit dialog)
-          this.selectedTask.set(updatedTask);
-          this.selectedModal.set('task-details-dialog');
+          this.activeDialog.set({ type: 'task-details-dialog', selectedTask: updatedTask });
         },
       });
   }
@@ -432,8 +492,13 @@ export class Tasks {
 
     // if request is REOPEN not START nor COMPLETE, transfer the request in reopen-task-dialog
     if (req.reopen) {
-      this.selectedModal.set('reopen-task-dialog');
-      this.selectedTask.set(req.targetTask);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { action: 'reopen', taskid: req.targetTask.id },
+        queryParamsHandling: 'merge',
+      });
+
+      this.activeDialog.set({ type: 'reopen-task-dialog', selectedTask: req.targetTask });
       return;
     }
 
@@ -459,8 +524,7 @@ export class Tasks {
       .subscribe({
         next: (updatedTask) => {
           // show the updated reopened task in the details dialog (replaces the edit dialog)
-          this.selectedTask.set(updatedTask);
-          this.selectedModal.set('task-details-dialog');
+          this.activeDialog.set({ type: 'task-details-dialog', selectedTask: updatedTask });
         },
       });
   }
