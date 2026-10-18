@@ -142,10 +142,7 @@ export class Tasks {
   }
 
   // sets ?action= and ?taskid= in the URL
-  private setQueryParams(
-    action: 'view' | 'create' | 'edit' | 'delete' | 'reopen',
-    taskId?: number,
-  ) {
+  private setQueryParams(action: 'view' | 'create' | 'edit' | 'reopen', taskId?: number) {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { action: action, taskid: taskId },
@@ -209,7 +206,6 @@ export class Tasks {
   }
 
   protected onOpenDeleteTaskDialog() {
-    this.setQueryParams('delete');
     // selectedTask stays null: the tasks to delete come from tasksToDelete (the picked rows), not from a single task
     this.activeDialog.set({ type: 'delete-task-dialog' });
   }
@@ -478,6 +474,7 @@ export class Tasks {
       .subscribe({
         next: (updatedTask) => {
           this.selectModeService.toggleOff();
+          this.setQueryParams('view', updatedTask.id);
           // show the updated task in the details dialog (replaces the edit dialog)
           this.activeDialog.set({ type: 'task-details-dialog', selectedTask: updatedTask });
         },
@@ -492,12 +489,7 @@ export class Tasks {
 
     // if request is REOPEN not START nor COMPLETE, transfer the request in reopen-task-dialog
     if (req.reopen) {
-      void this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { action: 'reopen', taskid: req.targetTask.id },
-        queryParamsHandling: 'merge',
-      });
-
+      this.setQueryParams('reopen', req.targetTask.id);
       this.activeDialog.set({ type: 'reopen-task-dialog', selectedTask: req.targetTask });
       return;
     }
@@ -523,6 +515,7 @@ export class Tasks {
       .pipe(finalize(() => this.isReopeningTask.set(false)))
       .subscribe({
         next: (updatedTask) => {
+          this.setQueryParams('view', updatedTask.id);
           // show the updated reopened task in the details dialog (replaces the edit dialog)
           this.activeDialog.set({ type: 'task-details-dialog', selectedTask: updatedTask });
         },

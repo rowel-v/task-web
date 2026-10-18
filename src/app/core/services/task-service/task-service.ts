@@ -65,7 +65,6 @@ export class TaskService {
   });
   getAllTask(): Observable<Task[]> {
     return this.api.getTasks().pipe(
-      tap((result) => this.appNotification.success(result.message)),
       map((result) => result.data?.map(this.toTask) ?? []),
       tap((tasks) => this.tasksState.set(tasks)),
       catchError((err: HttpErrorResponse) => this.handleError(err)),

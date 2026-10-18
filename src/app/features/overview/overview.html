@@ -19,7 +19,7 @@
       title="Total Tasks"
       [value]="totalTasks()"
       [description]="'All your tasks'"
-      (pressed)="openModalTasksDetailsFlag('total')"
+      (pressed)="tasksDetailsFlag.set('total')"
     >
       @if (tasksDetailsFlag() === 'total') {
         <app-total-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -32,7 +32,7 @@
       title="Pending"
       [value]="totalPendingTasks()"
       [description]="'Tasks waiting to start'"
-      (pressed)="openModalTasksDetailsFlag('pending')"
+      (pressed)="tasksDetailsFlag.set('pending')"
     >
       @if (tasksDetailsFlag() === 'pending') {
         <app-pending-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
@@ -45,10 +45,13 @@
       title="In Progress"
       [value]="totalInProgressTasks()"
       [description]="'Currently working on'"
-      (pressed)="openModalTasksDetailsFlag('in_progress')"
+      (pressed)="tasksDetailsFlag.set('in_progress')"
     >
       @if (tasksDetailsFlag() === 'in_progress') {
-        <app-inprogress-tasks-details-modal [tasks]="tasks()" (closed)="tasksDetailsFlag.set(null)" />
+        <app-inprogress-tasks-details-modal
+          [tasks]="tasks()"
+          (closed)="tasksDetailsFlag.set(null)"
+        />
       }
     </app-tasks-status-card>
 
@@ -58,7 +61,7 @@
       title="Completed"
       [value]="totalCompletedTasks()"
       [description]="completionRate() + '% completion rate'"
-      (pressed)="openModalTasksDetailsFlag('completed')"
+      (pressed)="tasksDetailsFlag.set('completed')"
     >
       @if (tasksDetailsFlag() === 'completed') {
         <app-completed-tasks-details-modal
@@ -103,7 +106,7 @@
                 data-tip="Add Task"
                 aria-label="Add Button"
                 style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-                (click)="openModal.set('create-task-dialog')"
+                (click)="onOpenCreateTaskDialog()"
               >
                 <svg lucidePlus />
                 <span class="
@@ -116,13 +119,10 @@
 
           <!-- Tasks -->
           <div class="mt-5 flex flex-col gap-2">
-            @for (task of displayedTodaysTasks(); track task.id) {
-              <app-task-item
-                [task]="task"
-                (pressed)="openModal.set('task-details-dialog'); selectedTask.set(task)"
-              />
+            @for (task of todaysTasks(); track task.id) {
+              <app-task-item [task]="task" (pressed)="onTaskClick(task)" />
             } @empty {
-              <app-task-empty-state (pressedAddTaskBtn)="openModal.set('create-task-dialog')" />
+              <app-task-empty-state (pressedAddTaskBtn)="onOpenCreateTaskDialog()" />
             }
           </div>
 
@@ -234,11 +234,9 @@
                     hover:rounded-2xl hover:bg-app-button-hover-gray
                     active:bg-app-button-hover-gray
                   "
-                  (click)="openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)"
+                  (click)="onTaskClick(upcomingTask)"
                   tabindex="0"
-                  (keydown.enter)="
-                    openModal.set('task-details-dialog'); selectedTask.set(upcomingTask)
-                  "
+                  (keydown.enter)="onTaskClick(upcomingTask)"
                 >
                   <td class="rounded-l-md">
                     <div class="font-medium">{{ upcomingTask.name }}</div>
@@ -270,9 +268,11 @@
   </div>
 </div>
 
-@let openedDialog = openModal();
+<!--current open dialog and task selected-->
+@let openDialog = activeDialog().type;
+@let openTask = activeDialog().selectedTask;
 
-@switch (openedDialog) {
+@switch (openDialog) {
   @case ('create-task-dialog') {
     <app-create-task-dialog
       [isClosing]="isClosing()"
@@ -283,9 +283,9 @@
   }
 
   @case ('task-details-dialog') {
-    @if (selectedTask(); as task) {
+    @if (openTask) {
       <app-task-details-dialog
-        [task]="task"
+        [task]="openTask"
         [isClosing]="isClosing()"
         [isLoading]="isUpdatingTaskStatus()"
         (closed)="closeModal()"

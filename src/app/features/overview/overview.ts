@@ -1,6 +1,6 @@
-import { Component, computed, inject, Signal, signal } from '@angular/core';
+import { Component, effect, inject, Signal, signal, untracked } from '@angular/core';
 import { TaskService } from '../../core/services/task-service/task-service';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Task } from '../../core/models/task';
 import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
 import { LucideArrowRight, LucidePlus } from '@lucide/angular';
@@ -21,6 +21,7 @@ import {
   TaskStatusAction,
 } from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
 import { CreateTaskRequest } from '../../api';
+import { NotificationService } from '../../core/services/notification-service/notification-service';
 
 type TasksDetailsFlag = 'total' | 'pending' | 'in_progress' | 'completed' | null;
 type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
@@ -47,37 +48,120 @@ type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
   styles: ``,
 })
 export class Overview {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  // dialog state from the URL (?action=...&taskid=...), updated whenever the query params change
+  private readonly modalQueryParams = toSignal(
+    this.route.queryParamMap.pipe(
+      map((q) => ({
+        action: q.get('action'),
+        taskId: Number(q.get('taskid')) || null,
+      })),
+    ),
+    { initialValue: { action: null, taskId: null } },
+  );
+
+  constructor() {
+    // opens the dialog from the URL's ?action= and ?taskId=
+    effect(() => {
+      const { action, taskId } = this.modalQueryParams();
+
+      if (!action) {
+        return;
+      }
+
+      if (action === 'create') {
+        untracked(() => this.activeDialog.set({ type: 'create-task-dialog' }));
+      }
+
+      if (!taskId || this.tasks().length === 0) return; // tasks not loaded yet
+
+      const task = this.tasks().find((t) => t.id === taskId);
+
+      if (!task) {
+        untracked(() => {
+          this.appNotification.error('Task not found');
+          this.clearQueryParams();
+        });
+        return;
+      }
+
+      if (action === 'view') {
+        untracked(() => this.activeDialog.set({ type: 'task-details-dialog', selectedTask: task }));
+      }
+    });
+  }
+
+  // sets ?action= and ?taskid= in the URL
+  private setQueryParams(action: 'view' | 'create', taskId?: number) {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { action: action, taskid: taskId },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  // clears ?action= and ?taskid= from the URL
+  private clearQueryParams() {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { action: null, taskid: null },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  // opens the create dialog and adds ?action=create to the URL
+  protected onOpenCreateTaskDialog() {
+    this.setQueryParams('create');
+    this.activeDialog.set({ type: 'create-task-dialog' });
+  }
+
+  // opens the task-details-dialog for the clicked task and adds ?action=view&taskid=<id> to the URL
+  protected onTaskClick(selectedTask: Task) {
+    this.setQueryParams('view', selectedTask.id);
+    this.activeDialog.set({ type: 'task-details-dialog', selectedTask: selectedTask });
+  }
+
+  // watches the screen size (Angular CDK)
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
     { initialValue: false },
   );
+
+  // loads and updates tasks through the API
   private readonly taskService = inject(TaskService);
+  // shows success and error toast messages
+  private readonly appNotification = inject(NotificationService);
+  // all tasks from the service (read-only)
   protected readonly tasks: Signal<Task[]> = this.taskService.tasks;
-  protected selectedTask = signal<Task | null>(null);
-  protected modalTasksDetails: TasksDetailsFlag = null;
-  protected tasksDetailsFlag = signal<TasksDetailsFlag>(null);
-  protected isClosing = signal(false);
-  // limit to 5 the displayed tasks in overview
-  protected displayedTodaysTasks = computed(() => this.taskService.todaysTasks().slice(0, 5));
+  // the open dialog and the task it shows (defaults to { type: null, selectedTask: undefined }, no dialog open)
+  protected readonly activeDialog = signal<{ type: ModalSelection; selectedTask?: Task }>({
+    type: null,
+    selectedTask: undefined,
+  });
+  // tracks which tasks details modal is open (null when none)
+  protected readonly tasksDetailsFlag = signal<TasksDetailsFlag>(null);
+  // tracks the dialog's closing animation
+  protected readonly isClosing = signal(false);
 
-  protected openModal = signal<ModalSelection>(null);
-
+  // closes the dialog after its closing animation
   protected closeModal() {
     if (this.isClosing()) {
       return;
     }
+
+    this.clearQueryParams();
+
     this.isClosing.set(true);
     setTimeout(() => {
-      this.openModal.set(null);
+      this.activeDialog.set({ type: null });
       this.isClosing.set(false);
     }, 300);
   }
 
-  protected openModalTasksDetailsFlag(currentTasksDetailsSelected: TasksDetailsFlag) {
-    this.tasksDetailsFlag.set(currentTasksDetailsSelected);
-  }
-
+  // closes a stat card's details popup after its closing animation
   protected closeTasksDetails(event: Event) {
     event.stopPropagation();
 
@@ -109,15 +193,18 @@ export class Overview {
     return this.taskService.completionRate();
   }
 
+  // limit to 5 the displayed today's Tasks
   protected todaysTasks(): Task[] {
-    return this.taskService.todaysTasks();
+    return this.taskService.todaysTasks().slice(0, 5);
   }
 
   protected upcomingTasks(): Task[] {
     return this.taskService.upcomingTasks();
   }
 
+  // disables the Create Task Dialog's [Create] button while the request runs
   protected readonly isCreatingTask = signal<boolean>(false);
+  // saves the new task
   protected onTaskCreated(req: CreateTaskRequest): void {
     this.isCreatingTask.set(true);
 
@@ -129,7 +216,9 @@ export class Overview {
       });
   }
 
+  // disables the Task Details Dialog's primary button while the request runs
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
+  // saves the edited task status
   protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
     this.isUpdatingTaskStatus.set(true);
 
