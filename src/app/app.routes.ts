@@ -4,7 +4,7 @@ import { Settings } from './features/settings/settings';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { Overview } from './features/overview/overview';
 
-const VALID_TABS = new Set(['all', 'pending', 'in-progress', 'completed', 'overdue', 'today']);
+const VALID_TABS = new Set(['all', 'pending', 'in-progress', 'completed', 'overdue', 'today', 'archive']);
 // true only when the URL is /tasks/<one of the valid tabs>
 const validTabGuard: CanMatchFn = (_route, segments) => VALID_TABS.has(segments[1]?.path);
 
@@ -32,7 +32,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'tasks',
+        redirectTo: 'overview',
         pathMatch: 'full',
       },
     ],

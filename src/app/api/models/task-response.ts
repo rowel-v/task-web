@@ -17,4 +17,6 @@ export interface TaskResponse {
     updatedAt: string;
     dueDate: string;
     completedAt?: string | null;
+    archived: boolean;
+    archivedAt?: string | null;
 }

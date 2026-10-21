@@ -202,4 +202,37 @@ export class TaskControllerService {
             context: this.createContextWithClientId(options?.context)
         });
     }
+
+    archiveTask(ids: Array<number>, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseListTaskResponse>;
+    archiveTask(ids: Array<number>, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseListTaskResponse>>;
+    archiveTask(ids: Array<number>, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseListTaskResponse>>;
+    archiveTask(ids: Array<number>, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/api/tasks/archive`;
+
+        let params = new HttpParams();
+        if (ids != null) {
+            params = HttpParamsBuilder.addToHttpParams(params, ids, 'ids');
+        }
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('patch', url, {
+            body: null,
+            observe,
+            headers,
+            params,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
 }

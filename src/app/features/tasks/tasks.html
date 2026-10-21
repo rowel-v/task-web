@@ -91,6 +91,21 @@
       Today
     </label>
 
+    <!--Archive-->
+    <label
+      class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
+      [class.tab-active]="selectedTab() === 'archive'"
+    >
+      <input
+        type="radio"
+        name="my_tabs_4"
+        [checked]="selectedTab() === 'archive'"
+        (change)="selectTab('archive')"
+      />
+      <svg lucideArchive class="size-5" />
+      Archive
+    </label>
+
     <!--Sort by-->
     <div class="relative ms-2 flex shrink-0 items-center">
       <svg lucideArrowDownWideNarrow class="
@@ -228,6 +243,28 @@
           (click)="onOpenEditTaskDialog(firstSelectedTask())"
         >
           <svg lucidePencil />
+        </button>
+      }
+
+      @let canReopen =
+        selectMode() && selectedTaskIds().size === 1 && firstSelectedTask().status === 'COMPLETED';
+      
+      <!--Reopen Button (only when exactly one task is selected and it is completed)-->
+      @if (canReopen) {
+        <button
+          animate.enter="fade-in-bottom"
+          animate.leave="scale-out-bottom"
+          class="
+            tooltip btn tooltip-left justify-center border-none bg-[#00D3BB]
+            py-3 text-app-text-green btn-md
+            hover:bg-[#15c2ae]
+          "
+          data-tip="Reopen Task"
+          aria-label="Reopen Button"
+          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+          (click)="onOpenReopenTaskDialog(firstSelectedTask())"
+        >
+          <svg lucideRotateCcw />
         </button>
       }
 

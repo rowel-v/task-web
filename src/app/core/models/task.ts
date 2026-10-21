@@ -11,4 +11,6 @@ export interface Task {
   updatedAt: string;
   dueDate: string;
   completedAt: string | null;
+  archive: boolean;
+  archiveAt: string | null;
 }

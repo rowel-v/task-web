@@ -7,7 +7,7 @@ import { TaskDetailsDialogHeader } from './task-details-dialog-header/task-detai
 export type TaskStatusAction = 'START' | 'COMPLETE';
 export interface TaskStatusChangeRequest {
   action: TaskStatusAction;
-  reopen?: boolean;
+  archive?: boolean;
   targetTask: Task;
 }
 

@@ -33,6 +33,8 @@ import {
   LucideArrowDownWideNarrow,
   LucideCalendarX,
   LucideSun,
+  LucideRotateCcw,
+  LucideArchive,
 } from '@lucide/angular';
 import { LongPress } from './directives/long-press';
 import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
@@ -45,7 +47,8 @@ import {
 import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
 
-type TabSelection = 'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today';
+type TabSelection =
+  'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today' | 'archive';
 type SortSelection =
   'due-asc' | 'due-desc' | 'priority-high' | 'name-asc' | 'name-desc' | 'created';
 type ModalSelection =
@@ -69,8 +72,10 @@ type ModalSelection =
     LucideArrowDownWideNarrow,
     LucideCalendarX,
     LucideSun,
+    LucideRotateCcw,
     CommonModule,
     LongPress,
+    LucideArchive,
 
     TasksStatusBadge,
     TaskDetailsDialog,
@@ -102,7 +107,15 @@ export class Tasks {
     effect(() => {
       const { action, taskId } = this.modalQueryParams();
 
-      if (!action) return;
+      // no action in the URL (e.g. the Back button): close any open dialog
+      if (!action) {
+        untracked(() => {
+          if (this.activeDialog().type !== null) {
+            this.closeModal();
+          }
+        });
+        return;
+      }
 
       if (action === 'create') {
         untracked(() => this.activeDialog.set({ type: 'create-task-dialog' }));
@@ -146,7 +159,7 @@ export class Tasks {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { action: action, taskid: taskId },
-      queryParamsHandling: 'merge',
+      queryParamsHandling: 'replace',
     });
   }
 
@@ -155,7 +168,7 @@ export class Tasks {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { action: null, taskid: null },
-      queryParamsHandling: 'merge',
+      queryParamsHandling: 'replace',
     });
   }
 
@@ -182,6 +195,7 @@ export class Tasks {
           'completed',
           'overdue',
           'today',
+          'archive',
         ];
         return validTabs.includes(tab) ? tab : 'all';
       }),
@@ -205,6 +219,11 @@ export class Tasks {
     this.activeDialog.set({ type: 'edit-task-dialog', selectedTask: selectedTask });
   }
 
+  protected onOpenReopenTaskDialog(selectedTask: Task) {
+    this.setQueryParams('reopen', selectedTask.id);
+    this.activeDialog.set({ type: 'reopen-task-dialog', selectedTask: selectedTask });
+  }
+
   protected onOpenDeleteTaskDialog() {
     // selectedTask stays null: the tasks to delete come from tasksToDelete (the picked rows), not from a single task
     this.activeDialog.set({ type: 'delete-task-dialog' });
@@ -225,7 +244,7 @@ export class Tasks {
     let filtered: Task[] = [];
     switch (this.selectedTab()) {
       case 'all':
-        filtered = this.tasks();
+        filtered = this.tasks().filter((t) => !t.archive);
         break;
       case 'pending':
         filtered = this.tasks().filter((t) => t.status === 'PENDING');
@@ -234,7 +253,7 @@ export class Tasks {
         filtered = this.tasks().filter((t) => t.status === 'IN_PROGRESS');
         break;
       case 'completed':
-        filtered = this.tasks().filter((t) => t.status === 'COMPLETED');
+        filtered = this.tasks().filter((t) => t.status === 'COMPLETED' && !t.archive);
         break;
       case 'overdue':
         filtered = this.tasks().filter((t) => this.isOverdue(t));
@@ -250,6 +269,9 @@ export class Tasks {
         );
         break;
       }
+      case 'archive':
+        filtered = this.tasks().filter((t) => t.status === 'COMPLETED' && t.archive);
+        break;
     }
 
     const result = term
@@ -334,6 +356,12 @@ export class Tasks {
           message: 'No tasks due today.',
           image: 'images/stick-man-empty-today-tasks.png',
           imageWidth: 'w-40',
+        };
+      case 'archive':
+        return {
+          message: 'No archived tasks yet.',
+          image: 'images/stick-man-empty-archive-tasks.png',
+          imageWidth: 'w-95',
         };
     }
   });
@@ -487,14 +515,18 @@ export class Tasks {
   protected onTaskUpdatedStatus(taskStatusChangeReq: TaskStatusChangeRequest): void {
     const req = taskStatusChangeReq;
 
-    // if request is REOPEN not START nor COMPLETE, transfer the request in reopen-task-dialog
-    if (req.reopen) {
-      this.setQueryParams('reopen', req.targetTask.id);
-      this.activeDialog.set({ type: 'reopen-task-dialog', selectedTask: req.targetTask });
+    this.isUpdatingTaskStatus.set(true);
+
+    // if request is ARCHIVE not START nor COMPLETE
+    if (req.archive) {
+      const targetTasks: Task[] = [req.targetTask];
+      this.taskService
+        .archiveTask(targetTasks)
+        .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
+        .subscribe({ next: () => this.closeModal() });
+
       return;
     }
-
-    this.isUpdatingTaskStatus.set(true);
 
     this.taskService
       .updateTaskStatus(req.targetTask.id, req.action)
@@ -502,6 +534,14 @@ export class Tasks {
       .subscribe({
         next: () => this.closeModal(),
       });
+  }
+
+  private readonly isArchivingTask = signal<boolean>(false);
+  protected onTaskArchive(taskStatusChangeReq: TaskStatusChangeRequest) {
+    const req = taskStatusChangeReq;
+
+    const targetTask: Task[] = [req.targetTask];
+    this.taskService.archiveTask(targetTask);
   }
 
   // disables the Reopen Task dialog's [Save] button while the request runs

@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { Task } from '../../../../../core/models/task';
-import { LucideCheck, LucidePlay } from '@lucide/angular';
+import { LucideArchive, LucideCheck, LucidePlay } from '@lucide/angular';
 import {
   TaskStatusAction,
   TaskStatusChangeRequest,
@@ -9,7 +9,7 @@ import { Button } from '../../../button/button';
 
 @Component({
   selector: 'app-task-details-dialog-footer',
-  imports: [LucidePlay, LucideCheck, Button],
+  imports: [LucidePlay, LucideCheck, LucideArchive, Button],
   templateUrl: './task-details-dialog-footer.html',
   styles: ``,
 })
@@ -18,11 +18,11 @@ export class TaskDetailsDialogFooter {
   isLoading = input.required<boolean>();
   cancelled = output<void>();
   statusChangeRequested = output<TaskStatusChangeRequest>();
-  protected onStatusChangeRequested(req: { action?: TaskStatusAction; reopen?: boolean }) {
+  protected onStatusChangeRequested(req: { action?: TaskStatusAction; archive?: boolean }) {
     this.statusChangeRequested.emit({
       action: req.action!,
       targetTask: this.task(),
-      reopen: req.reopen,
+      archive: req.archive,
     });
   }
 }

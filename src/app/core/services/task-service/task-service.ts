@@ -126,6 +126,22 @@ export class TaskService {
     );
   }
 
+  archiveTask(tasks: Task[]): Observable<void> {
+    const taskIds = tasks.map((t) => t.id);
+
+    return this.api.archiveTask(taskIds).pipe(
+      tap((result) => this.appNotification.success(result.message)),
+      map((result) => result.data!.map((taskResponse) => this.toTask(taskResponse))),
+      tap((tasksResult) => {
+        this.tasksState.update((currentTasks) =>
+          currentTasks.map((task) => tasksResult.find((updated) => updated.id === task.id) ?? task),
+        );
+      }),
+      map(() => undefined),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
+    );
+  }
+
   private readonly handleError = (err: HttpErrorResponse) => {
     const errorResponse = err.error as ApiResponse<null> | null;
     const errorMessage = errorResponse?.message ?? 'Something went wrong. Please try again.';
@@ -143,5 +159,7 @@ export class TaskService {
     updatedAt: taskResponse.updatedAt,
     dueDate: taskResponse.dueDate,
     completedAt: taskResponse.completedAt ?? null,
+    archive: taskResponse.archived ?? false,
+    archiveAt: taskResponse.archivedAt ?? null,
   });
 }

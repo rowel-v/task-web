@@ -27,10 +27,10 @@
     <app-button
       variant="green"
       [unclickable]="isLoading()"
-      (pressed)="onStatusChangeRequested({ reopen: true })"
+      (pressed)="onStatusChangeRequested({ archive: true })"
     >
-      <svg lucideCheck size="16" />
-      Reopen
+      <svg lucideArchive size="16" />
+      Archive
     </app-button>
   }
 </div>
