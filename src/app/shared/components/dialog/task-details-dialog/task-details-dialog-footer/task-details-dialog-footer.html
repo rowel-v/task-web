@@ -1,11 +1,18 @@
-@let status = task().status;
+@let t = task();
+@let status = t.status;
 
 <div class="flex justify-end gap-3 px-6 pt-3 pb-5">
-  <app-button variant="cancel" [unclickable]="isLoading()" (pressed)="cancelled.emit()">
-    Cancel</app-button
-  >
+  <!-- Show an archive notice for archived tasks; otherwise, show task actions. -->
+  @if (t.archive) {
+    <div class="w-full rounded-md bg-app-text-green/5 px-3 py-2 text-sm">
+      <p class="font-medium">Archived task</p>
+      <p class="opacity-70">This completed task is kept for your records.</p>
+    </div>
+  } @else {
+    <app-button variant="cancel" [unclickable]="isLoading()" (pressed)="cancelled.emit()" />
+  }
 
-  @if (status === 'PENDING') {
+  @if (!t.archive && status === 'PENDING') {
     <app-button
       variant="green"
       [unclickable]="isLoading()"
@@ -14,7 +21,7 @@
       <svg lucidePlay size="16" />
       Start
     </app-button>
-  } @else if (status === 'IN_PROGRESS') {
+  } @else if (!t.archive && status === 'IN_PROGRESS') {
     <app-button
       variant="green"
       [unclickable]="isLoading()"
@@ -23,7 +30,7 @@
       <svg lucideCheck size="16" />
       Complete
     </app-button>
-  } @else if (status === 'COMPLETED') {
+  } @else if (!t.archive && status === 'COMPLETED') {
     <app-button
       variant="green"
       [unclickable]="isLoading()"

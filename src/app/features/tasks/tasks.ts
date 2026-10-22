@@ -315,7 +315,7 @@ export class Tasks {
       return {
         message: `No task found for "${term}".`,
         image: 'images/stick-man-empty-task-search.png',
-        imageWidth: 'w-96',
+        imageWidth: 'w-80',
       };
     }
 
@@ -325,43 +325,43 @@ export class Tasks {
         return {
           message: "You don't have any tasks yet.",
           image: 'images/stick-man-empty-all-tasks.png',
-          imageWidth: 'w-35',
+          imageWidth: 'w-60',
         };
       case 'pending':
         return {
-          message: "No pending tasks. You're all caught up!",
+          message: "No tasks waiting to be started.",
           image: 'images/stick-man-empty-pending-tasks.png',
-          imageWidth: 'w-35',
+          imageWidth: 'w-40',
         };
       case 'in_progress':
         return {
           message: 'Nothing in progress right now.',
           image: 'images/stick-man-empty-in-progress-tasks.png',
-          imageWidth: 'w-30',
+          imageWidth: 'w-50',
         };
       case 'completed':
         return {
           message: 'No completed tasks yet.',
           image: 'images/stick-man-empty-completed-tasks.png',
-          imageWidth: 'w-35',
+          imageWidth: 'w-60',
         };
       case 'overdue':
         return {
           message: 'No overdue tasks.',
           image: 'images/stick-man-empty-overdue-tasks.png',
-          imageWidth: 'w-30',
+          imageWidth: 'w-40',
         };
       case 'today':
         return {
           message: 'No tasks due today.',
           image: 'images/stick-man-empty-today-tasks.png',
-          imageWidth: 'w-40',
+          imageWidth: 'w-50',
         };
       case 'archive':
         return {
           message: 'No archived tasks yet.',
           image: 'images/stick-man-empty-archive-tasks.png',
-          imageWidth: 'w-95',
+          imageWidth: 'w-50',
         };
     }
   });

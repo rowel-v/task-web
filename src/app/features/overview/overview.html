@@ -91,7 +91,7 @@
           <div class="flex items-center justify-between gap-4">
             <div>
               <h2 class="card-title">Today's Tasks</h2>
-              <p class="mt-1 text-sm">Tasks you need to focus on today.</p>
+              <p class="mt-1 text-sm">Your tasks due today.</p>
             </div>
 
             @if (todaysTasks().length !== 0) {
@@ -257,6 +257,28 @@
 
                   <td class="rounded-r-md">
                     <app-tasks-status-badge [status]="upcomingTask.status" />
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4">
+                    <div class="
+                      flex flex-col items-center justify-center gap-3 py-10
+                      text-center
+                    ">
+                      <svg
+                        lucideCalendarDays
+                        [size]="40"
+                        [strokeWidth]="1.5"
+                        class="opacity-60"
+                        aria-hidden="true"
+                      />
+
+                      <div>
+                        <p class="text-base font-medium">No upcoming tasks</p>
+                        <p class="mt-1 text-sm opacity-80">Your schedule ahead is clear.</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               }

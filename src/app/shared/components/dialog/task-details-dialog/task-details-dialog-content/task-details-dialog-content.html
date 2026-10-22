@@ -6,6 +6,7 @@
 <div class="
   flex max-h-[50vh] flex-col gap-4 overflow-y-auto px-6 pb-5 text-[17px]
 ">
+
   @if (t.description) {
     <p class="leading-relaxed italic opacity-80">{{ t.description }}</p>
   }
@@ -31,10 +32,20 @@
 
   <div class="flex flex-col gap-1 text-sm opacity-60">
     <span>Created: {{ createdAt }}</span>
-    <span>Updated: {{ updatedAt }}</span>
+
+    <!-- Show only when the task has been updated. -->
+    @if (t.updatedAt !== t.createdAt) {
+      <span>Updated: {{ updatedAt }}</span>
+    }
+
+    <!-- Show only when the task has a completion date. -->
     @if (t.completedAt) {
       <span>Completed: {{ completedAt }}</span>
     }
-  </div>
 
+    <!-- Show only when the task is archived. -->
+    @if (t.archive && t.archiveAt) {
+      <span>Archived: {{ t.archiveAt | date: 'short' }}</span>
+    }
+  </div>
 </div>

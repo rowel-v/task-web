@@ -1,7 +1,12 @@
-<div class="mx-auto flex size-full flex-col text-app-text-white">
-  <!--Tab list-->
-  <div class="tabs tabs-border mb-3 shrink-0 flex-nowrap gap-1 overflow-x-auto">
-    <!--All-->
+<div
+  class="
+    mx-auto flex size-full min-h-0 min-w-0 flex-col overflow-hidden
+    text-app-text-white
+  "
+>
+  <!-- Tab list -->
+  <div class="tabs tabs-border mb-3 shrink-0 flex-wrap gap-1">
+    <!-- All -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'all'"
@@ -16,7 +21,7 @@
       All
     </label>
 
-    <!--Pending-->
+    <!-- Pending -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'pending'"
@@ -31,7 +36,7 @@
       Pending
     </label>
 
-    <!--In progress-->
+    <!-- In progress -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'in_progress'"
@@ -46,7 +51,7 @@
       In Progress
     </label>
 
-    <!--Completed-->
+    <!-- Completed -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'completed'"
@@ -61,7 +66,7 @@
       Completed
     </label>
 
-    <!--Overdue-->
+    <!-- Overdue -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'overdue'"
@@ -76,7 +81,7 @@
       Overdue
     </label>
 
-    <!--Today-->
+    <!-- Today -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'today'"
@@ -91,7 +96,7 @@
       Today
     </label>
 
-    <!--Archive-->
+    <!-- Archive -->
     <label
       class="tab shrink-0 gap-1 text-[15px] whitespace-nowrap"
       [class.tab-active]="selectedTab() === 'archive'"
@@ -106,11 +111,12 @@
       Archive
     </label>
 
-    <!--Sort by-->
+    <!-- Sort by -->
     <div class="relative ms-2 flex shrink-0 items-center">
-      <svg lucideArrowDownWideNarrow class="
-        pointer-events-none absolute left-2 size-5
-      " />
+      <svg
+        lucideArrowDownWideNarrow
+        class="pointer-events-none absolute left-2 size-5"
+      />
 
       <select
         aria-label="Sort tasks"
@@ -135,11 +141,13 @@
     </div>
   </div>
 
-  <div class="flex flex-col overflow-y-auto">
-    <!--list of Task-->
+  <!-- Only this container scrolls -->
+  <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
     @for (task of tasksToDisplay(); track task.id) {
       <div
-        class="group relative flex items-center justify-between rounded-md"
+        class="
+          group relative flex shrink-0 items-center justify-between rounded-md
+        "
         [class]="
           isSelected(task)
             ? '
@@ -153,27 +161,31 @@
             '
         "
       >
-        <!--Clickable task info-->
+        <!-- Clickable task info -->
         <button
           appLongPress
           (longPressed)="onTaskLongPress(task)"
           type="button"
-          (click)="onTaskClick( task)"
+          (click)="onTaskClick(task)"
           class="
-            flex flex-1 cursor-pointer items-center justify-between rounded-md
-            p-4 text-left
+            flex min-w-0 flex-1 cursor-pointer items-center justify-between
+            rounded-md p-4 text-left
             focus:outline-none
           "
         >
-          <div class="flex flex-col">
-            <p class="
-              font- line-clamp-2 font-sora text-[15px] font-medium
-              text-app-text-white
-            ">
+          <div class="flex min-w-0 flex-col">
+            <p
+              class="
+                line-clamp-2 font-sora text-[15px] font-medium
+                text-app-text-white
+              "
+            >
               {{ task.name | titlecase }}
             </p>
-            <div class="mt-3 flex items-center gap-3">
+
+            <div class="mt-3 flex flex-wrap items-center gap-3">
               <app-tasks-status-badge [status]="task.status" />
+
               <p
                 class="
                   text-xs font-light
@@ -188,9 +200,11 @@
         </button>
       </div>
     } @empty {
-      <div class="
-        bg flex h-screen flex-col items-center justify-center overflow-hidden
-      ">
+      <div
+        class="
+          flex min-h-full shrink-0 flex-col items-center justify-center p-4
+        "
+      >
         <img
           [src]="emptyState().image"
           alt="Empty state"
@@ -199,98 +213,105 @@
           class="max-h-full max-w-full object-contain"
           [class]="emptyState().imageWidth"
         />
-        <p class="text-[18px] font-extralight italic">{{ emptyState().message }}</p>
+
+        <p class="text-center text-[18px] font-extralight italic">
+          {{ emptyState().message }}
+        </p>
       </div>
     }
+  </div>
 
-    <!-- Floating "Add, Editm Delete" button, fixed to bottom-right corner of the viewport -->
-    <div class="fixed right-0 bottom-0 mr-9 mb-12 flex flex-col gap-3">
-      <!--Delete Button-->
-      @if (selectMode() && selectedTaskIds().size > 0) {
-        <button
-          animate.enter="fade-in-bottom"
-          animate.leave="scale-out-bottom"
-          class="
-            tooltip btn tooltip-left justify-center border-none bg-red-500
-            text-app-text-green btn-md
-            hover:bg-red-500/75
-          "
-          [attr.data-tip]="tasksToDelete().length === 1 ? 'Delete Task' : 'Delete Tasks'"
-          aria-label="Delete Button"
-          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-          (click)="onOpenDeleteTaskDialog()"
-        >
-          <svg lucideTrash />
-        </button>
-      }
-
-      @let canEdit =
-        selectMode() && selectedTaskIds().size === 1 && firstSelectedTask().status !== 'COMPLETED';
-
-      <!--Edit Button (only when exactly one task is selected and it isn't completed)-->
-      @if (canEdit) {
-        <button
-          animate.enter="fade-in-bottom"
-          animate.leave="scale-out-bottom"
-          class="
-            tooltip btn tooltip-left justify-center border-none bg-[#00D3BB]
-            py-3 text-app-text-green btn-md
-            hover:bg-[#15c2ae]
-          "
-          data-tip="Edit Task"
-          aria-label="Edit Button"
-          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-          (click)="onOpenEditTaskDialog(firstSelectedTask())"
-        >
-          <svg lucidePencil />
-        </button>
-      }
-
-      @let canReopen =
-        selectMode() && selectedTaskIds().size === 1 && firstSelectedTask().status === 'COMPLETED';
-      
-      <!--Reopen Button (only when exactly one task is selected and it is completed)-->
-      @if (canReopen) {
-        <button
-          animate.enter="fade-in-bottom"
-          animate.leave="scale-out-bottom"
-          class="
-            tooltip btn tooltip-left justify-center border-none bg-[#00D3BB]
-            py-3 text-app-text-green btn-md
-            hover:bg-[#15c2ae]
-          "
-          data-tip="Reopen Task"
-          aria-label="Reopen Button"
-          style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-          (click)="onOpenReopenTaskDialog(firstSelectedTask())"
-        >
-          <svg lucideRotateCcw />
-        </button>
-      }
-
-      <!--Add Button-->
+  <!-- Floating action buttons -->
+  <div class="fixed right-0 bottom-0 mr-9 mb-12 flex flex-col gap-3">
+    <!-- Delete -->
+    @if (selectMode() && selectedTaskIds().size > 0) {
       <button
+        animate.enter="fade-in-bottom"
+        animate.leave="scale-out-bottom"
         class="
-          tooltip btn tooltip-left justify-center border-none
-          bg-app-button-purple text-app-text-green btn-md
-          hover:bg-app-button-hover-gray
+          tooltip btn tooltip-left justify-center border-none bg-red-500
+          text-app-text-green btn-md
+          hover:bg-red-500/75
         "
-        data-tip="Add Task"
-        aria-label="Add Button"
+        [attr.data-tip]="tasksToDelete().length === 1 ? 'Delete Task' : 'Delete Tasks'"
+        aria-label="Delete Button"
         style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
-      (click)="onOpenCreateTaskDialog()"
+        (click)="onOpenDeleteTaskDialog()"
       >
-        <svg lucidePlus />
+        <svg lucideTrash />
       </button>
-    </div>
+    }
+
+    @let canEdit =
+      selectMode() &&
+      selectedTaskIds().size === 1 &&
+      firstSelectedTask().status !== 'COMPLETED';
+
+    <!-- Edit -->
+    @if (canEdit) {
+      <button
+        animate.enter="fade-in-bottom"
+        animate.leave="scale-out-bottom"
+        class="
+          tooltip btn tooltip-left justify-center border-none bg-[#00D3BB] py-3
+          text-app-text-green btn-md
+          hover:bg-[#15c2ae]
+        "
+        data-tip="Edit Task"
+        aria-label="Edit Button"
+        style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+        (click)="onOpenEditTaskDialog(firstSelectedTask())"
+      >
+        <svg lucidePencil />
+      </button>
+    }
+
+    @let canReopen =
+      selectMode() &&
+      selectedTaskIds().size === 1 &&
+      firstSelectedTask().status === 'COMPLETED';
+
+    <!-- Reopen -->
+    @if (canReopen) {
+      <button
+        animate.enter="fade-in-bottom"
+        animate.leave="scale-out-bottom"
+        class="
+          tooltip btn tooltip-left justify-center border-none bg-[#00D3BB] py-3
+          text-app-text-green btn-md
+          hover:bg-[#15c2ae]
+        "
+        data-tip="Reopen Task"
+        aria-label="Reopen Button"
+        style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+        (click)="onOpenReopenTaskDialog(firstSelectedTask())"
+      >
+        <svg lucideRotateCcw />
+      </button>
+    }
+
+    <!-- Add -->
+    <button
+      class="
+        tooltip btn tooltip-left justify-center border-none bg-app-button-purple
+        text-app-text-green btn-md
+        hover:bg-app-button-hover-gray
+      "
+      data-tip="Add Task"
+      aria-label="Add Button"
+      style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+      (click)="onOpenCreateTaskDialog()"
+    >
+      <svg lucidePlus />
+    </button>
   </div>
 </div>
 
-<!--current open dialog and task selected-->
+<!-- Current dialog and selected task -->
 @let openDialog = activeDialog().type;
 @let openTask = activeDialog().selectedTask;
 
-<!--Task details dialog-->
+<!-- Task details dialog -->
 @if (openDialog === 'task-details-dialog' && openTask) {
   <app-task-details-dialog
     [task]="openTask"
@@ -301,7 +322,7 @@
   />
 }
 
-<!--Create task dialog-->
+<!-- Create task dialog -->
 @if (openDialog === 'create-task-dialog') {
   <app-create-task-dialog
     [isClosing]="closedModal()"
@@ -311,7 +332,7 @@
   />
 }
 
-<!--Edit task dialog-->`
+<!-- Edit task dialog -->
 @if (openDialog === 'edit-task-dialog' && openTask) {
   <app-edit-task-dialog
     [task]="openTask"
@@ -322,7 +343,7 @@
   />
 }
 
-<!--Delete task confirmation dialog-->
+<!-- Delete task confirmation dialog -->
 @if (openDialog === 'delete-task-dialog' && tasksToDelete().length > 0) {
   <app-delete-task-dialog
     [tasks]="tasksToDelete()"
@@ -333,7 +354,7 @@
   />
 }
 
-<!--Reopen task dialog-->
+<!-- Reopen task dialog -->
 @if (openDialog === 'reopen-task-dialog' && openTask) {
   <app-reopen-task-dialog
     [task]="openTask"

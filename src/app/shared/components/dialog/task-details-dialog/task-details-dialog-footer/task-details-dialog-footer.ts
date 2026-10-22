@@ -19,6 +19,10 @@ export class TaskDetailsDialogFooter {
   cancelled = output<void>();
   statusChangeRequested = output<TaskStatusChangeRequest>();
   protected onStatusChangeRequested(req: { action?: TaskStatusAction; archive?: boolean }) {
+    if (this.task().archive || this.isLoading()) {
+      return;
+    }
+
     this.statusChangeRequested.emit({
       action: req.action!,
       targetTask: this.task(),

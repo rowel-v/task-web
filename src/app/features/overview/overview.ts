@@ -3,7 +3,7 @@ import { TaskService } from '../../core/services/task-service/task-service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Task } from '../../core/models/task';
 import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
-import { LucideArrowRight, LucidePlus } from '@lucide/angular';
+import { LucideArrowRight, LucideCalendarDays, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
 import { DatePipe } from '@angular/common';
@@ -36,6 +36,8 @@ type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
     InprogressTasksDetailsModal,
     CompletedTasksDetailsModal,
     LucidePlus,
+    LucideCalendarDays,
+    
     TasksStatusBadge,
     LucideArrowRight,
     CreateTaskDialog,
