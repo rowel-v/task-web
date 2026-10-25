@@ -1,0 +1,84 @@
+import {
+  afterNextRender,
+  Component,
+  effect,
+  ElementRef,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TaskPriority } from '../../../../domains/tasks/models/task';
+import { DateTimePicker } from '../../../../shared/components/dialog/date-time-picker/date-time-picker';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DialogHeader } from '../../../../shared/components/dialog/dialog-header/dialog-header';
+import { DialogFooter } from '../../../../shared/components/dialog/dialog-footer/dialog-footer';
+import { CreateTaskRequest } from '../../../../api';
+
+@Component({
+  selector: 'app-create-task-dialog',
+  imports: [ReactiveFormsModule, DateTimePicker, DialogFooter, DialogHeader],
+  templateUrl: './create-task-dialog.html',
+  styles: ``,
+})
+export class CreateTaskDialog {
+  private readonly dialogRef = viewChild.required<ElementRef<HTMLDialogElement>>('dialogRef');
+  constructor() {
+    afterNextRender(() => {
+      this.dialogRef().nativeElement.showModal();
+    });
+  }
+
+  closed = output<void>();
+  submitted = output<CreateTaskRequest>();
+  isClosing = input.required<boolean>();
+  isLoading = input.required<boolean>();
+  protected readonly taskForm = new FormGroup({
+    name: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+
+    description: new FormControl('', {
+      nonNullable: true,
+    }),
+
+    priority: new FormControl<TaskPriority>('LOW', {
+      nonNullable: true,
+    }),
+
+    dueDate: new FormControl<string | null>(null, {
+      validators: [Validators.required],
+    }),
+  });
+
+  private readonly taskFormValueSignal = toSignal(this.taskForm.valueChanges, {
+    initialValue: this.taskForm.value,
+  });
+
+  taskFormLogger = effect(() => {
+    const currentValue = this.taskFormValueSignal();
+    console.log('current taskform value: ', currentValue);
+  });
+
+  protected onSubmit() {
+    if (this.taskForm.invalid) {
+      this.taskForm.markAllAsTouched();
+      return;
+    }
+
+    const { dueDate, ...rest } = this.taskForm.getRawValue();
+    const parsedDueDate = new Date(`${dueDate}`);
+    const payload: CreateTaskRequest = {
+      ...rest,
+      dueDate: parsedDueDate.toISOString(),
+    };
+    this.submitted.emit(payload);
+  }
+
+  protected onBackdropClick(event: MouseEvent) {
+    if (!this.isLoading() && event.target === this.dialogRef().nativeElement) {
+      this.closed.emit();
+    }
+  }
+}

@@ -1,14 +1,14 @@
 import { Component, effect, inject, Signal, signal, untracked } from '@angular/core';
-import { TaskService } from '../../core/services/task-service/task-service';
+import { TaskService } from '../../domains/tasks/services/task-service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Task } from '../../core/models/task';
-import { TasksStatusCard } from './tasks-status-card/tasks-status-card';
+import { Task } from '../../domains/tasks/models/task';
+import { TasksStatusCard } from './components/tasks-status-card/tasks-status-card';
 import { LucideArrowRight, LucideCalendarDays, LucidePlus } from '@lucide/angular';
-import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
-import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { TasksStatusBadge } from '../../domains/tasks/components/tasks-status-badge/tasks-status-badge';
+import { CreateTaskDialog } from '../../domains/tasks/dialogs/create-task-dialog/create-task-dialog';
 import { DatePipe } from '@angular/common';
-import { TaskItem } from './task-item/task-item';
-import { TaskEmptyState } from './task-empty-state/task-empty-state';
+import { TaskItem } from './components/task-item/task-item';
+import { TaskEmptyState } from './components/task-empty-state/task-empty-state';
 import { finalize, map } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -19,7 +19,7 @@ import { CompletedTasksDetailsModal } from './dialog/completed-tasks-details-mod
 import {
   TaskDetailsDialog,
   TaskStatusAction,
-} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+} from '../../domains/tasks/dialogs/task-details-dialog/task-details-dialog';
 import { CreateTaskRequest } from '../../api';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
 

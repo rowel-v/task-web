@@ -1,0 +1,15 @@
+import { Component, computed, input, output } from '@angular/core';
+import { Task } from '../../../../domains/tasks/models/task';
+import { TasksStatusBadge } from '../../../../domains/tasks/components/tasks-status-badge/tasks-status-badge';
+
+@Component({
+  selector: 'app-task-item',
+  imports: [TasksStatusBadge],
+  templateUrl: './task-item.html',
+  styles: ``,
+})
+export class TaskItem {
+  task = input.required<Task>();
+  pressed = output<void>();
+  protected readonly isCompleted = computed(() => this.task().status === 'COMPLETED');
+}

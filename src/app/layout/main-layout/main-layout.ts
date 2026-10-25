@@ -25,7 +25,7 @@ import {
 } from '@lucide/angular';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
-import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
+import { SelectModeService } from '../../features/tasks/services/select-mode-service/select-mode-service';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 

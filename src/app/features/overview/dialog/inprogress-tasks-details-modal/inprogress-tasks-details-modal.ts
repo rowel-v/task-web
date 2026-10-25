@@ -21,8 +21,8 @@ import {
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TaskDetailsList } from '../common/task-details-list/task-details-list';
-import { Task } from '../../../../core/models/task';
+import { TaskDetailsList } from '../components/task-details-list/task-details-list';
+import { Task } from '../../../../domains/tasks/models/task';
 
 type TaskCategory = 'in_progress' | 'high_priority' | 'due_today' | 'overdue' | null;
 

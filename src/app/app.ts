@@ -1,6 +1,6 @@
 import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TaskService } from './core/services/task-service/task-service';
+import { TaskService } from './domains/tasks/services/task-service';
 import { isPlatformBrowser } from '@angular/common';
 import { LoadingOverlay } from './shared/components/loading-overlay/loading-overlay';
 import { ServerError } from './shared/components/server-error/server-error';

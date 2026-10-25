@@ -1,9 +1,9 @@
-import { TaskService } from '../../core/services/task-service/task-service';
-import { Task } from '../../core/models/task';
+import { TaskService } from '../../domains/tasks/services/task-service';
+import { Task } from '../../domains/tasks/models/task';
 import { CommonModule } from '@angular/common';
-import { TasksStatusBadge } from '../../shared/components/tasks-status-badge/tasks-status-badge';
+import { TasksStatusBadge } from '../../domains/tasks/components/tasks-status-badge/tasks-status-badge';
 import { SearchService } from '../../core/services/search-service/search-service';
-import { CreateTaskDialog } from '../../shared/components/dialog/create-task-dialog/create-task-dialog';
+import { CreateTaskDialog } from '../../domains/tasks/dialogs/create-task-dialog/create-task-dialog';
 import { finalize, map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -11,7 +11,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   TaskDetailsDialog,
   TaskStatusChangeRequest,
-} from '../../shared/components/dialog/task-details-dialog/task-details-dialog';
+} from '../../domains/tasks/dialogs/task-details-dialog/task-details-dialog';
 import {
   Component,
   computed,
@@ -37,14 +37,14 @@ import {
   LucideArchive,
 } from '@lucide/angular';
 import { LongPress } from './directives/long-press';
-import { DeleteTaskDialog } from '../../shared/components/dialog/delete-task-dialog/delete-task-dialog';
-import { EditTaskDialog } from '../../shared/components/dialog/edit-task-dialog/edit-task-dialog';
+import { DeleteTaskDialog } from '../../domains/tasks/dialogs/delete-task-dialog/delete-task-dialog';
+import { EditTaskDialog } from '../../domains/tasks/dialogs/edit-task-dialog/edit-task-dialog';
 import { CreateTaskRequest, UpdateTaskRequest } from '../../api';
 import {
   ReopenTaskDialog,
   ReopenTaskEvent,
-} from '../../shared/components/dialog/reopen-task-dialog/reopen-task-dialog';
-import { SelectModeService } from '../../core/services/select-mode-service/select-mode-service';
+} from '../../domains/tasks/dialogs/reopen-task-dialog/reopen-task-dialog';
+import { SelectModeService } from './services/select-mode-service/select-mode-service';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
 
 type TabSelection =

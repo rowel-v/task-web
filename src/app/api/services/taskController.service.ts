@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { RequestOptions, ApiResponseListTaskResponse, CreateTaskRequest, ApiResponseTaskResponse, ApiResponseVoid, UpdateTaskRequest } from "../models";
+import { RequestOptions, ApiResponseUserWithTasksResponse, CreateTaskRequest, ApiResponseTaskResponse, ApiResponseVoid, UpdateTaskRequest, ApiResponseListTaskResponse } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class TaskControllerService {
@@ -25,9 +25,9 @@ export class TaskControllerService {
         return context.set(this.clientContextToken, 'default');
     }
 
-    getTasks(observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseListTaskResponse>;
-    getTasks(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseListTaskResponse>>;
-    getTasks(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseListTaskResponse>>;
+    getTasks(observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseUserWithTasksResponse>;
+    getTasks(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseUserWithTasksResponse>>;
+    getTasks(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseUserWithTasksResponse>>;
     getTasks(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/tasks`;
 
