@@ -1,4 +1,4 @@
-import { CanActivateFn } from '@angular/router';
+import { CanMatchFn } from '@angular/router';
 
 const VALID_TABS = new Set([
   'all',
@@ -10,11 +10,6 @@ const VALID_TABS = new Set([
   'archive',
 ]);
 
-export const tasksValidTabGuard: CanActivateFn = (_route, state) => {
-  const segments = state.url
-    .split(/[?#]/)[0] // Remove query parameters and the fragment.
-    .split('/') // Split the URL path into segments.
-    .filter(Boolean); // Remove empty segments caused by leading or trailing slashes.
-
-  return segments.length === 2 && segments[0] === 'tasks' && VALID_TABS.has(segments[1]);
+export const tasksValidTabGuard: CanMatchFn = (_route, segments) => {
+  return segments.length === 2 && segments[0].path === 'tasks' && VALID_TABS.has(segments[1].path);
 };

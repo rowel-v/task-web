@@ -1,17 +1,15 @@
-import { TestBed } from '@angular/core/testing';
-import { CanActivateFn } from '@angular/router';
-
+import { UrlSegment } from '@angular/router';
 import { tasksValidTabGuard } from './tasks-valid-tab-guard';
 
 describe('tasksValidTabGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) =>
-    TestBed.runInInjectionContext(() => tasksValidTabGuard(...guardParameters));
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
+  it('matches supported tabs', () => {
+    expect(tasksValidTabGuard({}, [new UrlSegment('tasks', {}), new UrlSegment('today', {})])).toBe(
+      true,
+    );
   });
-
-  it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+  it('rejects unsupported tabs so the fallback route can match', () => {
+    expect(
+      tasksValidTabGuard({}, [new UrlSegment('tasks', {}), new UrlSegment('unknown', {})]),
+    ).toBe(false);
   });
 });

@@ -1,0 +1,202 @@
+<main
+  class="
+    flex min-h-dvh flex-col items-center justify-center gap-5
+    bg-app-background-green px-4 py-8 text-app-text-green
+  "
+  data-theme="light"
+>
+  @if (open()) {
+    <section
+      animate.enter="scale-in-hor-left"
+      animate.leave="scale-out-hor-left"
+      class="
+        relative grid w-full max-w-md grid-cols-1 overflow-hidden rounded-md
+        border border-white/40 bg-app-background-white bg-clip-padding p-0
+        shadow-sm
+      "
+      aria-labelledby="auth-title"
+    >
+      <div class="
+        min-w-0 self-center bg-app-background-white p-6
+        sm:p-8
+      ">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate [attr.aria-busy]="submitting()">
+          <header
+            class="
+              -mx-6 -mt-6 mb-6 bg-app-background-green p-6 text-app-text-white
+              sm:-mx-8 sm:-mt-8 sm:px-8
+            "
+          >
+            <a
+              routerLink="/login"
+              class="
+                mb-5 inline-flex items-center gap-2.5 rounded-sm
+                focus-visible:outline-2 focus-visible:outline-offset-4
+                focus-visible:outline-app-button-purple
+              "
+              aria-label="My Tasks — sign in"
+            >
+              <span class="
+                text-[22px] font-medium tracking-tight text-[#ffd580]
+              ">My Tasks</span>
+            </a>
+            <div class="border-t border-app-text-white/20 pt-5">
+              <h1 class="m-0 text-[21px] font-semibold" id="auth-title">Create your account</h1>
+              <p class="mt-2 max-w-xs text-sm/relaxed text-app-text-white/80">
+                Create an account and start organizing your tasks.
+              </p>
+            </div>
+          </header>
+          <fieldset class="m-0 min-w-0 border-0 p-0" [disabled]="submitting()">
+            <label class="mb-1 block text-sm font-medium" for="username">Username</label>
+            <input
+              class="
+                box-border min-h-10 w-full rounded-none border-0 border-b
+                border-app-text-green bg-transparent py-1.5 text-app-text-green
+                placeholder:text-[#526d70]
+                focus-visible:border-b-2 focus-visible:border-[#7a3fc0]
+                focus-visible:outline-none
+                aria-invalid:border-red-700
+              "
+              id="username"
+              formControlName="username"
+              autocomplete="username"
+              maxlength="50"
+              placeholder="Your username"
+              aria-describedby="username-error"
+              [attr.aria-invalid]="form.controls.username.touched && form.controls.username.invalid"
+            />
+            <p class="mt-1 mb-2 min-h-4 text-xs text-red-700" id="username-error">
+              @if (form.controls.username.touched && form.controls.username.invalid) {
+                Enter a username with 1–50 characters.
+              }
+            </p>
+
+            <label class="mb-1 block text-sm font-medium" for="password">Password</label>
+            <div class="
+              relative
+              [&_input]:pr-30
+            ">
+              <input
+                class="
+                  box-border min-h-10 w-full rounded-none border-0 border-b
+                  border-app-text-green bg-transparent py-1.5
+                  text-app-text-green
+                  placeholder:text-[#526d70]
+                  focus-visible:border-b-2 focus-visible:border-[#7a3fc0]
+                  focus-visible:outline-none
+                  aria-invalid:border-red-700
+                "
+                id="password"
+                formControlName="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                autocomplete="new-password"
+                placeholder="Create your password"
+                aria-describedby="password-error"
+                [attr.aria-invalid]="
+                  form.controls.password.touched && form.controls.password.invalid
+                "
+              />
+              <button
+                type="button"
+                class="
+                  absolute top-1/2 right-0 -translate-y-1/2 cursor-pointer
+                  rounded-sm p-1.5 text-xs text-app-text-green
+                  hover:bg-app-background-hover
+                  focus-visible:outline-2 focus-visible:outline-offset-3
+                  focus-visible:outline-[#7a3fc0]
+                "
+                [attr.aria-pressed]="showPassword()"
+                (click)="showPassword.set(!showPassword())"
+              >
+                {{ showPassword() ? 'Hide' : 'Show' }} password
+              </button>
+            </div>
+            <p class="mt-1 mb-2 min-h-4 text-xs text-red-700" id="password-error">
+              @if (form.controls.password.touched && form.controls.password.invalid) {
+                @if (form.controls.password.hasError('required')) {
+                  Enter your password.
+                } @else {
+                  Password must be at most 72 UTF-8 bytes.
+                }
+              }
+            </p>
+
+            <label class="mb-1 block text-sm font-medium" for="confirm-password"
+              >Confirm password</label
+            >
+            <input
+              class="
+                box-border min-h-10 w-full rounded-none border-0 border-b
+                border-app-text-green bg-transparent py-1.5 text-app-text-green
+                placeholder:text-[#526d70]
+                focus-visible:border-b-2 focus-visible:border-[#7a3fc0]
+                focus-visible:outline-none
+                aria-invalid:border-red-700
+              "
+              id="confirm-password"
+              formControlName="confirmPassword"
+              [type]="showPassword() ? 'text' : 'password'"
+              autocomplete="new-password"
+              placeholder="Enter your password again"
+              aria-describedby="confirm-error"
+              [attr.aria-invalid]="
+                form.controls.confirmPassword.touched &&
+                (form.controls.confirmPassword.invalid || form.hasError('passwordMismatch'))
+              "
+            />
+            <p class="mt-1 mb-2 min-h-4 text-xs text-red-700" id="confirm-error">
+              @if (
+                form.controls.confirmPassword.touched &&
+                (form.controls.confirmPassword.invalid || form.hasError('passwordMismatch'))
+              ) {
+                Passwords must match.
+              }
+            </p>
+
+            <button
+              appButtonVariant
+              variant="green"
+              class="
+                mt-1 w-full
+                focus-visible:outline-2 focus-visible:outline-offset-3
+                focus-visible:outline-[#7a3fc0]
+              "
+              type="submit"
+              [disabled]="submitting()"
+            >
+              @if (submitting()) {
+                <span class="loading loading-sm loading-spinner" aria-hidden="true"></span>
+              }
+              {{ submitting() ? 'Creating account…' : 'Create account' }}
+            </button>
+          </fieldset>
+        </form>
+
+        <p
+          class="
+            mt-5 border-t border-app-text-green/15 pt-5 text-center text-sm
+            [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-3
+            [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-3
+            [&_a:focus-visible]:outline-[#7a3fc0]
+            [&_a:hover]:text-[#6d28a0]
+          "
+        >
+          Already have an account?
+          <button
+            class="
+              cursor-pointer font-medium underline underline-offset-3
+              hover:text-[#6d28a0]
+              focus-visible:outline-2 focus-visible:outline-offset-3
+              focus-visible:outline-[#7a3fc0]
+            "
+            type="button"
+            (click)="goToLogin()"
+          >
+            Sign in
+          </button>
+        </p>
+      </div>
+    </section>
+  }
+</main>

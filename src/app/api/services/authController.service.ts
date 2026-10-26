@@ -25,9 +25,9 @@ export class AuthControllerService {
         return context.set(this.clientContextToken, 'default');
     }
 
-    register(createAccountRequest: CreateAccountRequest, observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseVoid>;
-    register(createAccountRequest: CreateAccountRequest, observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseVoid>>;
-    register(createAccountRequest: CreateAccountRequest, observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseVoid>>;
+    register(createAccountRequest: CreateAccountRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseVoid>;
+    register(createAccountRequest: CreateAccountRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseVoid>>;
+    register(createAccountRequest: CreateAccountRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseVoid>>;
     register(createAccountRequest: CreateAccountRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/auth/register`;
 
@@ -39,7 +39,7 @@ export class AuthControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
         // Set Content-Type for JSON requests if not already set
         if (!headers.has('Content-Type')) {
@@ -50,16 +50,15 @@ export class AuthControllerService {
             body: createAccountRequest,
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
         });
     }
 
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'body', options?: RequestOptions<'blob'>): Observable<ApiResponseLoginResponse>;
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'response', options?: RequestOptions<'blob'>): Observable<HttpResponse<ApiResponseLoginResponse>>;
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'events', options?: RequestOptions<'blob'>): Observable<HttpEvent<ApiResponseLoginResponse>>;
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseLoginResponse>;
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseLoginResponse>>;
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseLoginResponse>>;
     login(loginAccountRequest: LoginAccountRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/auth/login`;
 
@@ -71,7 +70,7 @@ export class AuthControllerService {
         }
         // Advertise the response content type declared in the spec
         if (!headers.has('Accept')) {
-            headers = headers.set('Accept', '*/*');
+            headers = headers.set('Accept', 'application/json');
         }
         // Set Content-Type for JSON requests if not already set
         if (!headers.has('Content-Type')) {
@@ -82,7 +81,6 @@ export class AuthControllerService {
             body: loginAccountRequest,
             observe,
             headers,
-            responseType: 'blob',
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)

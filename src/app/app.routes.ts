@@ -4,11 +4,25 @@ import { Settings } from './features/settings/settings';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { Overview } from './features/overview/overview';
 import { tasksValidTabGuard } from './features/tasks/guards/tasks-valid-tab-guard';
+import { authGuard } from './core/guards/auth-guard';
+import { Register } from './features/auth/pages/register/register';
+import { Login } from './features/auth/pages/login/login';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    title: 'Sign in | My Task',
+    component: Login,
+  },
+  {
+    path: 'register',
+    title: 'Create account | My Task',
+    component: Register,
+  },
+  {
     path: '',
     component: MainLayout,
+    canActivate: [authGuard],
     children: [
       {
         path: 'overview',
