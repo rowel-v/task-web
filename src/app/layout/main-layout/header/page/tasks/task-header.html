@@ -1,0 +1,94 @@
+<!-- Header -->
+<header class="
+  m-3 flex items-center justify-between
+  sm:mx-6
+">
+  <div class="flex min-w-0 items-center gap-2">
+    <!--toggle open and closing button of sidenav (mobile only)-->
+    @if (isMobile()) {
+      <button
+        type="button"
+        aria-label="Toggle sidebar"
+        class="
+          btn -ms-2 btn-square btn-ghost
+          focus-within:border-0 focus-within:bg-gray-600 focus-within:outline-0
+          hover:border-0 hover:bg-gray-600 hover:outline-0
+          active:bg-gray-600
+        "
+        (click)="openSideNav.emit()"
+      >
+        <svg lucideMenu size="20"></svg>
+      </button>
+    }
+
+    <!-- Header Title-->
+    <div class="flex min-w-0 flex-col">
+      <h1 class="text-[21px] font-medium whitespace-nowrap text-[#FFD580]">
+        {{ title }}
+      </h1>
+      <p class="
+        text-sm
+        sm:text-base
+      ">{{ description }}</p>
+    </div>
+  </div>
+
+  <div class="
+    flex items-center gap-1
+    md:gap-5
+  ">
+    <div class="
+      flex min-w-0 items-center gap-1
+      md:gap-5
+    ">
+      <!--Select mode toggle (desktop only)-->
+      @if (!isMobile() && taskService.tasks().length !== 0) {
+        <label
+          class="
+            flex cursor-pointer items-center rounded-md border border-white/20
+            px-3 py-1 text-[15px] transition-colors select-none
+            hover:bg-white/10
+            has-checked:border-app-button-hover-gray
+            has-checked:bg-app-button-hover-gray has-checked:text-app-text-white
+            has-focus-visible:ring-2 has-focus-visible:ring-[#00D3BB]
+          "
+        >
+          <input
+            type="checkbox"
+            class="sr-only"
+            [checked]="selectModeService.enabled()"
+            (change)="onSelectToggle($event)"
+          />
+          Select Mode
+        </label>
+      }
+
+      <!--Search box-->
+      <label
+        class="
+          input mx-2 max-w-35 min-w-0 flex-1 bg-app-background-green
+          text-app-text-white
+          focus-within:outline-0
+          md:max-w-xs
+        "
+      >
+        <svg lucideSearch />
+        <input
+          type="search"
+          required
+          placeholder="Search Task"
+          aria-label="Search tasks"
+          class="
+            min-w-0
+            [&::-webkit-search-cancel-button]:cursor-pointer
+            [&::-webkit-search-cancel-button]:opacity-70
+            [&::-webkit-search-cancel-button]:brightness-0
+            [&::-webkit-search-cancel-button]:invert
+          "
+          [(ngModel)]="searchService.searchTerm"
+        />
+      </label>
+    </div>
+    <app-profile />
+  </div>
+</header>

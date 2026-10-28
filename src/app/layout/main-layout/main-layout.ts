@@ -1,82 +1,27 @@
-import {
-  Component,
-  computed,
-  ElementRef,
-  inject,
-  linkedSignal,
-  Signal,
-  signal,
-  viewChild,
-} from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { Sidebar } from './sidebar/sidebar';
+import { Component, computed, inject, linkedSignal, Signal } from '@angular/core';
+
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
-import { SearchService } from '../../core/services/search-service/search-service';
-import { FormsModule } from '@angular/forms';
-import {
-  LucideMenu,
-  LucideHouse,
-  LucideBadgeCheck,
-  LucideSettings,
-  LucideX,
-  LucideUser,
-  LucideLogOut,
-  LucideSearch,
-} from '@lucide/angular';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NotificationService } from '../../core/services/notification-service/notification-service';
-import { SelectModeService } from '../../features/tasks/services/select-mode-service/select-mode-service';
+
+import { TaskHeader } from './header/page/tasks/task-header';
+import { OverviewHeader } from './header/page/overview/overview-header';
+import { SettingsHeader } from './header/page/settings/settings-header';
+import { ViewportService } from '../../core/services/viewport-service/viewport-service';
 
 type CurrentSidenav = 'home' | 'tasks' | 'settings';
 
-interface NavItem {
-  key: CurrentSidenav;
-  label: string;
-  route: string;
-}
-
 @Component({
   selector: 'app-main-layout',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    LucideMenu,
-    LucideHouse,
-    LucideBadgeCheck,
-    LucideSettings,
-    LucideX,
-    LucideUser,
-    LucideLogOut,
-    LucideSearch,
-    FormsModule,
-  ],
-  host: {
-    '(document:click)': 'onDocumentClick($event)',
-    '(document:keydown.escape)': 'closeProfile()',
-  },
+  imports: [RouterOutlet, Sidebar, OverviewHeader, TaskHeader, SettingsHeader],
   templateUrl: './main-layout.html',
   styles: ``,
 })
 export class MainLayout {
-  private readonly bp = inject(BreakpointObserver);
-  protected readonly isMobile = toSignal(
-    this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
-    { initialValue: false },
-  );
-
   private readonly router = inject(Router);
-  protected readonly searchService = inject(SearchService);
-  protected readonly notificationService = inject(NotificationService);
-  protected readonly selectModeService = inject(SelectModeService);
+  protected readonly isMobile = inject(ViewportService).isMobile;
   protected readonly openSideNav = linkedSignal(() => !this.isMobile());
-  protected readonly navItems: NavItem[] = [
-    { key: 'home', label: 'Home', route: '/overview' },
-    { key: 'tasks', label: 'Tasks', route: '/tasks/all' },
-    { key: 'settings', label: 'Settings', route: '/settings' },
-  ];
-  protected readonly openedProfile = signal<boolean>(false);
-  protected readonly closingProfile = signal<boolean>(false);
 
   // Derived from the actual route — correct on load, refresh, back/forward, not just clicks
   private readonly url = toSignal(
@@ -95,45 +40,9 @@ export class MainLayout {
     return 'home';
   });
 
-  protected readonly header: Signal<{ title: string; desc: string }> = computed(() => {
-    switch (this.currentSideNav()) {
-      case 'home':
-        return { title: 'Home', desc: 'Overview of your Tasks' };
-      case 'tasks':
-        return { title: 'Tasks', desc: 'Stay organized' };
-      case 'settings':
-        return { title: 'Settings', desc: 'Manage your preferences' };
-    }
-  });
+  protected readonly currentHeader: Signal<CurrentSidenav> = this.currentSideNav;
 
-  protected openProfile() {
-    this.closingProfile.set(false);
-    this.openedProfile.set(true);
-  }
-
-  protected closeProfile() {
-    if (!this.openedProfile()) {
-      return;
-    }
-
-    this.closingProfile.set(true);
-
-    setTimeout(() => {
-      this.openedProfile.set(false);
-      this.closingProfile.set(false);
-    }, 200);
-  }
-
-  private readonly profileRef = viewChild<ElementRef<HTMLElement>>('profileRef');
-
-  // Closes the profile dropdown when clicking outside of it.
-  protected onDocumentClick(event: MouseEvent) {
-    if (!this.profileRef()?.nativeElement.contains(event.target as Node)) this.closeProfile();
-  }
-
-  protected onSelectToggle(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    if (checked) this.selectModeService.toggleOn();
-    else this.selectModeService.toggleOff();
+  onOpenSideNav() {
+    this.openSideNav.set(!this.openSideNav());
   }
 }

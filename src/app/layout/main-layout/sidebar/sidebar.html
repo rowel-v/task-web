@@ -1,0 +1,113 @@
+<!-- Backdrop (mobile only) -->
+@if (isMobile() && open()) {
+  <button
+    type="button"
+    aria-label="Close sidebar"
+    tabindex="-1"
+    class="fixed inset-0 z-40 cursor-default border-0 bg-black/50 p-0"
+    (click)="open.set(false)"
+  ></button>
+}
+
+<!-- Sidebar -->
+<aside
+  class="
+    flex h-full shrink-0 flex-col border-r border-[#166169]
+    bg-app-background-green transition-all duration-300
+    max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50
+  "
+  [class.w-54]="expanded()"
+  [class.w-16]="!expanded()"
+  [class.-translate-x-full]="hidden()"
+  [attr.inert]="hidden() ? '' : null"
+>
+  <div class="shrink-0">
+    @if (expanded()) {
+      <div class="flex items-center justify-between py-3 ps-6 pe-3">
+        <h1
+          class="
+            animate-wobble-hor-bottom text-[21px] font-medium whitespace-nowrap
+            text-[#FFD580]
+          "
+        >
+          My Tasks
+        </h1>
+
+        <!-- Only show close button of sidebar in desktop-->
+        @if (!isMobile()) {
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            class="
+              btn btn-square btn-ghost
+              focus-within:border-0 focus-within:bg-gray-600
+              focus-within:outline-0
+              hover:border-0 hover:bg-gray-600 hover:outline-0
+            "
+            (click)="open.set(false)"
+          >
+            <svg lucideX></svg>
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="flex justify-center py-3">
+        <button
+          type="button"
+          aria-label="Open sidebar"
+          class="
+            btn btn-square btn-ghost
+            focus-within:border-0 focus-within:bg-gray-600
+            focus-within:outline-0
+            hover:border-0 hover:bg-gray-600 hover:outline-0
+          "
+          (click)="open.set(true)"
+        >
+          <svg lucideMenu></svg>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex flex-col text-[18px]">
+    @for (item of navItems; track item.key) {
+      <a
+        #rla="routerLinkActive"
+        [routerLink]="item.route"
+        routerLinkActive="bg-app-button-hover-gray"
+        class="
+          flex items-center py-3
+          focus-visible:outline-0
+        "
+        [class.gap-4]="expanded()"
+        [class.px-6]="expanded()"
+        [class.justify-center]="!expanded()"
+        [class.tooltip]="!expanded()"
+        [class.tooltip-right]="!expanded()"
+        [class.hover:bg-gray-600]="!rla.isActive"
+        [class.active:bg-gray-600]="isMobile() && !rla.isActive"
+        [class.focus-visible:bg-gray-600]="!rla.isActive"
+        [attr.data-tip]="!expanded() ? item.label : null"
+        [attr.aria-label]="item.label"
+        style="--tt-bg: #1f585c; --tt-color: #e5e7eb"
+        (click)="closeOnMobile()"
+      >
+        @switch (item.key) {
+          @case ('home') {
+            <svg lucideHouse size="20" class="shrink-0"></svg>
+          }
+          @case ('tasks') {
+            <svg lucideBadgeCheck size="20" class="shrink-0"></svg>
+          }
+          @case ('settings') {
+            <svg lucideSettings size="20" class="shrink-0"></svg>
+          }
+        }
+        @if (expanded()) {
+          <span class="overflow-hidden whitespace-nowrap">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+</aside>
