@@ -2,18 +2,42 @@
   <app-sidebar [(open)]="openSideNav" />
 
   <main class="flex min-w-0 flex-1 flex-col">
-    <!-- Header -->
-    @switch (currentHeader()) {
-      @case ('home') {
-        <app-overview-header (openSideNav)="onOpenSideNav()" />
-      }
-      @case ('tasks') {
-        <app-task-header (openSideNav)="onOpenSideNav()" />
-      }
-      @case ('settings') {
-        <app-settings-header (openSideNav)="onOpenSideNav()" />
-      }
-    }
+    <!-- Shared header -->
+    <div class="
+      flex min-w-0 shrink-0 items-center pr-3
+      sm:pr-6
+    ">
+      <div class="min-w-0 flex-1">
+        @switch (currentHeader()) {
+          @case ('home') {
+            <app-overview-header (openSideNav)="onOpenSideNav()" />
+          }
+          @case ('tasks') {
+            <app-task-header (openSideNav)="onOpenSideNav()" />
+          }
+          @case ('settings') {
+            <app-settings-header (openSideNav)="onOpenSideNav()" />
+          }
+          @case ('profile') {
+            <app-profile-header (openSideNav)="onOpenSideNav()" />
+          }
+        }
+      </div>
+
+      <div class="
+        flex shrink-0 items-center gap-2
+        md:gap-5
+      ">
+        @let userDisplayName = userService.getDisplayName();
+        @if (userDisplayName !== undefined) {
+          <p class="
+            max-w-12 truncate text-sm
+            sm:max-w-40 sm:text-base
+          ">{{ userDisplayName }}</p>
+        }
+        <app-profile />
+      </div>
+    </div>
 
     <!-- Content -->
     <div class="

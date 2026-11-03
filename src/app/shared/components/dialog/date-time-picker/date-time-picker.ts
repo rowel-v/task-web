@@ -1,5 +1,7 @@
-import { Calendar } from 'vanilla-calendar-pro';
-import { DatePipe } from '@angular/common';
+import { Calendar, FormatDateString } from 'vanilla-calendar-pro';
+import { TimeZoneDatePipe } from '../../../../core/services/time-zone-service/time-zone-date.pipe';
+import { TimeZoneService } from '../../../../core/services/time-zone-service/time-zone-service';
+import { NotificationService } from '../../../../core/services/notification-service/notification-service';
 import { LucideCalendarDays, LucideX } from '@lucide/angular';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -19,10 +21,12 @@ import {
 @Component({
   selector: 'app-date-time-picker',
   standalone: true,
-  imports: [DatePipe, LucideX, LucideCalendarDays],
+  imports: [TimeZoneDatePipe, LucideX, LucideCalendarDays],
   templateUrl: './date-time-picker.html',
 })
 export class DateTimePicker {
+  protected readonly timeZones = inject(TimeZoneService);
+  private readonly notifications = inject(NotificationService);
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
@@ -38,14 +42,15 @@ export class DateTimePicker {
     const d = new Date(raw);
     if (Number.isNaN(d.getTime())) return null;
 
-    const date = d.toLocaleDateString('en-CA');
+    const date = this.timeZones.dateKey(d);
     const time = d.toLocaleTimeString('en-US', {
+      timeZone: this.timeZones.timeZone() ?? undefined,
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
     });
 
-    return { date, time, value: `${date}T${this.to24Hour(time)}` };
+    return { date, time, value: d.toISOString() };
   });
 
   // follows the default, but the user's pick or Clear can overwrite it
@@ -64,10 +69,12 @@ export class DateTimePicker {
       this.calendar = new Calendar(this.calendarEl().nativeElement, {
         inputMode: true, // renders as a closed input, opens on click
 
-        selectedDates: initial ? [initial.date] : this.getCurrentDate(),
+        selectedDates: [initial?.date ?? this.getCurrentDate()],
         selectedTime: initial?.time ?? this.getCurrentTimeFormatted(),
 
-        disableDatesPast: true,
+        dateToday: this.getCurrentDate(),
+        dateMin: this.getCurrentDate(),
+        disableDatesPast: false,
 
         positionToInput: 'auto',
 
@@ -129,7 +136,7 @@ export class DateTimePicker {
           if (!date) return;
 
           // today keeps the current time, any other day defaults to 9:00 AM
-          const isToday = date === this.getCurrentDate()[0];
+          const isToday = date === this.getCurrentDate();
           const time = isToday ? this.getCurrentTimeFormatted() : '09:00 AM';
 
           self.set({ selectedDates: [date], selectedTime: time });
@@ -149,12 +156,10 @@ export class DateTimePicker {
   }
 
   /**
-   * Returns today's date as a single-item array in "YYYY-MM-DD" format
-   * (e.g. ["2026-09-22"]), using the local date (not UTC) so the
-   * "is it today" check stays correct after midnight.
+   * Returns today's date in the selected or device time zone.
    */
-  private readonly getCurrentDate = (): string[] => {
-    return [new Date().toLocaleDateString('en-CA')];
+  private readonly getCurrentDate = (): FormatDateString => {
+    return this.timeZones.dateKey(new Date()) as FormatDateString;
   };
 
   /**
@@ -163,6 +168,7 @@ export class DateTimePicker {
    */
   private readonly getCurrentTimeFormatted = (): string => {
     return new Date().toLocaleTimeString('en-US', {
+      timeZone: this.timeZones.timeZone() ?? undefined,
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
@@ -180,7 +186,11 @@ export class DateTimePicker {
       const date = self.context.selectedDates[0];
       const time = this.to24Hour(self.context.selectedTime);
       if (date) {
-        const value = time ? `${date}T${time}` : date;
+        const value = this.timeZones.wallTimeToIso(`${date}T${time}`);
+        if (!value) {
+          this.notifications.error('That time does not exist in the selected time zone. Please choose another time.');
+          return;
+        }
         this.selectedDate.set(value);
         this.dateSelected.emit(value);
       }

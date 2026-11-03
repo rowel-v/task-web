@@ -10,6 +10,7 @@
 export * from "./api-response-list-task-response";
 export * from "./api-response-login-response";
 export * from "./api-response-task-response";
+export * from "./api-response-task-user-profile-response";
 export * from "./api-response-user-with-tasks-response";
 export * from "./api-response-void";
 export * from "./create-account-request";
@@ -17,6 +18,8 @@ export * from "./create-task-request";
 export * from "./login-account-request";
 export * from "./login-response";
 export * from "./request-options";
+export * from "./save-task-user-profile-request";
 export * from "./task-response";
+export * from "./task-user-profile-response";
 export * from "./update-task-request";
 export * from "./user-with-tasks-response";

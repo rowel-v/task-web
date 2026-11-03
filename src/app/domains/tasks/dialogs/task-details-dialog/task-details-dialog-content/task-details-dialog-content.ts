@@ -1,10 +1,11 @@
 import { Component, computed, input } from '@angular/core';
-import { DatePipe, TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
+import { TimeZoneDatePipe } from '../../../../../core/services/time-zone-service/time-zone-date.pipe';
 import { Task } from '../../../../../domains/tasks/models/task';
 
 @Component({
   selector: 'app-task-details-dialog-content',
-  imports: [TitleCasePipe, DatePipe],
+  imports: [TitleCasePipe, TimeZoneDatePipe],
   templateUrl: './task-details-dialog-content.html',
   styles: ``,
 })

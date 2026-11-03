@@ -23,6 +23,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { TaskDetailsList } from '../components/task-details-list/task-details-list';
 import { Task } from '../../../../domains/tasks/models/task';
+import { TimeZoneService } from '../../../../core/services/time-zone-service/time-zone-service';
 
 type TaskCategory = 'pending' | 'high_priority' | 'due_today' | 'overdue' | null;
 
@@ -41,6 +42,7 @@ type TaskCategory = 'pending' | 'high_priority' | 'due_today' | 'overdue' | null
   styles: ``,
 })
 export class PendingTasksDetailsModal {
+  private readonly timeZones = inject(TimeZoneService);
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
@@ -64,18 +66,20 @@ export class PendingTasksDetailsModal {
   );
   // Gets pending tasks that are due today.
   protected pendingDueToday = computed(() => {
-    const today = new Date().toDateString();
+    const today = new Date();
     return this.pendingTasks().filter((t) => {
-      return new Date(t.dueDate).toDateString() === today;
+      return this.timeZones.isSameDay(t.dueDate, today);
     });
   });
   // Gets overdue tasks that are not completed.
   protected overdueTasks = computed(() => {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    const today = this.timeZones.dateKey(new Date());
     return this.tasks()
       .filter((t) => t.status !== 'COMPLETED')
-      .filter((t) => new Date(t.dueDate) < startOfDay);
+      .filter((t) => {
+        const dueDate = this.timeZones.dateKey(t.dueDate);
+        return dueDate !== '' && dueDate < today;
+      });
   });
 
   // Category rows displayed in the task breakdown.

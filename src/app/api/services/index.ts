@@ -9,3 +9,4 @@
 */
 export { AuthControllerService } from "./authController.service";
 export { TaskControllerService } from "./taskController.service";
+export { TaskUserProfileControllerService } from "./taskUserProfileController.service";

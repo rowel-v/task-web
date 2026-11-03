@@ -6,7 +6,7 @@ import { TokenService } from '../services/token-service/token-service';
 
 describe('authInterceptor', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
-  it.each(['/api/tasks', '/api/tasks/1', 'http://localhost:8080/api/tasks'])(
+  it.each(['/api/tasks', '/api/tasks/1', '/api/profile/photo', 'http://localhost:8080/api/tasks'])(
     'adds the token to %s',
     (url) => {
       TestBed.inject(TokenService).setToken('test-token');
@@ -15,7 +15,7 @@ describe('authInterceptor', () => {
       expect(next.mock.calls[0][0].headers.get('Authorization')).toBe('Bearer test-token');
     },
   );
-  it.each(['https://example.com/api/tasks', '/api/auth/login', '/api/tasks-other'])(
+  it.each(['https://example.com/api/tasks', '/api/auth/login', '/api/tasks-other', '/api/profile-other'])(
     'does not send the token to %s',
     (url) => {
       TestBed.inject(TokenService).setToken('test-token');

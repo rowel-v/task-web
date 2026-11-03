@@ -1,7 +1,7 @@
 @let t = task();
-@let createdAt = t.createdAt | date: 'short';
-@let updatedAt = t.updatedAt | date: 'short';
-@let completedAt = t.completedAt | date: 'short';
+@let createdAt = t.createdAt | timeZoneDate: 'short';
+@let updatedAt = t.updatedAt | timeZoneDate: 'short';
+@let completedAt = t.completedAt | timeZoneDate: 'short';
 
 <div class="
   flex max-h-[50vh] flex-col gap-4 overflow-y-auto px-6 pb-5 text-[17px]
@@ -22,7 +22,7 @@
       <svg lucideCalendar class="size-4 shrink-0" />
       <span class="w-16">Due</span>
       <span [class.text-red-500]="isOverdue()" class="font-medium">
-        {{ t.dueDate | date: 'MMM d, y, h:mm a' }}
+        {{ t.dueDate | timeZoneDate: 'detail' }}
         @if (isOverdue()) {
           <span class="ml-1">(overdue)</span>
         }
@@ -45,7 +45,7 @@
 
     <!-- Show only when the task is archived. -->
     @if (t.archive && t.archiveAt) {
-      <span>Archived: {{ t.archiveAt | date: 'short' }}</span>
+      <span>Archived: {{ t.archiveAt | timeZoneDate: 'short' }}</span>
     }
   </div>
 </div>

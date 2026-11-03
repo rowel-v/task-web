@@ -4,16 +4,16 @@ import { LucideMenu, LucideSearch } from '@lucide/angular';
 import { SearchService } from '../../../../../core/services/search-service/search-service';
 import { SelectModeService } from '../../../../../features/tasks/services/select-mode-service/select-mode-service';
 import { TaskService } from '../../../../../domains/tasks/services/task-service';
-import { Profile } from '../../shared/profile/profile';
 import { ViewportService } from '../../../../../core/services/viewport-service/viewport-service';
 
 @Component({
   selector: 'app-task-header',
-  imports: [FormsModule, LucideMenu, LucideSearch, Profile],
+  imports: [FormsModule, LucideMenu, LucideSearch],
   templateUrl: './task-header.html',
   styles: ``,
 })
 export class TaskHeader {
+
   protected readonly searchService = inject(SearchService);
   protected readonly selectModeService = inject(SelectModeService);
   protected readonly taskService = inject(TaskService);

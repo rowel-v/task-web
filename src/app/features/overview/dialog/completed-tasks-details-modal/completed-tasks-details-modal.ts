@@ -23,6 +23,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TaskDetailsList } from '../components/task-details-list/task-details-list';
 import { Task } from '../../../../domains/tasks/models/task';
+import { TimeZoneService } from '../../../../core/services/time-zone-service/time-zone-service';
 
 type TaskCategory =
   'completed' | 'high_priority' | 'completed_today' | 'completed_this_week' | null;
@@ -42,6 +43,7 @@ type TaskCategory =
   styles: ``,
 })
 export class CompletedTasksDetailsModal {
+  private readonly timeZones = inject(TimeZoneService);
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
@@ -67,24 +69,23 @@ export class CompletedTasksDetailsModal {
   );
   // Gets tasks completed today.
   protected readonly completedToday = computed(() => {
-    const today = new Date().toDateString();
+    const today = new Date();
     return this.completedTasks().filter(
-      (t) => t.completedAt && new Date(t.completedAt).toDateString() === today,
+      (t) => t.completedAt && this.timeZones.isSameDay(t.completedAt, today),
     );
   });
   // Gets completed tasks from this week.
   protected readonly completedThisWeek = computed(() => {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-
-    const day = startOfWeek.getDay();
+    const today = this.timeZones.dateKey(new Date());
+    const startOfWeek = new Date(`${today}T00:00:00Z`);
+    const day = startOfWeek.getUTCDay();
     const diff = day === 0 ? 6 : day - 1; // Monday as first day
 
-    startOfWeek.setDate(startOfWeek.getDate() - diff);
-    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setUTCDate(startOfWeek.getUTCDate() - diff);
+    const startKey = startOfWeek.toISOString().slice(0, 10);
 
     return this.completedTasks().filter(
-      (t) => t.completedAt && new Date(t.completedAt) >= startOfWeek,
+      (t) => t.completedAt && this.timeZones.dateKey(t.completedAt) >= startKey,
     );
   });
 

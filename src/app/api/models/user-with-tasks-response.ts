@@ -10,6 +10,8 @@
 import { TaskResponse } from "./task-response";
 export interface UserWithTasksResponse {
     username: string;
-    displayName: string;
+    displayName?: string | null;
+    timeZone?: string | null;
+    bio?: string | null;
     tasks: Array<TaskResponse>;
 }

@@ -7,8 +7,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Only send the token to your backend.
   const taskApi =
-    /^\/api\/tasks(?:[/?#]|$)/.test(req.url) ||
-    /^http:\/\/localhost:8080\/api\/tasks(?:[/?#]|$)/.test(req.url);
+    /^\/api\/(?:tasks|profile)(?:[/?#]|$)/.test(req.url) ||
+    /^http:\/\/localhost:8080\/api\/(?:tasks|profile)(?:[/?#]|$)/.test(req.url);
   if (!token || !taskApi) {
     return next(req);
   }

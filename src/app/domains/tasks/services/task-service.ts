@@ -11,6 +11,8 @@ import {
   UpdateTaskRequest,
   ApiResponseVoid,
 } from '../../../api';
+import { UserService } from '../../user/services/user-service';
+import { TimeZoneService } from '../../../core/services/time-zone-service/time-zone-service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,8 @@ export class TaskService {
 
   private readonly http = inject(HttpClient);
   private readonly appNotification = inject(NotificationService);
+  private readonly userService = inject(UserService);
+  private readonly timeZones = inject(TimeZoneService);
   private readonly tasksState = signal<Task[]>([]);
   tasks = this.tasksState.asReadonly();
   totalTasks = computed(() => this.tasksState().length);
@@ -46,15 +50,7 @@ export class TaskService {
   readonly todaysTasks = computed(() => {
     const today = new Date();
 
-    return this.tasksState().filter((task) => {
-      const dueDate = new Date(task.dueDate);
-
-      return (
-        dueDate.getFullYear() === today.getFullYear() &&
-        dueDate.getMonth() === today.getMonth() &&
-        dueDate.getDate() === today.getDate()
-      );
-    });
+    return this.tasksState().filter((task) => this.timeZones.isSameDay(task.dueDate, today));
   });
 
   readonly upcomingTasks = computed(() => {
@@ -65,6 +61,10 @@ export class TaskService {
   });
   getAllTask(): Observable<Task[]> {
     return this.api.getTasks().pipe(
+      tap((result) => {
+        this.userService.setDisplayName(result.data?.displayName ?? undefined);
+        this.timeZones.setTimeZone(result.data?.timeZone || null);
+      }),
       map((result) => result.data?.tasks.map(this.toTask) ?? []),
       tap((tasks) => this.tasksState.set(tasks)),
       catchError((err: HttpErrorResponse) => this.handleError(err)),

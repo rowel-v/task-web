@@ -1,0 +1,307 @@
+<div class="
+  mx-auto w-full max-w-6xl px-3 pt-2 pb-8 text-app-background-white
+  sm:px-4 sm:pt-3
+">
+  @if (loading()) {
+    <div class="rounded-xl border border-[#23656a] bg-[#164e52] p-6" role="status">
+      Loading your profile...
+    </div>
+  } @else if (error()) {
+    <div class="rounded-xl border border-[#23656a] bg-[#164e52] p-6" role="alert">
+      <h2 class="text-lg font-semibold">Could not load your profile</h2>
+      <p class="mt-1 text-sm opacity-80">Please try again.</p>
+      <button
+        type="button"
+        class="
+          btn mt-4 border-0 bg-app-button-purple text-app-background-white
+          btn-sm
+          hover:bg-app-button-hover-gray
+        "
+        (click)="loadProfile()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (user(); as profile) {
+    <section
+      class="
+        overflow-hidden rounded-xl border border-[#23656a] bg-[#164e52]
+        shadow-sm
+      "
+      aria-labelledby="profile-details-heading"
+    >
+      <div class="
+        p-4
+        sm:p-6
+        lg:p-8
+      ">
+        <div class="
+          flex flex-col gap-5
+          sm:flex-row sm:items-center sm:justify-between
+        ">
+          <div class="
+            flex min-w-0 items-center gap-4
+            sm:gap-5
+          ">
+            <div
+              class="
+                relative flex size-18 shrink-0 items-center justify-center
+                rounded-full bg-[#21676a] text-[#00d3bb] ring-4 ring-[#1d5b5e]
+                sm:size-20
+              "
+            >
+              @if (photoPreview() || photoUrl(); as photo) {
+                <img [src]="photo" alt="" class="
+                  size-full rounded-full object-cover
+                " />
+              } @else {
+                <svg lucideCircleUserRound [size]="42" [strokeWidth]="1.5" aria-hidden="true"></svg>
+              }
+              @if (editing()) {
+                <label
+                  class="
+                    absolute inset-0 cursor-pointer rounded-full
+                    focus-within:outline-2 focus-within:outline-offset-2
+                    focus-within:outline-white
+                  "
+                  [class.opacity-60]="saving()"
+                >
+                  <span
+                    class="
+                      absolute -top-1 -right-1 flex size-8 items-center
+                      justify-center rounded-full border-2 border-[#164e52]
+                      bg-app-button-purple text-app-text-green shadow-sm
+                      hover:bg-app-button-hover-gray
+                    "
+                  >
+                    <svg lucidePencil [size]="15" aria-hidden="true"></svg>
+                  </span>
+                  <input
+                    type="file"
+                    class="sr-only"
+                    aria-label="Change profile photo"
+                    accept="image/jpeg,image/png"
+                    [disabled]="saving()"
+                    (change)="onPhotoSelected($event)"
+                  />
+                </label>
+              }
+            </div>
+            <div class="min-w-0">
+              <p class="
+                text-xs font-semibold tracking-widest text-[#8fd5c8] uppercase
+              ">
+                USER
+              </p>
+              <h2
+                id="profile-details-heading"
+                class="
+                  mt-1 text-xl font-semibold wrap-break-word
+                  sm:text-2xl
+                "
+              >
+                {{ profile.displayName || profile.username }}
+              </h2>
+              <p class="mt-1 text-sm break-all text-[#b6d0cf]">&#64;{{ profile.username }}</p>
+            </div>
+          </div>
+          @if (!editing()) {
+            <button
+              type="button"
+              class="
+                btn w-full border-0 bg-app-button-purple text-app-text-green
+                hover:bg-app-button-hover-gray
+                sm:w-auto sm:shrink-0
+              "
+              (click)="startEditing()"
+            >
+              <svg lucidePencil [size]="17" aria-hidden="true"></svg> Edit profile
+            </button>
+          } @else {
+            <div class="
+              grid w-full grid-cols-2 gap-2
+              sm:flex sm:w-auto sm:shrink-0
+            ">
+              <button
+                type="button"
+                class="
+                  btn min-w-0 border-0 btn-ghost text-app-background-white
+                  shadow-none
+                  hover:border-0 hover:bg-[#276568]
+                  sm:w-auto
+                "
+                [disabled]="saving()"
+                (click)="cancelEditing()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="profile-edit-form"
+                class="
+                  btn min-w-0 border-0 bg-app-button-purple text-app-text-green
+                  hover:bg-app-button-hover-gray
+                  disabled:cursor-not-allowed disabled:opacity-50
+                "
+                [disabled]="
+                  saving() ||
+                  form.invalid ||
+                  (!hasProfileChanges() && !stagedPhoto())
+                "
+              >
+                {{ saving() ? 'Saving...' : 'Save changes' }}
+              </button>
+            </div>
+          }
+        </div>
+        @if (editing()) {
+          <p class="mt-3 text-xs text-[#b6d0cf]" role="status">
+            {{
+              photoPreview()
+                ? 'Photo selected. Save changes to apply it.'
+                : 'Select the photo to choose a new image.'
+            }}
+          </p>
+        }
+        @if (saved()) {
+          <p class="mt-5 text-sm text-[#8fe6c5]" role="status">Profile saved successfully.</p>
+        }
+        <div class="
+          mt-6 border-t border-[#317176] pt-6
+          sm:mt-8
+        ">
+          <div class="flex items-center gap-2">
+            <svg lucideUser [size]="20" class="text-[#FFD580]" aria-hidden="true"></svg>
+            <h3 class="text-lg font-semibold">Account details</h3>
+          </div>
+          @if (editing()) {
+            <form
+              id="profile-edit-form"
+              [formGroup]="form"
+              (ngSubmit)="saveProfile()"
+              class="mt-6 space-y-5"
+            >
+              <fieldset [disabled]="saving()" class="space-y-5">
+                <div class="
+                  grid gap-4
+                  sm:grid-cols-2
+                ">
+                  <div class="min-w-0">
+                    <label for="display-name" class="
+                      mb-2 block text-sm font-medium
+                    "
+                      >Display name</label
+                    >
+                    <input
+                      id="display-name"
+                      formControlName="displayName"
+                      maxlength="100"
+                      placeholder="Your display name"
+                      class="
+                        input w-full border-[#397579] bg-[#103f43]
+                        text-app-background-white
+                        focus-within:outline-none
+                        focus:border-app-button-purple/70 focus:ring-2
+                        focus:ring-app-button-purple/20 focus:outline-none
+                      "
+                    />
+                  </div>
+                  <div class="min-w-0">
+                    <label for="time-zone" class="
+                      mb-2 block text-sm font-medium
+                    ">Time zone</label>
+                    <select
+                      id="time-zone"
+                      formControlName="timeZone"
+                      class="
+                        time-zone-select select w-full border-[#397579]
+                        bg-[#103f43] text-app-background-white
+                      "
+                    >
+                      <option value="">Use device time zone</option>
+                      <option value="UTC">UTC</option>
+                      @if (previousTimeZone; as zone) {
+                        <option [value]="zone">{{ zone }} (previous selection)</option>
+                      }
+                      @for (group of timeZoneGroups; track group.label) {
+                        <optgroup [label]="group.label">
+                          @for (zone of group.zones; track zone.value) {
+                            <option [value]="zone.value">{{ zone.label }}</option>
+                          }
+                        </optgroup>
+                      }
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label for="bio" class="mb-2 block text-sm font-medium">Bio</label>
+                  <textarea
+                    id="bio"
+                    formControlName="bio"
+                    maxlength="500"
+                    rows="4"
+                    placeholder="A little about you"
+                    class="
+                      textarea min-h-28 w-full resize-y border-[#397579]
+                      bg-[#103f43] text-app-background-white
+                      focus-within:outline-none
+                      focus:border-app-button-purple/70 focus:ring-2
+                      focus:ring-app-button-purple/20 focus:outline-none
+                    "
+                  ></textarea>
+                  <p class="mt-1 text-right text-xs text-[#b6d0cf]">
+                    {{ form.controls.bio.value.length }}/500
+                  </p>
+                </div>
+                @if (saveError()) {
+                  <p class="text-sm text-[#ffb3b3]" role="alert">{{ saveError() }}</p>
+                }
+              </fieldset>
+            </form>
+          } @else {
+            <dl class="
+              mt-5 grid gap-3
+              sm:grid-cols-2
+              lg:grid-cols-3
+            ">
+              <div class="min-w-0 rounded-lg bg-[#103f43] p-4">
+                <dt class="text-sm text-[#b6d0cf]">Display name</dt>
+                <dd class="mt-1 font-medium wrap-break-word">
+                  {{ profile.displayName || 'Not set' }}
+                </dd>
+              </div>
+              <div class="min-w-0 rounded-lg bg-[#103f43] p-4">
+                <dt class="text-sm text-[#b6d0cf]">Username</dt>
+                <dd class="mt-1 font-medium break-all">{{ profile.username }}</dd>
+              </div>
+              <div class="
+                min-w-0 rounded-lg bg-[#103f43] p-4
+                sm:col-span-2
+                lg:col-span-1
+              ">
+                <dt class="flex items-center gap-2 text-sm text-[#b6d0cf]">
+                  <svg lucideGlobe [size]="16" aria-hidden="true"></svg> Time zone
+                </dt>
+                <dd class="mt-1 font-medium wrap-break-word">
+                  {{ timeZoneService.timeZone() || 'Use device time zone' }}
+                </dd>
+              </div>
+              <div class="
+                min-w-0 rounded-lg bg-[#103f43] p-4
+                sm:col-span-2
+                lg:col-span-3
+              ">
+                <dt class="flex items-center gap-2 text-sm text-[#b6d0cf]">
+                  <svg lucideAlignLeft [size]="16" aria-hidden="true"></svg> Bio
+                </dt>
+                <dd class="mt-1 wrap-break-word whitespace-pre-wrap">
+                  {{ profile.bio || 'No bio added yet.' }}
+                </dd>
+              </div>
+            </dl>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</div>

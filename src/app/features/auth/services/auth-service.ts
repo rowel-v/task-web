@@ -5,6 +5,7 @@ import { TokenService } from '../../../core/services/token-service/token-service
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponseVoid } from '../../../api';
+import { TimeZoneService } from '../../../core/services/time-zone-service/time-zone-service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export class AuthService {
   private readonly api = inject(AuthControllerService);
   private readonly appNotification = inject(NotificationService);
   private readonly tokenService = inject(TokenService);
+  private readonly timeZones = inject(TimeZoneService);
 
   register(req: CreateAccountRequest): Observable<void> {
     return this.api.register(req).pipe(
@@ -24,6 +26,7 @@ export class AuthService {
 
   login(req: LoginAccountRequest): Observable<void> {
     return this.api.login(req).pipe(
+      tap(() => this.timeZones.setTimeZone(null)),
       tap((result) => this.tokenService.setToken(result.data!.token!)),
       tap((result) => this.appNotification.success(result.message)),
       map(() => undefined),

@@ -8,7 +8,7 @@
       placeholder="Enter task due date"
       class="border-0 bg-transparent outline-none"
       readonly
-      [value]="selectedDate() | date: 'MMM d, y, h:mm a'"
+      [value]="selectedDate() | timeZoneDate: 'detail'"
     />
 
     @if (!selectedDate()) {
@@ -37,4 +37,5 @@
       </button>
     }
   </div>
+  <p class="w-full text-xs opacity-70">Time zone: {{ timeZones.timeZone() || 'Device time zone' }}</p>
 </div>

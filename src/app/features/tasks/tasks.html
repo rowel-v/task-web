@@ -193,7 +193,7 @@
                 "
                 [class.text-[#fca5a5]]="isOverdue(task)"
               >
-                Due: {{ task.dueDate | date: 'medium' }}
+                Due: {{ task.dueDate | timeZoneDate: 'medium' }}
               </p>
             </div>
           </div>

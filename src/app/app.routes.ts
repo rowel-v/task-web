@@ -7,6 +7,7 @@ import { tasksValidTabGuard } from './features/tasks/guards/tasks-valid-tab-guar
 import { authGuard } from './core/guards/auth-guard';
 import { Register } from './features/auth/pages/register/register';
 import { Login } from './features/auth/pages/login/login';
+import { Profile } from './features/profile/profile';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,10 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'overview',
         pathMatch: 'full',
+      },
+      {
+        path: 'profile',
+        component: Profile,
       },
     ],
   },

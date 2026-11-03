@@ -6,7 +6,7 @@ import { TasksStatusCard } from './components/tasks-status-card/tasks-status-car
 import { LucideArrowRight, LucideCalendarDays, LucidePlus } from '@lucide/angular';
 import { TasksStatusBadge } from '../../domains/tasks/components/tasks-status-badge/tasks-status-badge';
 import { CreateTaskDialog } from '../../domains/tasks/dialogs/create-task-dialog/create-task-dialog';
-import { DatePipe } from '@angular/common';
+import { TimeZoneDatePipe } from '../../core/services/time-zone-service/time-zone-date.pipe';
 import { TaskItem } from './components/task-item/task-item';
 import { TaskEmptyState } from './components/task-empty-state/task-empty-state';
 import { finalize, map } from 'rxjs';
@@ -42,7 +42,7 @@ type ModalSelection = 'create-task-dialog' | 'task-details-dialog' | null;
     LucideArrowRight,
     CreateTaskDialog,
     TaskDetailsDialog,
-    DatePipe,
+    TimeZoneDatePipe,
     TaskItem,
     TaskEmptyState,
   ],

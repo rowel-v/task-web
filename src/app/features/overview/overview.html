@@ -253,7 +253,7 @@
                     </div>
                   </td>
 
-                  <td>{{ upcomingTask.dueDate | date: 'short' }}</td>
+                  <td>{{ upcomingTask.dueDate | timeZoneDate: 'short' }}</td>
 
                   <td class="rounded-r-md">
                     <app-tasks-status-badge [status]="upcomingTask.status" />

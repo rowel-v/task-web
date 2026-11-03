@@ -46,6 +46,8 @@ import {
 } from '../../domains/tasks/dialogs/reopen-task-dialog/reopen-task-dialog';
 import { SelectModeService } from './services/select-mode-service/select-mode-service';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
+import { TimeZoneDatePipe } from '../../core/services/time-zone-service/time-zone-date.pipe';
+import { TimeZoneService } from '../../core/services/time-zone-service/time-zone-service';
 
 type TabSelection =
   'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today' | 'archive';
@@ -62,6 +64,7 @@ type ModalSelection =
 @Component({
   selector: 'app-tasks',
   imports: [
+    TimeZoneDatePipe,
     LucideClipboardList,
     LucideClock5,
     LucideCircleEllipsis,
@@ -88,6 +91,7 @@ type ModalSelection =
   styles: ``,
 })
 export class Tasks {
+  private readonly timeZones = inject(TimeZoneService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -265,7 +269,7 @@ export class Tasks {
           (t) =>
             t.status !== 'COMPLETED' &&
             t.dueDate &&
-            new Date(t.dueDate).toDateString() === now.toDateString(),
+            this.timeZones.isSameDay(t.dueDate, now),
         );
         break;
       }
