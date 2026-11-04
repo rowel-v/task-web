@@ -41,6 +41,7 @@ export class Login {
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => void this.router.navigateByUrl('/overview'),
+        error: () => undefined,
       });
   }
 

@@ -1,17 +1,29 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { TokenService } from '../services/token-service/token-service';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { SessionService } from '../services/session-service/session-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(TokenService).getToken();
+  const session = inject(SessionService);
+  const router = inject(Router);
 
-  // Only send the token to your backend.
+  // Only expire the session for protected API requests.
   const taskApi =
     /^\/api\/(?:tasks|profile)(?:[/?#]|$)/.test(req.url) ||
     /^http:\/\/localhost:8080\/api\/(?:tasks|profile)(?:[/?#]|$)/.test(req.url);
-  if (!token || !taskApi) {
-    return next(req);
-  }
-
-  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+  return next(req).pipe(
+    catchError((error: unknown) => {
+      if (
+        taskApi &&
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        session.status() === 'authenticated'
+      ) {
+        session.expire();
+        void router.navigateByUrl('/login');
+      }
+      return throwError(() => error);
+    }),
+  );
 };

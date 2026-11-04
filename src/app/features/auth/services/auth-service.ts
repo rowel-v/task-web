@@ -1,23 +1,31 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { AuthControllerService, CreateAccountRequest, LoginAccountRequest } from '../../../api';
+import { catchError, map, Observable, switchMap, tap, throwError } from 'rxjs';
+import {
+  ApiResponseVoid,
+  AuthControllerService,
+  CreateAccountRequest,
+  LoginAccountRequest,
+} from '../../../api';
 import { NotificationService } from '../../../core/services/notification-service/notification-service';
-import { TokenService } from '../../../core/services/token-service/token-service';
-import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
-import { ApiResponseVoid } from '../../../api';
-import { TimeZoneService } from '../../../core/services/time-zone-service/time-zone-service';
+import { SessionService } from '../../../core/services/session-service/session-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly api = inject(AuthControllerService);
+  private readonly http = inject(HttpClient);
   private readonly appNotification = inject(NotificationService);
-  private readonly tokenService = inject(TokenService);
-  private readonly timeZones = inject(TimeZoneService);
+  private readonly session = inject(SessionService);
+
+  private getCsrfToken(): Observable<unknown> {
+    return this.http.get('/api/auth/csrf');
+  }
 
   register(req: CreateAccountRequest): Observable<void> {
-    return this.api.register(req).pipe(
+    return this.getCsrfToken().pipe(
+      switchMap(() => this.api.register(req)),
       tap((result) => this.appNotification.success(result.message)),
       map(() => undefined),
       catchError((err: HttpErrorResponse) => this.handleError(err)),
@@ -25,12 +33,23 @@ export class AuthService {
   }
 
   login(req: LoginAccountRequest): Observable<void> {
-    return this.api.login(req).pipe(
-      tap(() => this.timeZones.setTimeZone(null)),
-      tap((result) => this.tokenService.setToken(result.data!.token!)),
+    return this.getCsrfToken().pipe(
+      switchMap(() => this.api.login(req)),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
+      tap(() => this.session.reset()),
+      switchMap((result) =>
+        this.getCsrfToken().pipe(
+          map(() => result),
+          catchError((err: HttpErrorResponse) => {
+            this.appNotification.error(
+              'Signed in, but could not prepare the security token. Please try again.',
+            );
+            return throwError(() => err);
+          }),
+        ),
+      ),
       tap((result) => this.appNotification.success(result.message)),
       map(() => undefined),
-      catchError((err: HttpErrorResponse) => this.handleError(err)),
     );
   }
 

@@ -59,7 +59,7 @@ export class TaskService {
       .filter((task) => task.dueDate && new Date(task.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
   });
-  getAllTask(): Observable<Task[]> {
+  getAllTask(notifyOnError = true): Observable<Task[]> {
     return this.api.getTasks().pipe(
       tap((result) => {
         this.userService.setDisplayName(result.data?.displayName ?? undefined);
@@ -67,8 +67,16 @@ export class TaskService {
       }),
       map((result) => result.data?.tasks.map(this.toTask) ?? []),
       tap((tasks) => this.tasksState.set(tasks)),
-      catchError((err: HttpErrorResponse) => this.handleError(err)),
+      catchError((err: HttpErrorResponse) =>
+        notifyOnError ? this.handleError(err) : throwError(() => err),
+      ),
     );
+  }
+
+  clear(): void {
+    this.tasksState.set([]);
+    this.userService.setDisplayName(undefined);
+    this.timeZones.setTimeZone(null);
   }
 
   createTask(req: CreateTaskRequest): Observable<Task> {
@@ -143,6 +151,7 @@ export class TaskService {
   }
 
   private readonly handleError = (err: HttpErrorResponse) => {
+    if (err.status === 401) return throwError(() => err);
     const errorResponse = err.error as ApiResponseVoid | null;
     const errorMessage = errorResponse?.message ?? 'Something went wrong. Please try again.';
     this.appNotification.error(errorMessage);

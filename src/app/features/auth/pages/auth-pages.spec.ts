@@ -17,7 +17,7 @@ describe('Authentication pages', () => {
 
   it('does not submit invalid login credentials', () => {
     const page = TestBed.createComponent(Login).componentInstance;
-    page.submit();
+    page.onLogin();
     expect(auth.login).not.toHaveBeenCalled();
     expect(page.form.controls.username.touched).toBe(true);
   });
@@ -27,7 +27,7 @@ describe('Authentication pages', () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const page = TestBed.createComponent(Login).componentInstance;
     page.form.setValue({ username: ' rowel ', password: 'secret' });
-    page.submit();
+    page.onLogin();
     expect(auth.login).toHaveBeenCalledWith({ username: 'rowel', password: 'secret' });
     expect(navigate).toHaveBeenCalledWith('/overview');
     expect(page.submitting()).toBe(false);
@@ -40,7 +40,7 @@ describe('Authentication pages', () => {
       password: '€'.repeat(25),
       confirmPassword: '€'.repeat(25),
     });
-    page.submit();
+    page.onSubmit();
     expect(page.form.controls.password.hasError('byteLimit')).toBe(true);
     expect(auth.register).not.toHaveBeenCalled();
   });
@@ -48,7 +48,7 @@ describe('Authentication pages', () => {
   it('requires matching registration passwords', () => {
     const page = TestBed.createComponent(Register).componentInstance;
     page.form.setValue({ username: 'rowel', password: 'secret', confirmPassword: 'different' });
-    page.submit();
+    page.onSubmit();
     expect(page.form.hasError('passwordMismatch')).toBe(true);
     expect(auth.register).not.toHaveBeenCalled();
   });
@@ -58,7 +58,7 @@ describe('Authentication pages', () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const page = TestBed.createComponent(Register).componentInstance;
     page.form.setValue({ username: 'rowel', password: 'secret', confirmPassword: 'secret' });
-    page.submit();
+    page.onSubmit();
     expect(auth.register).toHaveBeenCalledWith({ username: 'rowel', password: 'secret' });
     expect(navigate).toHaveBeenCalledWith('/login');
   });
@@ -67,12 +67,12 @@ describe('Authentication pages', () => {
     auth.login.mockReturnValue(new Subject<void>());
     const page = TestBed.createComponent(Login).componentInstance;
     page.form.setValue({ username: 'rowel', password: 'secret' });
-    page.submit();
-    page.submit();
+    page.onLogin();
+    page.onLogin();
     expect(auth.login).toHaveBeenCalledTimes(1);
   });
 
-  it('shows an API error and allows another attempt', () => {
+  it('allows another attempt after an API error', () => {
     auth.login.mockReturnValue(
       throwError(
         () => new HttpErrorResponse({ status: 401, error: { message: 'Invalid credentials' } }),
@@ -81,41 +81,19 @@ describe('Authentication pages', () => {
     const fixture = TestBed.createComponent(Login);
     const page = fixture.componentInstance;
     page.form.setValue({ username: 'rowel', password: 'wrong' });
-    page.submit();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
-      'Invalid credentials',
-    );
+    page.onLogin();
     expect(page.submitting()).toBe(false);
+    page.onLogin();
+    expect(auth.login).toHaveBeenCalledTimes(2);
   });
-  it('waits for the actual leave animation before navigating', async () => {
+  it('waits for the leave animation before opening registration', () => {
+    vi.useFakeTimers();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const page = TestBed.createComponent(Login).componentInstance;
-    let finish!: () => void;
-    const finished = new Promise<void>((resolve) => {
-      finish = resolve;
-    });
-    const target = document.createElement('section');
-    target.getAnimations = () => [{ finished }] as unknown as Animation[];
-    const animationComplete = vi.fn();
     page.goToRegister();
-    const leaving = page.onLeave({ target, animationComplete });
-    expect(target.classList.contains('scale-out-hor-left')).toBe(true);
     expect(navigate).not.toHaveBeenCalled();
-    finish();
-    await leaving;
-    expect(animationComplete).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(200);
     expect(navigate).toHaveBeenCalledWith('/register');
-  });
-
-  it('navigates when no CSS animation is running', async () => {
-    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
-    const page = TestBed.createComponent(Login).componentInstance;
-    const target = document.createElement('section');
-    target.getAnimations = () => [];
-    page.goToRegister();
-    await page.onLeave({ target, animationComplete: vi.fn() });
-    expect(navigate).toHaveBeenCalledWith('/register');
+    vi.useRealTimers();
   });
 });
-

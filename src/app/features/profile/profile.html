@@ -90,9 +90,7 @@
             <div class="min-w-0">
               <p class="
                 text-xs font-semibold tracking-widest text-[#8fd5c8] uppercase
-              ">
-                USER
-              </p>
+              ">USER</p>
               <h2
                 id="profile-details-heading"
                 class="
@@ -143,11 +141,7 @@
                   hover:bg-app-button-hover-gray
                   disabled:cursor-not-allowed disabled:opacity-50
                 "
-                [disabled]="
-                  saving() ||
-                  form.invalid ||
-                  (!hasProfileChanges() && !stagedPhoto())
-                "
+                [disabled]="saving() || form.invalid || (!hasProfileChanges() && !stagedPhoto())"
               >
                 {{ saving() ? 'Saving...' : 'Save changes' }}
               </button>

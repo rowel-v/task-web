@@ -1,10 +1,10 @@
 <!-- Current page -->
 <router-outlet />
 
-@if (fetchStatus() === 'FETCHING') {
+@if (session.status() === 'checking') {
   <!-- Loading overlay: blurs the page while the first task fetch runs -->
   <app-loading-overlay />
-} @else if (fetchStatus() === 'FAILED') {
+} @else if (session.status() === 'error') {
   <!-- Error screen with a retry button -->
   <app-server-error (retried)="onRetry()" />
 }

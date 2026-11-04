@@ -44,7 +44,8 @@ export class Register {
       .register({ username: username.trim(), password })
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: () => this.router.navigateByUrl('/login')
+        next: () => this.router.navigateByUrl('/login'),
+        error: () => undefined,
       });
   }
 

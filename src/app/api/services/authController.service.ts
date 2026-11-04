@@ -12,7 +12,7 @@ import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BASE_PATH_DEFAULT, CLIENT_CONTEXT_TOKEN_DEFAULT } from "../tokens";
 import { HttpParamsBuilder } from "../utils/http-params-builder";
-import { CreateAccountRequest, RequestOptions, ApiResponseVoid, LoginAccountRequest, ApiResponseLoginResponse } from "../models";
+import { CreateAccountRequest, RequestOptions, ApiResponseVoid, LoginAccountRequest, CsrfToken, ApiResponseCsrfToken } from "../models";
 
 @Injectable({ providedIn: "root" })
 export class AuthControllerService {
@@ -56,9 +56,36 @@ export class AuthControllerService {
         });
     }
 
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseLoginResponse>;
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseLoginResponse>>;
-    login(loginAccountRequest: LoginAccountRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseLoginResponse>>;
+    logout(observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseVoid>;
+    logout(observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseVoid>>;
+    logout(observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseVoid>>;
+    logout(observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/api/auth/logout`;
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('post', url, {
+            body: null,
+            observe,
+            headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseVoid>;
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseVoid>>;
+    login(loginAccountRequest: LoginAccountRequest, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseVoid>>;
     login(loginAccountRequest: LoginAccountRequest, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
         const url = `${this.basePath}/api/auth/login`;
 
@@ -81,6 +108,38 @@ export class AuthControllerService {
             body: loginAccountRequest,
             observe,
             headers,
+            reportProgress: options?.reportProgress,
+            withCredentials: options?.withCredentials,
+            context: this.createContextWithClientId(options?.context)
+        });
+    }
+
+    csrf(token: CsrfToken, observe?: 'body', options?: RequestOptions<'json'>): Observable<ApiResponseCsrfToken>;
+    csrf(token: CsrfToken, observe?: 'response', options?: RequestOptions<'json'>): Observable<HttpResponse<ApiResponseCsrfToken>>;
+    csrf(token: CsrfToken, observe?: 'events', options?: RequestOptions<'json'>): Observable<HttpEvent<ApiResponseCsrfToken>>;
+    csrf(token: CsrfToken, observe?: 'body' | 'events' | 'response', options?: RequestOptions<'arraybuffer' | 'blob' | 'json' | 'text'>): Observable<any> {
+        const url = `${this.basePath}/api/auth/csrf`;
+
+        let params = new HttpParams();
+        if (token != null) {
+            params = HttpParamsBuilder.addToHttpParams(params, token, 'token');
+        }
+
+        let headers: HttpHeaders;
+        if (options?.headers instanceof HttpHeaders) {
+            headers = options.headers;
+        } else {
+            headers = new HttpHeaders(options?.headers);
+        }
+        // Advertise the response content type declared in the spec
+        if (!headers.has('Accept')) {
+            headers = headers.set('Accept', 'application/json');
+        }
+
+        return this.httpClient.request('get', url, {
+            observe,
+            headers,
+            params,
             reportProgress: options?.reportProgress,
             withCredentials: options?.withCredentials,
             context: this.createContextWithClientId(options?.context)
