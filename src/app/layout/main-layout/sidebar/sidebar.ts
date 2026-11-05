@@ -30,7 +30,7 @@ export class Sidebar {
   protected readonly hidden = computed(() => this.isMobile() && !this.open());
   protected readonly navItems = [
     { key: 'home', label: 'Home', route: '/overview' },
-    { key: 'tasks', label: 'Tasks', route: '/tasks/all' },
+    { key: 'tasks', label: 'Tasks', route: '/tasks' },
     { key: 'settings', label: 'Settings', route: '/settings' },
   ];
 

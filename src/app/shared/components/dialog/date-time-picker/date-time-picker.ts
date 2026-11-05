@@ -2,6 +2,7 @@ import { Calendar, FormatDateString } from 'vanilla-calendar-pro';
 import { TimeZoneDatePipe } from '../../../../core/services/time-zone-service/time-zone-date.pipe';
 import { TimeZoneService } from '../../../../core/services/time-zone-service/time-zone-service';
 import { NotificationService } from '../../../../core/services/notification-service/notification-service';
+import { DisplayPreferencesService } from '../../../../core/services/display-preferences-service/display-preferences-service';
 import { LucideCalendarDays, LucideX } from '@lucide/angular';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,6 +28,7 @@ import {
 export class DateTimePicker {
   protected readonly timeZones = inject(TimeZoneService);
   private readonly notifications = inject(NotificationService);
+  private readonly displayPreferences = inject(DisplayPreferencesService);
   private readonly bp = inject(BreakpointObserver);
   protected readonly isMobile = toSignal(
     this.bp.observe(Breakpoints.Handset).pipe(map((r) => r.matches)),
@@ -43,12 +45,7 @@ export class DateTimePicker {
     if (Number.isNaN(d.getTime())) return null;
 
     const date = this.timeZones.dateKey(d);
-    const time = d.toLocaleTimeString('en-US', {
-      timeZone: this.timeZones.timeZone() ?? undefined,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const time = this.formatCalendarTime(d);
 
     return { date, time, value: d.toISOString() };
   });
@@ -78,7 +75,7 @@ export class DateTimePicker {
 
         positionToInput: 'auto',
 
-        selectionTimeMode: 12,
+        selectionTimeMode: this.displayPreferences.is12Hour() ? 12 : 24,
 
         layouts: {
           default: `
@@ -137,7 +134,9 @@ export class DateTimePicker {
 
           // today keeps the current time, any other day defaults to 9:00 AM
           const isToday = date === this.getCurrentDate();
-          const time = isToday ? this.getCurrentTimeFormatted() : '09:00 AM';
+          const time = isToday
+            ? this.getCurrentTimeFormatted()
+            : this.displayPreferences.is12Hour() ? '09:00 AM' : '09:00';
 
           self.set({ selectedDates: [date], selectedTime: time });
           this.bindSave(self); // set() re-renders the popup, so bind Confirm again
@@ -162,16 +161,16 @@ export class DateTimePicker {
     return this.timeZones.dateKey(new Date()) as FormatDateString;
   };
 
-  /**
-   * Returns the current time formatted as "hh:mm aa" (e.g. "02:37 PM"),
-   * matching the format vanilla-calendar-pro's `selectedTime` option expects.
-   */
   private readonly getCurrentTimeFormatted = (): string => {
-    return new Date().toLocaleTimeString('en-US', {
+    return this.formatCalendarTime(new Date());
+  };
+
+  private readonly formatCalendarTime = (date: Date): string => {
+    return date.toLocaleTimeString('en-US', {
       timeZone: this.timeZones.timeZone() ?? undefined,
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hourCycle: this.displayPreferences.is12Hour() ? 'h12' : 'h23',
     });
   };
 
@@ -199,8 +198,7 @@ export class DateTimePicker {
   }
 
   /**
-   * Converts a 12-hour time string
-   * (e.g. "02:37 PM") into 24-hour format ("14:37").
+   * Converts a 12-hour or 24-hour time string to 24-hour format.
    */
   private readonly to24Hour = (time: string): string => {
     const [timePart, period] = time.split(' ');

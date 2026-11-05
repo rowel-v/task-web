@@ -18,12 +18,32 @@
   --color-app-background-hover: #d8b4fe;
   --color-app-button-purple: #a47bd4;
   --color-app-button-hover-gray: #8f6bb8;
+  --color-app-surface: #164e52;
+  --color-app-surface-deep: #103f43;
+  --color-app-surface-border: #23656a;
+  --color-app-input-border: #397579;
+}
+
+:root[data-appearance='soft-teal'] {
+  --color-app-background-green: #20585d;
+  --color-app-surface: #28686a;
+  --color-app-surface-deep: #16494d;
+  --color-app-surface-border: #478488;
+  --color-app-input-border: #629a9d;
+}
+
+:root[data-appearance='dark-teal'] {
+  --color-app-background-green: #102f33;
+  --color-app-surface: #193c40;
+  --color-app-surface-deep: #0d292d;
+  --color-app-surface-border: #38666a;
+  --color-app-input-border: #527c7e;
 }
 
 /* Vanilla Calendar Pro — custom theme*/
 :root {
   /* Base */
-  --vc-bg: #12464a;
+  --vc-bg: var(--color-app-background-green);
   --vc-color: #e5e7eb;
   --vc-header-color: #e5e7eb;
   --vc-title-color: #e5e7eb;
@@ -36,7 +56,7 @@
   --vc-week-day-off-color-hover: #00d3bb;
 
   /* Dates */
-  --vc-date-bg: #12464a;
+  --vc-date-bg: var(--color-app-background-green);
   --vc-date-color: #e5e7eb;
   --vc-date-bg-hover: #3b7e76;
   --vc-date-today-bg: #1a5b60;
@@ -55,13 +75,13 @@
   --vc-date-weekend-disabled-color: #6b9490;
   --vc-date-weekend-today-disabled-color: #6b9490;
   --vc-date-weekend-outside-color: #5ca598;
-  --vc-date-weekend-outside-bg: #12464a;
+  --vc-date-weekend-outside-bg: var(--color-app-background-green);
   --vc-date-weekend-disabled-outside-color: #6b9490;
 
   /* Time controls */
   --vc-time-border-color: #3b7e76;
   --vc-time-separator-color: #e5e7eb;
-  --vc-time-input-bg: #12464a;
+  --vc-time-input-bg: var(--color-app-background-green);
   --vc-time-input-color: #e5e7eb;
   --vc-time-range-track-color: #3b7e76;
   --vc-time-range-thumb-bg: #00d3bb;
@@ -69,7 +89,7 @@
   --vc-time-keeping-color-hover: #00d3bb;
 
   /* Month / year picker */
-  --vc-months-years-bg: #12464a;
+  --vc-months-years-bg: var(--color-app-background-green);
   --vc-months-years-color: #e5e7eb;
   --vc-months-years-bg-hover: #3b7e76;
   --vc-months-years-color-disabled: #6b9490;
@@ -79,9 +99,9 @@
   /* Time controls */
   --vc-time-border-color: #3b7e76;
   --vc-time-separator-color: #e5e7eb;
-  --vc-time-input-bg: #12464a;
+  --vc-time-input-bg: var(--color-app-background-green);
   --vc-time-input-color: #e5e7eb;
-  --vc-time-range-bg: #12464a;
+  --vc-time-range-bg: var(--color-app-background-green);
   --vc-time-range-track-color: #3b7e76;
   --vc-time-range-thumb-bg: #00d3bb;
   --vc-time-range-thumb-border: #00d3bb;

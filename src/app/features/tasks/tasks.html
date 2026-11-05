@@ -131,12 +131,9 @@
         "
         (change)="sortBy.set($any($event.target).value)"
       >
-        <option value="due-asc">Due date: soonest</option>
-        <option value="due-desc">Due date: latest</option>
-        <option value="priority-high">Priority: high</option>
-        <option value="name-asc">Name: A to Z</option>
-        <option value="name-desc">Name: Z to A</option>
-        <option value="created">Newest created</option>
+        @for (sort of sortOptions; track sort.value) {
+          <option [value]="sort.value" [selected]="sort.value === sortBy()">{{ sort.label }}</option>
+        }
       </select>
     </div>
   </div>
@@ -155,7 +152,7 @@
               hover:bg-app-button-hover-gray
             '
             : '
-              hover:bg-[#1f585c]
+              hover:bg-app-button-hover-gray
               active:bg-app-button-hover-gray
               has-focus-visible:bg-app-button-hover-gray
             '

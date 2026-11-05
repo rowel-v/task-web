@@ -48,11 +48,14 @@ import { SelectModeService } from './services/select-mode-service/select-mode-se
 import { NotificationService } from '../../core/services/notification-service/notification-service';
 import { TimeZoneDatePipe } from '../../core/services/time-zone-service/time-zone-date.pipe';
 import { TimeZoneService } from '../../core/services/time-zone-service/time-zone-service';
+import {
+  TASK_SORT_OPTIONS,
+  TaskPreferencesService,
+  TaskSort,
+} from './services/task-preferences-service/task-preferences-service';
 
 type TabSelection =
   'all' | 'pending' | 'in_progress' | 'completed' | 'overdue' | 'today' | 'archive';
-type SortSelection =
-  'due-asc' | 'due-desc' | 'priority-high' | 'name-asc' | 'name-desc' | 'created';
 type ModalSelection =
   | 'task-details-dialog'
   | 'create-task-dialog'
@@ -239,7 +242,8 @@ export class Tasks {
   }
 
   // current order chosen in the sort dropdown
-  protected readonly sortBy = signal<SortSelection>('due-asc');
+  protected readonly sortOptions = TASK_SORT_OPTIONS;
+  protected readonly sortBy = signal<TaskSort>(inject(TaskPreferencesService).defaultSort());
 
   // tasks shown in the list: filtered by tab, then by search term, then sorted
   protected readonly tasksToDisplay = computed(() => {

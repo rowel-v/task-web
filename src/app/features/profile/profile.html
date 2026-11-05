@@ -3,11 +3,11 @@
   sm:px-4 sm:pt-3
 ">
   @if (loading()) {
-    <div class="rounded-xl border border-[#23656a] bg-[#164e52] p-6" role="status">
+    <div class="rounded-xl border border-app-surface-border bg-app-surface p-6" role="status">
       Loading your profile...
     </div>
   } @else if (error()) {
-    <div class="rounded-xl border border-[#23656a] bg-[#164e52] p-6" role="alert">
+    <div class="rounded-xl border border-app-surface-border bg-app-surface p-6" role="alert">
       <h2 class="text-lg font-semibold">Could not load your profile</h2>
       <p class="mt-1 text-sm opacity-80">Please try again.</p>
       <button
@@ -25,7 +25,7 @@
   } @else if (user(); as profile) {
     <section
       class="
-        overflow-hidden rounded-xl border border-[#23656a] bg-[#164e52]
+        overflow-hidden rounded-xl border border-app-surface-border bg-app-surface
         shadow-sm
       "
       aria-labelledby="profile-details-heading"
@@ -69,7 +69,7 @@
                   <span
                     class="
                       absolute -top-1 -right-1 flex size-8 items-center
-                      justify-center rounded-full border-2 border-[#164e52]
+                      justify-center rounded-full border-2 border-app-surface
                       bg-app-button-purple text-app-text-green shadow-sm
                       hover:bg-app-button-hover-gray
                     "
@@ -192,7 +192,7 @@
                       maxlength="100"
                       placeholder="Your display name"
                       class="
-                        input w-full border-[#397579] bg-[#103f43]
+                        input w-full border-app-input-border bg-app-surface-deep
                         text-app-background-white
                         focus-within:outline-none
                         focus:border-app-button-purple/70 focus:ring-2
@@ -208,8 +208,8 @@
                       id="time-zone"
                       formControlName="timeZone"
                       class="
-                        time-zone-select select w-full border-[#397579]
-                        bg-[#103f43] text-app-background-white
+                        time-zone-select select w-full border-app-input-border
+                        bg-app-surface-deep text-app-background-white
                       "
                     >
                       <option value="">Use device time zone</option>
@@ -236,8 +236,8 @@
                     rows="4"
                     placeholder="A little about you"
                     class="
-                      textarea min-h-28 w-full resize-y border-[#397579]
-                      bg-[#103f43] text-app-background-white
+                      textarea min-h-28 w-full resize-y border-app-input-border
+                      bg-app-surface-deep text-app-background-white
                       focus-within:outline-none
                       focus:border-app-button-purple/70 focus:ring-2
                       focus:ring-app-button-purple/20 focus:outline-none
@@ -258,18 +258,18 @@
               sm:grid-cols-2
               lg:grid-cols-3
             ">
-              <div class="min-w-0 rounded-lg bg-[#103f43] p-4">
+              <div class="min-w-0 rounded-lg bg-app-surface-deep p-4">
                 <dt class="text-sm text-[#b6d0cf]">Display name</dt>
                 <dd class="mt-1 font-medium wrap-break-word">
                   {{ profile.displayName || 'Not set' }}
                 </dd>
               </div>
-              <div class="min-w-0 rounded-lg bg-[#103f43] p-4">
+              <div class="min-w-0 rounded-lg bg-app-surface-deep p-4">
                 <dt class="text-sm text-[#b6d0cf]">Username</dt>
                 <dd class="mt-1 font-medium break-all">{{ profile.username }}</dd>
               </div>
               <div class="
-                min-w-0 rounded-lg bg-[#103f43] p-4
+                min-w-0 rounded-lg bg-app-surface-deep p-4
                 sm:col-span-2
                 lg:col-span-1
               ">
@@ -281,7 +281,7 @@
                 </dd>
               </div>
               <div class="
-                min-w-0 rounded-lg bg-[#103f43] p-4
+                min-w-0 rounded-lg bg-app-surface-deep p-4
                 sm:col-span-2
                 lg:col-span-3
               ">

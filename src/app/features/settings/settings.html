@@ -1,0 +1,206 @@
+<div
+  class="
+    mx-auto w-full max-w-6xl px-3 pt-2 text-app-background-white
+    sm:px-4 sm:pt-3
+  "
+  [class.pb-28]="hasChanges()"
+  [class.pb-4]="!hasChanges()"
+>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <section
+      class="
+        rounded-xl border border-app-surface-border bg-app-surface p-4 shadow-sm
+        sm:p-6
+        lg:p-8
+      "
+    >
+      <div class="flex items-center gap-2">
+        <svg lucideClipboardList class="size-5 text-[#ffd580]" aria-hidden="true"></svg>
+        <h2 class="text-lg font-semibold">Task preferences</h2>
+      </div>
+      <p class="mt-1 text-sm text-[#b6d0cf]">
+        Choose how your tasks are displayed when you open the page.
+      </p>
+
+      <div
+        role="presentation"
+        (click)="openOptions($event, defaultView)"
+        class="
+          mt-4 flex cursor-pointer flex-col gap-2 rounded-md border-b
+          border-app-surface-border p-4
+          hover:bg-app-button-hover-gray
+          has-focus-visible:bg-app-button-hover-gray
+          sm:flex-row sm:items-center sm:justify-between sm:gap-6
+        "
+      >
+        <label for="default-view" class="
+          cursor-pointer font-sora text-[15px] font-medium
+        "
+          >Default task view</label
+        >
+        <select
+          #defaultView
+          id="default-view"
+          formControlName="defaultView"
+          class="
+            settings-select select w-full cursor-pointer border-0 bg-transparent
+            text-[15px] text-app-background-white scheme-dark shadow-none
+            select-sm outline-none [--depth:0]
+            focus-visible:outline-2 focus-visible:outline-app-button-purple
+            sm:max-w-64
+          "
+        >
+          @for (view of taskViews; track view.value) {
+            <option [value]="view.value">{{ view.label }}</option>
+          }
+        </select>
+      </div>
+      <div
+        role="presentation"
+        (click)="openOptions($event, defaultSort)"
+        class="
+          flex cursor-pointer flex-col gap-2 rounded-md p-4
+          hover:bg-app-button-hover-gray
+          has-focus-visible:bg-app-button-hover-gray
+          sm:flex-row sm:items-center sm:justify-between sm:gap-6
+        "
+      >
+        <label for="default-sort" class="
+          cursor-pointer font-sora text-[15px] font-medium
+        "
+          >Default sort order</label
+        >
+        <select
+          #defaultSort
+          id="default-sort"
+          formControlName="defaultSort"
+          class="
+            settings-select select w-full cursor-pointer border-0 bg-transparent
+            text-[15px] text-app-background-white scheme-dark shadow-none
+            select-sm outline-none [--depth:0]
+            focus-visible:outline-2 focus-visible:outline-app-button-purple
+            sm:max-w-64
+          "
+        >
+          @for (sort of sortOptions; track sort.value) {
+            <option [value]="sort.value">{{ sort.label }}</option>
+          }
+        </select>
+      </div>
+    </section>
+
+    <section
+      class="
+        mt-5 rounded-xl border border-app-surface-border bg-app-surface p-4
+        shadow-sm
+        sm:p-6
+        lg:p-8
+      "
+    >
+      <div class="flex items-center gap-2">
+        <svg lucidePalette class="size-5 text-[#ffd580]" aria-hidden="true"></svg>
+        <h2 class="text-lg font-semibold">Appearance and time</h2>
+      </div>
+      <p class="mt-1 text-sm text-[#b6d0cf]">Choose your colors and how times are displayed.</p>
+
+      <div [formGroup]="displayForm">
+        <div
+          role="presentation"
+          (click)="openOptions($event, appearance)"
+          class="
+            mt-4 flex cursor-pointer flex-col gap-2 rounded-md border-b
+            border-app-surface-border p-4
+            hover:bg-app-button-hover-gray
+            has-focus-visible:bg-app-button-hover-gray
+            sm:flex-row sm:items-center sm:justify-between sm:gap-6
+          "
+        >
+          <label for="appearance" class="
+            cursor-pointer font-sora text-[15px] font-medium
+          "
+            >Appearance</label
+          >
+          <select
+            #appearance
+            id="appearance"
+            formControlName="appearance"
+            class="
+              settings-select select w-full cursor-pointer border-0
+              bg-transparent text-[15px] text-app-background-white scheme-dark
+              shadow-none select-sm outline-none [--depth:0]
+              focus-visible:outline-2 focus-visible:outline-app-button-purple
+              sm:max-w-64
+            "
+          >
+            <option value="classic-teal">Classic teal</option>
+            <option value="soft-teal">Soft teal</option>
+            <option value="dark-teal">Dark teal</option>
+          </select>
+        </div>
+        <div
+          role="presentation"
+          (click)="openOptions($event, timeFormat)"
+          class="
+            flex cursor-pointer flex-col gap-2 rounded-md p-4
+            hover:bg-app-button-hover-gray
+            has-focus-visible:bg-app-button-hover-gray
+            sm:flex-row sm:items-center sm:justify-between sm:gap-6
+          "
+        >
+          <label for="time-format" class="
+            cursor-pointer font-sora text-[15px] font-medium
+          "
+            >Time format</label
+          >
+          <select
+            #timeFormat
+            id="time-format"
+            formControlName="timeFormat"
+            class="
+              settings-select select w-full cursor-pointer border-0
+              bg-transparent text-[15px] text-app-background-white scheme-dark
+              shadow-none select-sm outline-none [--depth:0]
+              focus-visible:outline-2 focus-visible:outline-app-button-purple
+              sm:max-w-64
+            "
+          >
+            <option value="device">Use browser format</option>
+            <option value="12-hour">12-hour (2:30 PM)</option>
+            <option value="24-hour">24-hour (14:30)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    @if (hasChanges()) {
+      <div class="
+        fixed right-4 bottom-6 z-20 flex items-center gap-2
+        sm:right-9 sm:bottom-12
+      ">
+        <button
+          type="button"
+          (click)="cancel()"
+          aria-label="Cancel changes"
+          animate.enter="fade-in-bottom"
+          class="
+            btn border-0 bg-app-surface-deep text-app-background-white
+            hover:bg-[#276568]
+          "
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          aria-label="Save changes"
+          animate.enter="fade-in-bottom"
+          class="
+            btn border-0 bg-app-button-purple text-app-text-green
+            hover:bg-app-button-hover-gray
+          "
+        >
+          Save changes
+        </button>
+      </div>
+    }
+  </form>
+</div>

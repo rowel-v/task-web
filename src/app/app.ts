@@ -5,6 +5,7 @@ import { LoadingOverlay } from './shared/components/loading-overlay/loading-over
 import { ServerError } from './shared/components/server-error/server-error';
 import { NotificationToast } from './shared/components/notification-toast/notification-toast';
 import { SessionService } from './core/services/session-service/session-service';
+import { DisplayPreferencesService } from './core/services/display-preferences-service/display-preferences-service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,10 @@ export class App {
   protected readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    inject(DisplayPreferencesService);
+  }
 
   protected onRetry() {
     this.session
