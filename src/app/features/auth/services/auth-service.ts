@@ -53,6 +53,16 @@ export class AuthService {
     );
   }
 
+  logout(): Observable<void> {
+    return this.getCsrfToken().pipe(
+      switchMap(() => this.api.logout()),
+      tap(() => this.session.expire()),
+      tap((result) => this.appNotification.success(result.message)),
+      map(() => undefined),
+      catchError((err: HttpErrorResponse) => this.handleError(err)),
+    );
+  }
+
   private readonly handleError = (err: HttpErrorResponse) => {
     const errorResponse = err.error as ApiResponseVoid | null;
     const errorMessage = errorResponse?.message ?? 'Something went wrong. Please try again.';

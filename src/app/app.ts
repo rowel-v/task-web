@@ -10,7 +10,6 @@ import { DisplayPreferencesService } from './core/services/display-preferences-s
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
-  styleUrl: './app.css',
   imports: [RouterOutlet, LoadingOverlay, ServerError, NotificationToast],
 })
 export class App {

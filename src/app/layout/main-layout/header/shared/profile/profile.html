@@ -85,6 +85,7 @@
         <li>
           <button
             type="button"
+            (click)="onOpenLogout()"
             class="
               flex w-full cursor-pointer items-center gap-2 rounded-sm p-2
               text-left
@@ -100,3 +101,7 @@
     </div>
   }
 </div>
+
+@if (logoutOpen()) {
+  <app-logout-dialog (cancelled)="logoutOpen.set(false)" />
+}

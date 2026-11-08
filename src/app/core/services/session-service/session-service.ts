@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, map, Observable, of, switchMap } from 'rxjs';
 import { TaskService } from '../../../domains/tasks/services/task-service';
+import { SearchService } from '../search-service/search-service';
 
 type SessionStatus = 'unknown' | 'checking' | 'authenticated' | 'unauthenticated' | 'error';
 
@@ -9,6 +10,7 @@ type SessionStatus = 'unknown' | 'checking' | 'authenticated' | 'unauthenticated
 export class SessionService {
   private readonly tasks = inject(TaskService);
   private readonly http = inject(HttpClient);
+  private readonly search = inject(SearchService);
   private readonly sessionStatus = signal<SessionStatus>('unknown');
   readonly status = this.sessionStatus.asReadonly();
   private attemptedUrl = '/overview';
@@ -53,6 +55,7 @@ export class SessionService {
 
   expire(): void {
     this.tasks.clear();
+    this.search.searchTerm.set('');
     this.sessionStatus.set('unauthenticated');
   }
 }

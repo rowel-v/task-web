@@ -1,0 +1,31 @@
+<dialog
+  #dialogRef
+  aria-labelledby="logout-title"
+  class="
+    scale-in-center fixed inset-0 m-auto flex w-full max-w-md flex-col
+    overflow-hidden rounded-md bg-app-background-white p-6 text-app-text-green
+  "
+  (cancel)="$event.preventDefault(); !loggingOut() && cancelled.emit()"
+>
+  <div class="flex items-start justify-between">
+    <div class="flex items-center gap-3">
+      <svg lucideLogOut class="size-6" aria-hidden="true"></svg>
+      <h2 id="logout-title" class="text-xl font-bold">Log out</h2>
+    </div>
+    <app-button variant="close" [unclickable]="loggingOut()" (pressed)="cancelled.emit()" class="
+      -me-2 -mt-2
+    " />
+  </div>
+
+  <p class="mt-4">Are you sure you want to log out?</p>
+
+  <div class="mt-6 flex justify-end gap-3">
+    <app-button variant="cancel" [unclickable]="loggingOut()" (pressed)="cancelled.emit()" />
+    <button appButtonVariant variant="green" type="button" [disabled]="loggingOut()" (click)="onLogout()">
+      @if (loggingOut()) {
+        <span class="loading loading-sm loading-spinner" aria-hidden="true"></span>
+      }
+      {{ loggingOut() ? 'Logging out...' : 'Log out' }}
+    </button>
+  </div>
+</dialog>

@@ -16,10 +16,11 @@ import { LucideLogOut, LucideSettings, LucideUser } from '@lucide/angular';
 import { RouterLink } from '@angular/router';
 import { ProfilePhotoService } from '../../../../../core/services/profile-photo-service/profile-photo-service';
 import { UserService } from '../../../../../domains/user/services/user-service';
+import { LogoutDialog } from '../../../../../features/auth/components/logout-dialog/logout-dialog';
 
 @Component({
   selector: 'app-profile',
-  imports: [LucideUser, LucideSettings, LucideLogOut, RouterLink],
+  imports: [LucideUser, LucideSettings, LucideLogOut, RouterLink, LogoutDialog],
   templateUrl: './profile.html',
   styles: ``,
   host: {
@@ -62,6 +63,12 @@ export class Profile implements OnInit {
 
   protected openedProfile = signal(false);
   protected closingProfile = signal(false);
+  protected readonly logoutOpen = signal(false);
+
+  protected onOpenLogout(): void {
+    this.onCloseProfile();
+    this.logoutOpen.set(true);
+  }
 
   protected onOpenProfile() {
     this.closingProfile.set(false);
