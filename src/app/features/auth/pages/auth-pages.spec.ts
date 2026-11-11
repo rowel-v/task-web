@@ -5,14 +5,31 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Login } from './login/login';
 import { Register } from './register/register';
 import { AuthService } from '../services/auth-service';
+import { SessionService } from '../../../core/services/session-service/session-service';
 
 describe('Authentication pages', () => {
   const auth = { login: vi.fn(), register: vi.fn() };
+  const session = { getAttemptedUrl: vi.fn() };
   beforeEach(() => {
     vi.resetAllMocks();
+    session.getAttemptedUrl.mockReturnValue('/overview');
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: AuthService, useValue: auth }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: auth },
+        { provide: SessionService, useValue: session },
+      ],
     });
+  });
+
+  it('returns to the requested page after signing in', () => {
+    session.getAttemptedUrl.mockReturnValue('/tasks/archive');
+    auth.login.mockReturnValue(of(undefined));
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const page = TestBed.createComponent(Login).componentInstance;
+    page.form.setValue({ username: 'rowel', password: 'secret' });
+    page.onLogin();
+    expect(navigate).toHaveBeenCalledWith('/tasks/archive');
   });
 
   it('does not submit invalid login credentials', () => {

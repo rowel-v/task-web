@@ -1,4 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { computed, DestroyRef, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Task } from '../models/task';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
@@ -18,6 +19,17 @@ import { TimeZoneService } from '../../../core/services/time-zone-service/time-z
   providedIn: 'root',
 })
 export class TaskService {
+  // Refresh time-based lists while the app stays open.
+  private readonly currentTime = signal(new Date());
+  readonly now = this.currentTime.asReadonly();
+
+  constructor() {
+    if (isPlatformBrowser(inject(PLATFORM_ID))) {
+      const timer = setInterval(() => this.currentTime.set(new Date()), 60_000);
+      inject(DestroyRef).onDestroy(() => clearInterval(timer));
+    }
+  }
+
   private readonly api = inject(TaskControllerService);
   private readonly baseUrl = '/api/tasks';
 
@@ -48,13 +60,13 @@ export class TaskService {
   });
 
   readonly todaysTasks = computed(() => {
-    const today = new Date();
+    const today = this.now();
 
     return this.tasksState().filter((task) => this.timeZones.isSameDay(task.dueDate, today));
   });
 
   readonly upcomingTasks = computed(() => {
-    const now = new Date();
+    const now = this.now();
     return this.tasksState()
       .filter((task) => task.dueDate && new Date(task.dueDate) > now)
       .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());

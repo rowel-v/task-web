@@ -179,9 +179,7 @@ export class DateTimePicker {
   private bindSave(self: Calendar): void {
     const popup = self.context.mainElement as HTMLElement;
 
-    popup.onpointerup = (e: PointerEvent) => {
-      if (!(e.target as HTMLElement).closest('[data-vc-save]')) return;
-
+    const save = () => {
       const date = self.context.selectedDates[0];
       const time = this.to24Hour(self.context.selectedTime);
       if (date) {
@@ -194,6 +192,14 @@ export class DateTimePicker {
         this.dateSelected.emit(value);
       }
       this.calendar.hide();
+    };
+
+    popup.onpointerup = (e: PointerEvent) => {
+      if ((e.target as HTMLElement).closest('[data-vc-save]')) save();
+    };
+    popup.onclick = (e: MouseEvent) => {
+      // A keyboard or assistive-technology click has no preceding pointer event.
+      if (e.detail === 0 && (e.target as HTMLElement).closest('[data-vc-save]')) save();
     };
   }
 

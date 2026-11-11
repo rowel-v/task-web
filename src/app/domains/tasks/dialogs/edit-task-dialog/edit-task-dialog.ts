@@ -34,6 +34,7 @@ export class EditTaskDialog implements OnInit {
       name: task.name,
       description: task.description ?? '',
       priority: task.priority,
+      status: task.status,
       dueDate: task.dueDate,
     });
   }

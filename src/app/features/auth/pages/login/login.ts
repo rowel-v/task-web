@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { AppButtonVariant } from '../../../../shared/directives/app-button-variant';
 import { AuthIllustration } from '../../components/auth-illustration/auth-illustration';
 import { AuthService } from '../../services/auth-service';
+import { SessionService } from '../../../../core/services/session-service/session-service';
 import { nonBlank, passwordByteLimit } from '../../validators/auth-validators';
 
 @Component({
@@ -16,6 +17,7 @@ import { nonBlank, passwordByteLimit } from '../../validators/auth-validators';
 })
 export class Login {
   private readonly auth = inject(AuthService);
+  private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly builder = inject(FormBuilder);
   readonly submitting = signal(false);
@@ -40,7 +42,7 @@ export class Login {
       .login({ username: username.trim(), password })
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: () => void this.router.navigateByUrl('/overview'),
+        next: () => void this.router.navigateByUrl(this.session.getAttemptedUrl()),
         error: () => undefined,
       });
   }

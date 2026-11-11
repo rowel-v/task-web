@@ -29,4 +29,28 @@ describe('task dates in the selected time zone', () => {
     zones.setTimeZone('America/New_York');
     expect(tasks.todaysTasks()).toHaveLength(1);
   });
+
+  it('refreshes today and upcoming tasks as time passes', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-03T23:59:30Z'));
+    TestBed.configureTestingModule({ providers: [
+      provideHttpClient(),
+      { provide: TaskControllerService, useValue: { getTasks: () => of({ data: {
+        username: 'test', displayName: 'Test', timeZone: 'UTC', tasks: [{
+          id: 1, name: 'Task', priority: 'LOW', status: 'PENDING',
+          dueDate: '2026-11-04T00:00:20Z', createdAt: '2026-11-01T00:00:00Z',
+          updatedAt: '2026-11-01T00:00:00Z',
+        }],
+      } }) } },
+    ] });
+    const tasks = TestBed.inject(TaskService);
+    tasks.getAllTask().subscribe();
+    expect(tasks.todaysTasks()).toHaveLength(0);
+    expect(tasks.upcomingTasks()).toHaveLength(1);
+
+    vi.advanceTimersByTime(60_000);
+
+    expect(tasks.todaysTasks()).toHaveLength(1);
+    expect(tasks.upcomingTasks()).toHaveLength(0);
+  });
 });

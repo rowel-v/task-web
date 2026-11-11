@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node -e \"require('node:fs').copyFileSync('dist/my-task/browser/index.csr.html', 'dist/my-task/browser/index.html')\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:my-task": "node dist/my-task/server/server.mjs",

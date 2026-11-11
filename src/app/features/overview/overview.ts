@@ -18,7 +18,7 @@ import { InprogressTasksDetailsModal } from './dialog/inprogress-tasks-details-m
 import { CompletedTasksDetailsModal } from './dialog/completed-tasks-details-modal/completed-tasks-details-modal';
 import {
   TaskDetailsDialog,
-  TaskStatusAction,
+  TaskStatusChangeRequest,
 } from '../../domains/tasks/dialogs/task-details-dialog/task-details-dialog';
 import { CreateTaskRequest } from '../../api';
 import { NotificationService } from '../../core/services/notification-service/notification-service';
@@ -221,11 +221,19 @@ export class Overview {
   // disables the Task Details Dialog's primary button while the request runs
   protected readonly isUpdatingTaskStatus = signal<boolean>(false);
   // saves the edited task status
-  protected onTaskUpdatedStatus(targetTask: Task, taskStatusAction: TaskStatusAction): void {
+  protected onTaskUpdatedStatus(req: TaskStatusChangeRequest): void {
     this.isUpdatingTaskStatus.set(true);
 
+    if (req.archive) {
+      this.taskService
+        .archiveTask([req.targetTask])
+        .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
+        .subscribe({ next: () => this.closeModal() });
+      return;
+    }
+
     this.taskService
-      .updateTaskStatus(targetTask.id, taskStatusAction)
+      .updateTaskStatus(req.targetTask.id, req.action)
       .pipe(finalize(() => this.isUpdatingTaskStatus.set(false)))
       .subscribe({
         next: () => this.closeModal(),

@@ -267,7 +267,7 @@ export class Tasks {
         filtered = this.tasks().filter((t) => this.isOverdue(t));
         break;
       case 'today': {
-        const now = new Date();
+        const now = this.taskService.now();
 
         filtered = this.tasks().filter(
           (t) =>
@@ -393,7 +393,7 @@ export class Tasks {
 
   // helper function
   protected readonly isOverdue = (task: Task) => {
-    return task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date();
+    return task.status !== 'COMPLETED' && new Date(task.dueDate) < this.taskService.now();
   };
 
   // Watches the screen size (CDK). Handset = phones only.

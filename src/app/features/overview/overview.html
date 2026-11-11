@@ -311,7 +311,7 @@
         [isClosing]="isClosing()"
         [isLoading]="isUpdatingTaskStatus()"
         (closed)="closeModal()"
-        (statusChangeRequested)="onTaskUpdatedStatus($event.targetTask, $event.action)"
+        (statusChangeRequested)="onTaskUpdatedStatus($event)"
       />
     }
   }

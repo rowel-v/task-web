@@ -7,6 +7,7 @@ import { DateTimePicker } from './date-time-picker';
 vi.mock('vanilla-calendar-pro', () => ({
   Calendar: vi.fn(class {
     init = vi.fn();
+    hide = vi.fn();
   }),
 }));
 
@@ -36,6 +37,29 @@ describe('DateTimePicker time format', () => {
     const options = vi.mocked(Calendar).mock.calls[0][1];
     expect(options?.selectionTimeMode).toBe(mode);
     expect(options?.selectedTime).toBe(time);
+    fixture.destroy();
+  });
+
+  it('confirms the date when the button is activated with a keyboard click', async () => {
+    TestBed.configureTestingModule({ imports: [DateTimePicker] });
+    TestBed.inject(TimeZoneService).setTimeZone('UTC');
+    const fixture = TestBed.createComponent(DateTimePicker);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const selected = vi.fn();
+    fixture.componentInstance.dateSelected.subscribe(selected);
+    const popup = document.createElement('div');
+    popup.innerHTML = '<button type="button" data-vc-save>Confirm</button>';
+    const calendar = {
+      context: { mainElement: popup, selectedDates: ['2026-01-02'], selectedTime: '14:30' },
+    } as unknown as Calendar;
+    const options = vi.mocked(Calendar).mock.calls[0][1];
+    options?.onShow?.(calendar);
+
+    popup.querySelector('button')!.click();
+
+    expect(selected).toHaveBeenCalledWith('2026-01-02T14:30:00.000Z');
     fixture.destroy();
   });
 });
